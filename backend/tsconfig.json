@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    // Source is executed directly by `node` with type stripping — nothing is emitted, and
+    // relative imports carry explicit ".ts" extensions so Node can resolve them.
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "verbatimModuleSyntax": true,
+    // Type stripping cannot erase enums, namespaces or parameter properties; this makes the
+    // compiler reject them rather than letting them fail at runtime.
+    "erasableSyntaxOnly": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "test"]
+}

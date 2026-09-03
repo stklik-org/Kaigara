@@ -1,0 +1,187 @@
+@startuml Kaigara-Metamodel
+title Kaigara Scenario Metamodel\nScenario -> LoadTimeline -> Track -> Load -> LoadShape / RequestComposition
+skinparam classAttributeIconSize 0
+skinparam wrapWidth 200
+hide empty members
+
+package "Scenario" {
+  class Scenario {
+    id: string
+    name: string
+    connectionId: string [0..1]
+    +toJSON(): ScenarioData
+    +{static} fromJSON(data): Scenario
+  }
+
+  interface ScenarioPhases {
+    preparation: PhaseStep[]
+    preconditions: PhaseStep[]
+    method: LoadTimeline
+    postconditions: PhaseStep[]
+    cleanup: PhaseStep[]
+  }
+
+  interface PhaseStep {
+    id: string
+    label: string
+    kind: string
+    config: map<string, any>
+  }
+  note bottom of PhaseStep
+    Preparation / Preconditions / Postconditions / Cleanup
+    stay plain ordered lists of opaque steps for now --
+    not (yet) part of the polymorphic metamodel below.
+    No Compose screen surfaces them yet either.
+  end note
+}
+
+package "Method timeline" {
+  class LoadTimeline {
+    totalDurationSeconds: number
+    tracks: Track[]
+    +toJSON(): LoadTimelineData
+    +{static} fromJSON(data): LoadTimeline
+    +{static} empty(): LoadTimeline
+    +with(patch): LoadTimeline
+  }
+
+  class Track {
+    id: string
+    label: string
+    color: string [0..1]
+    loads: Load[]
+    +toJSON(): TrackData
+    +{static} fromJSON(data): Track
+    +with(patch): Track
+  }
+  note bottom of Track
+    Organizational only -- a Track is not tied to one
+    LoadShapeKind. Each Load carries its own shape.
+  end note
+
+  class Load {
+    id: string
+    startSeconds: number
+    durationSeconds: number
+    +toJSON(): LoadData
+    +{static} fromJSON(data): Load
+    +with(patch): Load
+  }
+}
+
+package "Load shape (polymorphic rate curve)" {
+  abstract class LoadShape {
+    {abstract} kind: LoadShapeKind
+    {abstract} label: string
+    {abstract} instantaneous: boolean
+    +{abstract} rateAt(elapsedSeconds, durationSeconds): number
+    +{abstract} toJSON(): LoadShapeData
+    +{static} fromJSON(data): LoadShape
+  }
+
+  class RampShape {
+    kind = "ramp"
+    instantaneous = false
+    direction: "up" | "down"
+    fromRatePerSec: number
+    toRatePerSec: number
+    +{static} createDefault(direction): RampShape
+  }
+  class ConstantShape {
+    kind = "constant"
+    instantaneous = false
+    ratePerSec: number
+    +{static} createDefault(): ConstantShape
+  }
+  class SpikeShape {
+    kind = "spike"
+    instantaneous = true
+    magnitudeRatePerSec: number
+    +{static} createDefault(): SpikeShape
+  }
+  class SineShape {
+    kind = "sine"
+    instantaneous = false
+    peakRatePerSec: number
+    +{static} createDefault(): SineShape
+  }
+  class BellShape {
+    kind = "bell"
+    instantaneous = false
+    peakRatePerSec: number
+    +{static} createDefault(): BellShape
+  }
+  class IndividualShape {
+    kind = "individual"
+    instantaneous = true
+    requestCount: number
+    +{static} createDefault(): IndividualShape
+  }
+
+  LoadShape <|-- RampShape
+  LoadShape <|-- ConstantShape
+  LoadShape <|-- SpikeShape
+  LoadShape <|-- SineShape
+  LoadShape <|-- BellShape
+  LoadShape <|-- IndividualShape
+}
+
+package "Request composition" {
+  class RequestComposition {
+    requests: RequestSpec[]
+    +totalWeight(): number
+    +toJSON(): RequestCompositionData
+    +{static} fromJSON(data): RequestComposition
+    +{static} empty(): RequestComposition
+  }
+
+  class RequestSpec {
+    id: string
+    operation: RequestOperation
+    target: RequestTargetEntity
+    weight: number
+    +toJSON(): RequestSpecData
+    +{static} fromJSON(data): RequestSpec
+    +{static} createDefault(): RequestSpec
+  }
+
+  enum RequestOperation {
+    create
+    update
+    delete
+    query
+  }
+
+  enum RequestTargetEntity {
+    shell
+    submodel
+  }
+}
+
+class ServerConnection <<(C,#cccccc) external>> {
+  id: string
+  baseUrl: string
+  conformanceProfile: string
+  ...
+}
+note bottom of ServerConnection
+  Not part of this metamodel -- shown only for
+  context. See packages/shared-types/src/connection.ts.
+end note
+
+Scenario "1" *-- "1" ScenarioPhases : phases
+ScenarioPhases "1" o-- "*" PhaseStep : preparation / preconditions /\npostconditions / cleanup
+ScenarioPhases "1" *-- "1" LoadTimeline : method
+
+LoadTimeline "1" *-- "*" Track : tracks
+Track "1" *-- "*" Load : loads
+Load "1" *-- "1" LoadShape : shape
+Load "1" *-- "1" RequestComposition : requests
+
+RequestComposition "1" *-- "*" RequestSpec : requests
+RequestSpec --> RequestOperation : operation
+RequestSpec --> RequestTargetEntity : target
+
+Scenario ..> ServerConnection : connectionId (reference)
+
+@enduml

@@ -1,0 +1,568 @@
+{
+  "id": "public-website",
+  "name": "Public website",
+  "description": "StressForge's read-dominant profile — a hundred reads per write, submodels five times the traffic of shells.",
+  "phases": {
+    "preparation": [
+      {
+        "id": "seed-shells",
+        "label": "shells: 2000",
+        "kind": "seed-shells",
+        "config": {
+          "count": 2000
+        }
+      },
+      {
+        "id": "seed-submodels",
+        "label": "submodels: 10000",
+        "kind": "seed-submodels",
+        "config": {
+          "count": 10000,
+          "size": "normal"
+        }
+      },
+      {
+        "id": "seed-generator-nameplate",
+        "label": "nameplate ×1",
+        "kind": "seed-generator",
+        "config": {
+          "generator": "nameplate",
+          "weight": 1,
+          "size": "normal"
+        }
+      },
+      {
+        "id": "seed-generator-technical-data",
+        "label": "technical-data ×1",
+        "kind": "seed-generator",
+        "config": {
+          "generator": "technical-data",
+          "weight": 1,
+          "size": "normal"
+        }
+      },
+      {
+        "id": "seed-generator-handover-documentation",
+        "label": "handover-documentation ×1",
+        "kind": "seed-generator",
+        "config": {
+          "generator": "handover-documentation",
+          "weight": 1,
+          "size": "normal"
+        }
+      }
+    ],
+    "preconditions": [
+      {
+        "id": "c1",
+        "label": "conformance: SSP-002",
+        "kind": "conformance-check",
+        "config": {
+          "profile": "SSP-002"
+        }
+      }
+    ],
+    "method": {
+      "totalDurationSeconds": 600,
+      "tracks": [
+        {
+          "id": "shells",
+          "label": "Shells",
+          "color": "#2977d6",
+          "loads": [
+            {
+              "id": "shells-ramp-up",
+              "startSeconds": 0,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "up",
+                "fromRatePerSec": 0,
+                "toRatePerSec": 120
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-shell",
+                    "operation": "query",
+                    "target": "shell",
+                    "weight": 100,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-shell",
+                    "operation": "create",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "shells-hold",
+              "startSeconds": 120,
+              "durationSeconds": 360,
+              "shape": {
+                "kind": "constant",
+                "ratePerSec": 120
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-shell",
+                    "operation": "query",
+                    "target": "shell",
+                    "weight": 100,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-shell",
+                    "operation": "create",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "shells-ramp-down",
+              "startSeconds": 480,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "down",
+                "fromRatePerSec": 120,
+                "toRatePerSec": 0
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-shell",
+                    "operation": "query",
+                    "target": "shell",
+                    "weight": 100,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-shell",
+                    "operation": "create",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "submodels",
+          "label": "Submodels",
+          "color": "#eb6733",
+          "loads": [
+            {
+              "id": "submodels-ramp-up",
+              "startSeconds": 0,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "up",
+                "fromRatePerSec": 0,
+                "toRatePerSec": 640
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 100,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "mutate",
+                      "baseValue": "{}",
+                      "mutationRatePercent": 25
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "submodels-hold",
+              "startSeconds": 120,
+              "durationSeconds": 360,
+              "shape": {
+                "kind": "constant",
+                "ratePerSec": 640
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 100,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "mutate",
+                      "baseValue": "{}",
+                      "mutationRatePercent": 25
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "submodels-ramp-down",
+              "startSeconds": 480,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "down",
+                "fromRatePerSec": 640,
+                "toRatePerSec": 0
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 100,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "mutate",
+                      "baseValue": "{}",
+                      "mutationRatePercent": 25
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "submodel-elements",
+          "label": "Submodel elements",
+          "color": "#1ba775",
+          "loads": [
+            {
+              "id": "submodel-elements-ramp-up",
+              "startSeconds": 0,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "up",
+                "fromRatePerSec": 0,
+                "toRatePerSec": 120
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "mutate",
+                      "baseValue": "{}",
+                      "mutationRatePercent": 25
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "submodel-elements-hold",
+              "startSeconds": 120,
+              "durationSeconds": 360,
+              "shape": {
+                "kind": "constant",
+                "ratePerSec": 120
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "mutate",
+                      "baseValue": "{}",
+                      "mutationRatePercent": 25
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "submodel-elements-ramp-down",
+              "startSeconds": 480,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "down",
+                "fromRatePerSec": 120,
+                "toRatePerSec": 0
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 4096
+                    }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 0.5,
+                    "generator": {
+                      "kind": "mutate",
+                      "baseValue": "{}",
+                      "mutationRatePercent": 25
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "query-language",
+          "label": "Query language",
+          "color": "#c68701",
+          "loads": [
+            {
+              "id": "query-language-ramp-up",
+              "startSeconds": 0,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "up",
+                "fromRatePerSec": 0,
+                "toRatePerSec": 120
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "query-language-hold",
+              "startSeconds": 120,
+              "durationSeconds": 360,
+              "shape": {
+                "kind": "constant",
+                "ratePerSec": 120
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "query-language-ramp-down",
+              "startSeconds": 480,
+              "durationSeconds": 120,
+              "shape": {
+                "kind": "ramp",
+                "direction": "down",
+                "fromRatePerSec": 120,
+                "toRatePerSec": 0
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-submodel",
+                    "operation": "query",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "postconditions": [
+      {
+        "id": "q1",
+        "label": "schema: written-data",
+        "kind": "schema-check",
+        "config": {
+          "against": "written-data"
+        }
+      }
+    ],
+    "cleanup": [
+      {
+        "id": "u1",
+        "label": "delete-seeded",
+        "kind": "cleanup-mode",
+        "config": {
+          "mode": "delete-seeded",
+          "modificationLevel": "small"
+        }
+      }
+    ]
+  }
+}

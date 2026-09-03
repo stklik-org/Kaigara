@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    // Internal imports carry explicit ".ts" extensions so the backend can consume this package
+    // with plain `node` (which strips types but will not guess extensions) and no build step.
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "declaration": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}

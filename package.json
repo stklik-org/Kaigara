@@ -1,0 +1,16 @@
+{
+  "name": "kaigara",
+  "private": true,
+  "description": "Generic, standards-based benchmarking tool for Asset Administration Shell (AAS) servers.",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:backend": "npm run dev -w backend",
+    "build:frontend": "npm run build -w frontend",
+    "lint:frontend": "npm run lint -w frontend"
+  }
+}

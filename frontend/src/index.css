@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Carried over from the "Load Composer" timeline prototype
+ * (docs/Benchmark UI prototype/AAS Benchmarking Tool - Wireframes.dc.html, sections t5/t5-light)
+ * — these are the exact light/dark hex values extracted from that mockup, not sketch styling.
+ * Every token below is a CSS custom property Tailwind 4 turns into utilities (--color-ink ->
+ * text-ink, etc); dark mode works by overriding the SAME variable names in the blocks below, so
+ * no component ever needs a `dark:` variant.
+ */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-bg: #dbeafe;
+
+  --color-status-pass: #16a34a;
+  --color-status-pass-bg: #dcfce7;
+  --color-status-fail: #dc2626;
+  --color-status-fail-bg: #fee2e2;
+  --color-status-warn: #b45309;
+  --color-status-warn-bg: #fef3c7;
+
+  /* Periodic-burst track color — the one LoadKind with no pass/fail/warn semantic equivalent. */
+  --color-track-magenta: #db2777;
+  --color-track-magenta-bg: #fce7f3;
+
+  /* The Track (swimlane) palette used to live here as per-theme CSS variables. It now lives in
+     @kaigara/shared-types' trackPalette.ts, because a track's colour is part of the *document*
+     rather than of the theme — so it has to be a literal hex a saved scenario can carry, and one
+     value has to clear ≥3:1 against --color-surface in BOTH themes. The hues and their CVD-safe
+     order are unchanged; see that file before touching them. */
+
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f7f7f6;
+  --color-field: #f4f4f5;
+  --color-field-border: #d1d5db;
+  --color-border: #e2e2e0;
+  --color-border-strong: #cfcfcc;
+  --color-ink: #17181c;
+  --color-ink-muted: #6b6d76;
+}
+
+@layer base {
+  html {
+    /* Bumps the rem baseline (16px -> 20px) so every Tailwind text/spacing utility across the
+       app scales up together — most of the UI is built from Tailwind's rem-based scale, so this
+       one rule does the bulk of the work; see the arbitrary text-[Npx] values bumped by hand
+       elsewhere for the few spots that don't use the scale. */
+    font-size: 125%;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-surface-sunken);
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+
+  /* Explicit dark-mode override, set by ThemeProvider on <html data-theme="dark">. */
+  [data-theme="dark"] {
+    --color-accent-bg: #1e2a4a;
+    --color-status-pass: #4ade80;
+    --color-status-pass-bg: #132a1c;
+    --color-status-fail: #f87171;
+    --color-status-fail-bg: #3f1d1d;
+    --color-status-warn: #fbbf24;
+    --color-status-warn-bg: #2a2410;
+    --color-track-magenta: #f472b6;
+    --color-track-magenta-bg: #500724;
+
+    --color-surface: #1c1f24;
+    --color-surface-sunken: #14171b;
+    --color-field: #20242b;
+    --color-field-border: #3a4048;
+    --color-border: #2c313a;
+    --color-border-strong: #3a4048;
+    --color-ink: #e5e7eb;
+    --color-ink-muted: #8b96a3;
+  }
+}

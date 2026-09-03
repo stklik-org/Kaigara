@@ -1,0 +1,147 @@
+/**
+ * The `EngineAdapter` seam required by ADR 0001.
+ *
+ * The proposal's Option C (section 5.3) is the target end-state: k6, autocannon, Gatling or a
+ * future in-house engine each registered as an adapter, with the recipe format, the HTTP API and
+ * the results schema unchanged. The ADR is explicit that this interface must exist *before or
+ * alongside* the first adapter rather than be retrofitted — so it is defined here, and the k6
+ * adapter under `k6/` is written against it like any later one would be.
+ *
+ * What this interface deliberately does **not** expose: scripts, stages, VUs, subprocess
+ * plumbing, or any other engine vocabulary. An adapter receives an `ExecutionPlan` and emits
+ * `RequestSample`s; everything in between is its own business. That is what lets a second adapter
+ * be "a new implementation plus a config choice, not a redesign".
+ */
+
+import type { EngineId } from "@kaigara/shared-types";
+import type { ExecutionPlan } from "../timeline/executionPlan.ts";
+
+/** Whether the engine can actually run on this machine, answered before a run is accepted so the
+ *  user gets "k6 is not installed" rather than a failed run. */
+export interface EngineAvailability {
+  available: boolean;
+  /** Engine version string as reported by the engine itself, when available. */
+  version?: string;
+  /** Human-readable explanation, shown in the UI when `available` is false. */
+  detail: string;
+}
+
+/**
+ * One completed HTTP request, normalised across engines.
+ *
+ * Emitted in batches rather than individually: at a few hundred requests per second the per-call
+ * overhead of a finer-grained channel would itself compete with the load being generated, which
+ * the minimal-footprint goal (proposal section 2.3) rules out.
+ */
+export interface RequestSample {
+  /** Milliseconds since the run started, as observed by the engine. */
+  offsetMs: number;
+  /** `PlannedLoad.key` this request belongs to. */
+  loadKey: string;
+  operation: string;
+  target: string;
+  /** Server-side round trip in milliseconds. */
+  durationMs: number;
+  /** HTTP status, or 0 when the request never completed (timeout, connection refused). */
+  status: number;
+  failed: boolean;
+}
+
+export interface EngineLogLine {
+  stream: "stdout" | "stderr";
+  message: string;
+}
+
+/** Terminal outcome of an engine process. */
+export interface EngineExit {
+  /** Process exit code, or null if it was killed by a signal. */
+  code: number | null;
+  signal: string | null;
+  /** True when the engine finished the plan; false when it crashed, was stopped, or refused the
+   *  plan. Note a non-zero exit is normal for engines that fail a threshold, so adapters decide
+   *  this rather than the caller inferring it from `code`. */
+  completed: boolean;
+  /** Populated when the engine reports totals of its own; used to reconcile the streamed samples
+   *  against the engine's authoritative count. */
+  summary?: EngineSummary;
+}
+
+export interface EngineSummary {
+  requests: number;
+  failed: number;
+  durationMs?: { avg?: number; p95?: number; p99?: number; max?: number };
+  /** Iterations the engine wanted to start but could not, because its worker pool was saturated.
+   *  A non-zero value means the *tool* was the bottleneck, not the server under test — critical
+   *  to surface, since it silently invalidates the measurement. */
+  droppedIterations?: number;
+}
+
+export interface EngineHandlers {
+  onSamples(samples: RequestSample[]): void;
+  onLog(line: EngineLogLine): void;
+  onExit(exit: EngineExit): void;
+}
+
+export interface EngineRunContext {
+  runId: string;
+  plan: ExecutionPlan;
+  /** Directory the adapter owns for this run: generated inputs, raw engine output, artifacts.
+   *  Already created by the caller. */
+  workDir: string;
+}
+
+/** Files the adapter produced for a run, surfaced so the UI can show the user exactly what was
+ *  executed on their behalf — the translation from timeline to requests should be inspectable,
+ *  not a black box. */
+export interface CompiledArtifact {
+  /** Short name, e.g. "script.js". */
+  name: string;
+  absolutePath: string;
+  /** MIME-ish hint for rendering, e.g. "application/javascript". */
+  contentType: string;
+  description: string;
+}
+
+export interface EngineRunHandle {
+  /** Asks the engine to stop; resolves once it has exited. Idempotent. */
+  stop(): Promise<void>;
+}
+
+export interface EngineAdapter {
+  readonly id: EngineId;
+  readonly name: string;
+
+  /** Is the engine installed and runnable here? */
+  probe(): Promise<EngineAvailability>;
+
+  /**
+   * Renders `plan` into whatever inputs the engine needs, under `context.workDir`. Separated from
+   * `start` so a plan can be compiled and inspected (or validated) without being executed — the
+   * dry-run path behind `POST /api/runs { dryRun: true }`.
+   */
+  compile(context: EngineRunContext): Promise<CompiledArtifact[]>;
+
+  /** Launches the engine against previously compiled artifacts. */
+  start(context: EngineRunContext, artifacts: CompiledArtifact[], handlers: EngineHandlers): Promise<EngineRunHandle>;
+}
+
+/** Adapters available to this build. Only k6 is implemented; ADR 0001 says not to add others
+ *  speculatively, so this map stays a one-entry registry until a second engine is actually
+ *  needed. */
+export class EngineRegistry {
+  private readonly adapters = new Map<EngineId, EngineAdapter>();
+
+  register(adapter: EngineAdapter): void {
+    this.adapters.set(adapter.id, adapter);
+  }
+
+  get(id: EngineId): EngineAdapter {
+    const adapter = this.adapters.get(id);
+    if (!adapter) throw new Error(`No engine adapter registered for "${id}".`);
+    return adapter;
+  }
+
+  list(): EngineAdapter[] {
+    return [...this.adapters.values()];
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "id": "persistence-latency",
+  "name": "Persistence latency",
+  "description": "Inject one shell, then poll the shell collection every 1 ms until it shows up.",
+  "phases": {
+    "preparation": [],
+    "preconditions": [
+      {
+        "id": "c1",
+        "label": "probe shell absent",
+        "kind": "absence-check",
+        "config": {
+          "shellId": "https://kaigara.example/ids/aas/persistence-probe"
+        }
+      }
+    ],
+    "method": {
+      "totalDurationSeconds": 30,
+      "tracks": [
+        {
+          "id": "inject",
+          "label": "Inject one shell",
+          "color": "#2977d6",
+          "loads": [
+            {
+              "id": "inject-shell",
+              "startSeconds": 0,
+              "durationSeconds": 0,
+              "shape": {
+                "kind": "individual",
+                "requestCount": 1
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "create-shell",
+                    "operation": "create",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "exact",
+                      "value": "{\n  \"modelType\": \"AssetAdministrationShell\",\n  \"id\": \"https://kaigara.example/ids/aas/persistence-probe\",\n  \"idShort\": \"KaigaraPersistenceProbe\",\n  \"assetInformation\": {\n    \"assetKind\": \"Instance\",\n    \"globalAssetId\": \"https://kaigara.example/ids/asset/persistence-probe\"\n  }\n}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "poll",
+          "label": "Poll every 1 ms",
+          "color": "#eb6733",
+          "loads": [
+            {
+              "id": "poll-shells",
+              "startSeconds": 0,
+              "durationSeconds": 30,
+              "shape": {
+                "kind": "constant",
+                "ratePerSec": 1000
+              },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "query-shell",
+                    "operation": "query",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": {
+                      "kind": "randomized",
+                      "sizeBytes": 0
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "postconditions": [
+      {
+        "id": "q1",
+        "label": "probe shell present",
+        "kind": "presence-check",
+        "config": {
+          "shellId": "https://kaigara.example/ids/aas/persistence-probe"
+        }
+      }
+    ],
+    "cleanup": [
+      {
+        "id": "u1",
+        "label": "delete probe shell",
+        "kind": "delete-shell",
+        "config": {
+          "shellId": "https://kaigara.example/ids/aas/persistence-probe"
+        }
+      }
+    ]
+  }
+}

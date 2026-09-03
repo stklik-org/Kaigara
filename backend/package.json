@@ -1,0 +1,25 @@
+{
+  "name": "@kaigara/backend",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Kaigara orchestrator backend. Only the connection reachability probe is implemented so far \u2014 see backend/README.md and proposal section 5.1/5.3.",
+  "type": "module",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "node --watch src/server.ts",
+    "start": "node src/server.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "stub-aas": "node src/devtools/stubAasServer.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.0",
+    "@kaigara/shared-types": "*",
+    "fastify": "^5.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "tsx": "^4.19.0",
+    "typescript": "~6.0.2"
+  }
+}
