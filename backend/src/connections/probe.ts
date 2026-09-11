@@ -81,12 +81,14 @@ interface Attempt {
   transportError?: { kind: ConnectionErrorKind; message: string };
 }
 
-async function attempt(url: string, timeoutMs: number): Promise<Attempt> {
+async function attempt(url: string, timeoutMs: number, headers: Record<string, string> = {}): Promise<Attempt> {
   const startedAt = performance.now();
   try {
     const response = await fetch(url, {
       method: "GET",
-      headers: { accept: "application/json" },
+      // Caller-supplied headers (e.g. Authorization) go first so `accept` always wins if a caller
+      // somehow also set it — the probe always wants a JSON reply, never the credential's choice.
+      headers: { ...headers, accept: "application/json" },
       redirect: "follow",
       signal: AbortSignal.timeout(timeoutMs),
     });
@@ -131,7 +133,8 @@ export async function probeConnection(request: ConnectionTestRequest): Promise<C
   }
 
   const timeoutMs = clampTimeoutSeconds(request.timeoutSeconds) * 1000;
-  const description = await attempt(`${baseUrl}/description`, timeoutMs);
+  const headers = request.headers ?? {};
+  const description = await attempt(`${baseUrl}/description`, timeoutMs, headers);
   const base = { probedUrl: description.url, probedEndpoint: "description" as const, checkedAt };
 
   if (description.transportError) {
@@ -161,19 +164,23 @@ export async function probeConnection(request: ConnectionTestRequest): Promise<C
   }
 
   if (status === 401 || status === 403) {
+    const credentialHint =
+      Object.keys(headers).length > 0
+        ? "the header(s) configured for this connection were not accepted."
+        : "Kaigara has no credentials configured for this connection yet — add a header (e.g. Authorization) on the Connect screen.";
     return {
       ...base,
       reachable: true,
       httpStatus: status,
       latencyMs: description.latencyMs,
-      detail: `HTTP ${status} in ${description.latencyMs} ms — the server is up but rejected an unauthenticated request. Kaigara has no credentials for this connection yet.`,
+      detail: `HTTP ${status} in ${description.latencyMs} ms — the server is up but rejected the request: ${credentialHint}`,
     };
   }
 
   // Not every deployment exposes /description; fall back to the collection endpoint that every
   // AAS repository has before declaring the server unreachable.
   if (status === 404 || status === 405 || status === 501) {
-    const shells = await attempt(`${baseUrl}/shells?limit=1`, timeoutMs);
+    const shells = await attempt(`${baseUrl}/shells?limit=1`, timeoutMs, headers);
     const shellsBase = { probedUrl: shells.url, probedEndpoint: "shells" as const, checkedAt };
 
     if (shells.transportError) {

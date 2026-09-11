@@ -1,0 +1,34 @@
+{
+  "id": "query-shells",
+  "title": "Query shells",
+  "operation": "query",
+  "target": "aas",
+  "execution": "authoring",
+  "summary": "POST /shells/$query with an IDTA-01002 $condition.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/shells/$query",
+    "expect": [
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "condition",
+      "label": "Condition",
+      "type": "query-condition",
+      "bindsTo": "body.$condition"
+    },
+    {
+      "id": "pageSize",
+      "label": "Page size",
+      "type": "page-size",
+      "bindsTo": "body.limit"
+    }
+  ],
+  "defaults": {
+    "weight": 8
+  },
+  "kind": "request"
+}

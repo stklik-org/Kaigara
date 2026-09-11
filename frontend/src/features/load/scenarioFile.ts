@@ -1,11 +1,9 @@
 import { ScenarioFileError, parseScenarioDocument, type Scenario } from "@kaigara/shared-types";
 
-/** Re-exported so callers on this screen have one import for reading a dropped file. The parser
- *  itself lives in `@kaigara/shared-types` because the backend's scenario-library folder reads
- *  the *same* documents — see `scenarioDocument.ts` there. Only the browser-specific parts (the
- *  size ceiling, `File` handling, byte formatting) belong here. */
-export { ScenarioFileError, fileStem } from "@kaigara/shared-types";
-export const parseScenarioFile = parseScenarioDocument;
+/** Reading a scenario the user picked in the browser. The *parsing* deliberately lives in
+ *  `@kaigara/shared-types` — the backend's scenario-library folder reads the same documents with
+ *  the same reader, so a file one accepts is a file the other accepts. Only the browser-specific
+ *  parts (the size ceiling, `File` handling, byte formatting) belong here. */
 
 /** Ceiling on what the picker/drop zone will even attempt to read. A scenario is a small
  *  declarative document (tracks/loads/request specs) — anything this large is a mis-drop, and

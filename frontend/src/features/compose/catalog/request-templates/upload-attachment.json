@@ -1,0 +1,48 @@
+{
+  "id": "upload-attachment",
+  "title": "Upload attachment",
+  "operation": "create",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "PUT file bytes onto a File element — the byte-heavy path of a real AAS workload.",
+  "endpoint": {
+    "method": "PUT",
+    "path": "/submodels/{smId}/submodel-elements/{path}/attachment",
+    "expect": [
+      204,
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "path",
+      "label": "File element",
+      "type": "idshort-path",
+      "bindsTo": "path.path",
+      "default": "from-template"
+    },
+    {
+      "id": "file",
+      "label": "File",
+      "type": "attachment",
+      "bindsTo": "body",
+      "strategies": [
+        "synthesised",
+        "from-folder"
+      ],
+      "default": "synthesised"
+    }
+  ],
+  "defaults": {
+    "weight": 4
+  },
+  "notes": "Watch for 413 (payload too large) and 507 (storage exhausted) — they are conformance findings, not latency.",
+  "kind": "request"
+}

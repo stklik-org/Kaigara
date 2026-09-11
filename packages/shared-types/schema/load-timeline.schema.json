@@ -26,6 +26,7 @@
       "type": "string",
       "enum": [
         "create",
+        "read",
         "update",
         "delete",
         "query"
@@ -132,6 +133,55 @@
         },
         "generator": {
           "$ref": "#/definitions/RequestGenerator"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "bindings": {
+          "$ref": "#/definitions/ParameterBindings"
+        },
+        "idPool": {
+          "$ref": "#/definitions/RequestIdPool"
+        }
+      }
+    },
+    "RequestIdPool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source"
+      ],
+      "description": "Where the identifier a request addresses comes from. Absent means \"created\".",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "created",
+            "server"
+          ]
+        },
+        "maxIds": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "ParameterBindings": {
+      "type": "object",
+      "description": "Parameter id -> how it was bound in the catalogue template named by templateId.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "strategy"
+        ],
+        "properties": {
+          "strategy": {
+            "type": "string"
+          },
+          "config": {
+            "type": "object"
+          }
         }
       }
     },

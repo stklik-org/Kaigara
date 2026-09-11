@@ -1,0 +1,28 @@
+{
+  "id": "read-submodel-value",
+  "title": "Read Submodel $value",
+  "operation": "read",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "GET the value-only serialisation — much smaller than the full submodel.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/submodels/{smId}/$value",
+    "expect": [
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    }
+  ],
+  "defaults": {
+    "weight": 15
+  },
+  "notes": "Comparing this against Read Submodel isolates serialisation cost from lookup cost.",
+  "kind": "request"
+}

@@ -1,10 +1,10 @@
 @startuml Kaigara-Architecture
-title Kaigara -- Proposed System Architecture\n(Option A baseline, engine boundary designed for Option C -- see ADR 0001)
-skinparam wrapWidth 220
+title Kaigara -- System Architecture\n(Option C: the EngineAdapter seam is in place; only the k6 adapter is implemented -- ADR 0001.\nThe adapter compiles the timeline itself; no plan crosses the seam -- ADR 0004)
+skinparam wrapWidth 200
 skinparam shadowing false
 skinparam componentStyle rectangle
-
-actor "Benchmark\nEngineer" as engineer
+skinparam nodesep 16
+skinparam ranksep 42
 
 skinparam component {
   BackgroundColor<<implemented>> #d4edda
@@ -13,71 +13,128 @@ skinparam component {
   BorderColor<<planned>> #cc9a06
   BackgroundColor<<external>> #e2e3e5
   BorderColor<<external>> #6c757d
+  BackgroundColor<<devonly>> #d6e9f8
+  BorderColor<<devonly>> #3d7ab5
 }
 skinparam database {
   BackgroundColor<<planned>> #fff3cd
   BorderColor<<planned>> #cc9a06
 }
-
-package "Kaigara -- ships as a Tauri desktop app or a Docker / server image" {
-
-  component "Frontend (React + TypeScript + Vite)\nConnect / Load / Compose / Run / Analyze" as frontend <<implemented>>
-
-  package "Backend (Fastify orchestrator) -- scaffolding only, not implemented" {
-    component "Scenario / Connection / Run store" as store <<planned>>
-    component "EngineAdapter interface" as adapterIface <<planned>>
-    component "k6 adapter\n(compiles a Scenario's method\nLoadTimeline into a k6 script)" as k6adapter <<planned>>
-    component "Correctness checker\n(ajv + official JSON Schemas)" as correctness <<planned>>
-    component "Generated OpenAPI client" as openapiclient <<planned>>
-  }
-
-  database "SQLite\n(scenarios, runs, time series)" as sqlite <<planned>>
+skinparam folder {
+  BackgroundColor<<implemented>> #d4edda
+  BorderColor<<implemented>> #28a745
 }
 
-component "k6\n(external subprocess -- AGPL,\nnever linked in-process)" as k6 <<external>>
-component "aas-test-engines\n(official conformance CLI)" as testengines <<external>>
-component "LLM backend\n(hosted API or local Ollama)" as llm <<external>>
-component "IDTA aas-specs-api\n(official OpenAPI spec)" as idtaspec <<external>>
-component "Target AAS server(s)\n(twinsphere / Eclipse BaSyx)\nvia IDTA-01002 REST API" as target <<external>>
+actor "Benchmark\nEngineer" as engineer
 
-engineer --> frontend : browses / composes\nScenarios, watches runs
+package "Kaigara -- one repo, npm workspaces" {
 
-frontend --> store : HTTP / WebSocket\n(Scenario CRUD, run control,\nlive metrics -- currently mocked\nin-process, see lib/api/)
+  package "frontend/ (React + TypeScript + Vite)" {
+    component "Connect / Load / Compose / Run\nreal data end to end" as screens <<implemented>>
+    component "Analyze\nstill mock data" as analyze <<planned>>
+    component "lib/api -- the ApiClient seam\nconnections / scenarios / runs are real;\nanalysis still comes from mockClient" as apiseam <<implemented>>
+  }
+  note right of apiseam
+    In development the Vite server mounts the
+    backend's **probe** and **scenario library**
+    modules in-process -- both need only a socket
+    and a filesystem -- so `npm run dev -w frontend`
+    alone drives Connect and Load. Running a
+    benchmark always needs the orchestrator.
+  end note
 
-store --> sqlite : persist
-store --> adapterIface : compile & run
-k6adapter ..|> adapterIface : implements
-correctness --> openapiclient
-store ..> correctness : pre/postcondition\ngates
+  package "packages/shared-types/" {
+    component "The metamodel\nScenario / LoadTimeline / Track / Load /\nLoadShape / RequestComposition / RequestGenerator\n+ its validator, generated JSON Schema,\nand the run wire contract" as shared <<implemented>>
+  }
 
-k6adapter --> k6 : spawn subprocess\nwith compiled script
-k6 --> target : load generation
+  package "backend/ -- Fastify orchestrator (:5174)" {
+    component "REST + SSE routes\nself-documented at /swagger (OpenAPI 3.1)" as routes <<implemented>>
+    component "Connection probe\nGET {baseUrl}/description, falling back\nto /shells -- standards-only" as probe <<implemented>>
+    component "Scenario library\nread-only folder of documents" as library <<implemented>>
+    component "RunService\norchestration, RunState projection,\nruns held in memory" as runsvc <<implemented>>
+    component "Timeline compiler (k6-internal)\nLoadTimeline -> K6Plan, one executor per\nLoadShape (sine/bell sampled via rateAt());\ncompile-time identifier harvest" as compiler <<implemented>>
+    component "Metrics aggregator\nper-second buckets + bounded latency\nreservoir; raw events never reach the UI" as aggregator <<implemented>>
+    component "EngineAdapter interface\n+ registry" as adapterIface <<implemented>>
+    component "k6 adapter\ncompile(timeline) -> CompiledRun,\nspawns subprocess, parses --out json" as k6adapter <<implemented>>
+    component "Correctness checker\najv + official JSON Schemas" as correctness <<planned>>
+    component "Generated OpenAPI client\npreparation / cleanup phases" as openapiclient <<planned>>
+  }
 
-openapiclient --> target : preparation +\ncorrectness-check calls
-idtaspec ..> openapiclient : generates client\n(build-time, via openapi-to-k6\nor equivalent)
+  folder "backend/scenarios/\ndemo scenario documents\n(KAIGARA_SCENARIOS_DIR)" as scenariodir <<implemented>>
+  database "SQLite\nrun history, saved scenarios, connections" as sqlite <<planned>>
+}
 
-correctness --> testengines : shell out\n(external process)
+component "k6\nexternal subprocess -- AGPL,\nnever linked in-process" as k6 <<external>>
 
-store --> llm : scenario / instance\ngeneration (agreement Step 2)
+package "Systems under test" {
+  component "Target AAS server(s)\ntwinsphere / Eclipse BaSyx\nvia the IDTA-01002 REST API" as target <<external>>
+  component "Stub AAS server\nin-memory, `npm run stub-aas` --\nwhat you aim at with no real server" as stub <<devonly>>
+}
 
-note bottom of frontend
-  **Implemented today**: a working prototype
-  with all data mocked in-memory (see
-  frontend/src/lib/mock/) -- no real backend,
-  engine or storage exists yet.
+component "aas-test-engines\nofficial conformance CLI" as testengines <<external>>
+component "IDTA aas-specs-api\nofficial OpenAPI spec" as idtaspec <<external>>
+component "LLM backend\nhosted API or local Ollama" as llm <<external>>
+
+engineer --> screens : composes scenarios,\nwatches runs
+screens --> apiseam
+analyze --> apiseam
+
+apiseam --> routes : HTTP + SSE\nprobe, scenario library,\nrun control, live metrics
+apiseam ..> shared : imports
+routes ..> shared : imports
+note on link
+  One package, both ends -- which is why the bytes the
+  Compose Code view shows are exactly the bytes
+  `POST /api/runs` validates and executes. There is no
+  separate export format to keep in sync.
 end note
 
+routes --> probe
+routes --> library
+routes --> runsvc
+library --> scenariodir : reads
+
+runsvc --> adapterIface : compile(timeline) & run
+k6adapter --> compiler : validate + compile
+runsvc --> aggregator : samples in, RunView out
+k6adapter ..|> adapterIface : implements
+
+k6adapter --> k6 : spawn subprocess\nwith generated script
+k6 --> target : load generation
+
+probe --> target : reachability +\nadvertised profiles
+
+runsvc ..> sqlite : persist -- planned;\nruns are in-memory today
+runsvc ..> correctness : pre/postcondition gates
+runsvc ..> llm : scenario / instance generation\n(agreement Step 2)
+correctness --> openapiclient
+correctness --> testengines : shell out\n(external process)
+openapiclient --> target : preparation +\ncorrectness-check calls
+idtaspec ..> openapiclient : generates client\n(build-time)
+
 note bottom of k6adapter
-  Only the k6 adapter is being built within
-  the funded period. Additional EngineAdapter
-  implementations (e.g. autocannon) are
-  future work, not scheduled -- ADR 0001.
+  Only the k6 adapter is being built within the funded
+  period; further EngineAdapter implementations are
+  future work, not scheduled (ADR 0001). Nothing about
+  scripts, VUs or subprocesses crosses back into the
+  results -- an adapter takes the authored timeline and
+  emits samples; its compiled K6Plan never crosses the
+  seam (ADR 0004). A second engine brings its own compiler.
+end note
+
+note bottom of runsvc
+  **Not implemented:** the preparation, preconditions,
+  postconditions and cleanup phases. Only `method` runs;
+  the other four report `skipped` rather than `done`, so
+  a clean run is never mistaken for "correctness checks
+  passed".
 end note
 
 legend right
   |     | Status |
   |<#d4edda>| Implemented |
   |<#fff3cd>| Proposed, not yet built |
+  |<#d6e9f8>| Development convenience only |
   |<#e2e3e5>| External tool / third-party system |
 endlegend
 

@@ -1,10 +1,10 @@
 import {
   Scenario,
   type ScenarioData,
-  type ScenarioLibraryEntry,
   type ScenarioLibraryView,
   type ValidationIssue,
 } from "@kaigara/shared-types";
+import { ApiRequestError, readJsonOrThrow } from "./httpError";
 
 /**
  * The real, backend-backed `scenarios` slice: the Load screen's library is a folder of serialized
@@ -23,61 +23,32 @@ const SCENARIOS_ENDPOINT = "/api/scenarios";
 
 /** Thrown when the library cannot serve a scenario. Carries the validator's per-path issues for a
  *  file that is present but unusable, so the Load screen can name the offending value. */
-export class ScenarioRequestError extends Error {
-  readonly issues: ValidationIssue[];
-  readonly status: number;
+export class ScenarioRequestError extends ApiRequestError {}
 
-  constructor(message: string, status: number, issues: ValidationIssue[] = []) {
-    super(message);
-    this.name = "ScenarioRequestError";
-    this.status = status;
-    this.issues = issues;
-  }
-}
-
-async function failure(response: Response): Promise<ScenarioRequestError> {
-  let message = `${response.status} ${response.statusText}`;
-  let issues: ValidationIssue[] = [];
-  try {
-    const body = await response.json();
-    if (typeof body?.error === "string") message = body.error;
-    if (Array.isArray(body?.issues)) issues = body.issues;
-  } catch {
-    // A non-JSON error body (a proxy's HTML 502, say) leaves the status line as the message.
-  }
-  return new ScenarioRequestError(message, response.status, issues);
-}
+const scenarioFailure = (message: string, status: number, issues: ValidationIssue[]) =>
+  new ScenarioRequestError(message, status, issues);
 
 export interface ScenariosClient {
   /** Every document in the library folder, including the ones that failed to load — those carry
    *  `issues` and cannot be opened. */
   library(): Promise<ScenarioLibraryView>;
-  /** The listing the rest of the app reads: loadable entries only. */
-  templates(): Promise<ScenarioLibraryEntry[]>;
   instantiate(id: string): Promise<Scenario>;
 }
 
 export function createScenariosClient(): ScenariosClient {
-  async function library(): Promise<ScenarioLibraryView> {
-    const response = await fetch(SCENARIOS_ENDPOINT, { headers: { accept: "application/json" } });
-    if (!response.ok) throw await failure(response);
-    return (await response.json()) as ScenarioLibraryView;
-  }
+  const get = (path: string) => fetch(path, { headers: { accept: "application/json" } });
+  const read = <T,>(response: Response) => readJsonOrThrow<T, ScenarioRequestError>(response, scenarioFailure);
 
   return {
-    library,
-    async templates() {
-      const view = await library();
-      return view.entries.filter((entry) => entry.issues === undefined || entry.issues.length === 0);
+    async library() {
+      return read<ScenarioLibraryView>(await get(SCENARIOS_ENDPOINT));
     },
+
     async instantiate(id) {
-      const response = await fetch(`${SCENARIOS_ENDPOINT}/${encodeURIComponent(id)}`, {
-        headers: { accept: "application/json" },
-      });
-      if (!response.ok) throw await failure(response);
+      const data = await read<ScenarioData>(await get(`${SCENARIOS_ENDPOINT}/${encodeURIComponent(id)}`));
       // The backend already validated the document; rebuilding the class instances here is what
       // turns it back into something the Compose store can mutate.
-      return Scenario.fromJSON((await response.json()) as ScenarioData);
+      return Scenario.fromJSON(data);
     },
   };
 }

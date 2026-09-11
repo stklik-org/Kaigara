@@ -7,14 +7,20 @@
  * alongside* the first adapter rather than be retrofitted — so it is defined here, and the k6
  * adapter under `k6/` is written against it like any later one would be.
  *
- * What this interface deliberately does **not** expose: scripts, stages, VUs, subprocess
- * plumbing, or any other engine vocabulary. An adapter receives an `ExecutionPlan` and emits
- * `RequestSample`s; everything in between is its own business. That is what lets a second adapter
- * be "a new implementation plus a config choice, not a redesign".
+ * Per ADR 0004, an adapter is handed the **authored timeline** and compiles it itself — there is
+ * no shared "execution plan" type crossing this boundary. `RunService` no longer builds one and
+ * hands it to an adapter; it validates nothing beyond `EngineRunContext`'s own shape and lets
+ * `compile()` fail loudly (`TimelineValidationError` and friends) if the timeline is not usable.
+ * What an adapter hands *back* from `compile()` — `CompiledRun` — is a deliberately thin summary
+ * (identifiers, counts, a per-load key/label list), not a re-creation of that removed type: enough
+ * for `RunService` to project a `RunView` and correlate live metrics to loads, nothing about
+ * scripts, executors or HTTP mapping. That detail stays entirely inside the adapter that produced
+ * it — even the Run screen's "concrete plan" debug view and the `plan.json` artifact are k6's own
+ * translation now (`engines/k6/concretePlan.ts`), read directly by `RunService`, never exposed
+ * through this interface.
  */
 
-import type { EngineId } from "@kaigara/shared-types";
-import type { ExecutionPlan } from "../timeline/executionPlan.ts";
+import type { EngineId, LoadTimelineData, ValidationIssue } from "@kaigara/shared-types";
 
 /** Whether the engine can actually run on this machine, answered before a run is accepted so the
  *  user gets "k6 is not installed" rather than a failed run. */
@@ -36,7 +42,7 @@ export interface EngineAvailability {
 export interface RequestSample {
   /** Milliseconds since the run started, as observed by the engine. */
   offsetMs: number;
-  /** `PlannedLoad.key` this request belongs to. */
+  /** The `key` an adapter's own `CompiledRunSummary` gave this load. */
   loadKey: string;
   operation: string;
   target: string;
@@ -82,9 +88,22 @@ export interface EngineHandlers {
   onExit(exit: EngineExit): void;
 }
 
+/** A target AAS server, resolved and normalised (`RunService.resolveTarget`) — a trimmed,
+ *  scheme-checked `baseUrl`, a defaulted `timeoutSeconds`, and whatever `headers` the connection
+ *  carries. Every adapter needs exactly this; nothing here is k6-specific. */
+export interface ResolvedTarget {
+  baseUrl: string;
+  timeoutSeconds: number;
+  headers: Record<string, string>;
+}
+
 export interface EngineRunContext {
   runId: string;
-  plan: ExecutionPlan;
+  /** The authored timeline, byte-for-byte what the Compose screen's Code view shows. An adapter
+   *  compiles this itself — see the module doc. */
+  timeline: LoadTimelineData;
+  target: ResolvedTarget;
+  scenarioName?: string;
   /** Directory the adapter owns for this run: generated inputs, raw engine output, artifacts.
    *  Already created by the caller. */
   workDir: string;
@@ -102,6 +121,39 @@ export interface CompiledArtifact {
   description: string;
 }
 
+/** One load's worth of facts `RunService` needs without knowing anything about how the adapter
+ *  arrived at them — enough to project a `RunView` and correlate live `RequestSample.loadKey`s
+ *  back to the timeline's own `Load`/`Track` ids. */
+export interface CompiledLoadSummary {
+  /** Stable, adapter-chosen key — what `RequestSample.loadKey` and live metrics are tagged with. */
+  key: string;
+  loadId: string;
+  trackId: string;
+  label: string;
+  startSeconds: number;
+  requestCount: number;
+}
+
+/** What compiling a timeline produced, independent of the engine that did it. */
+export interface CompiledRunSummary {
+  /** Defaulted/trimmed scenario name — never blank, unlike the request field it came from. */
+  scenarioName: string;
+  totalDurationSeconds: number;
+  /** Requests the compiled run expects to issue if the target keeps up — the same number the
+   *  Compose overlay previews. */
+  expectedRequests: number;
+  loads: CompiledLoadSummary[];
+}
+
+export interface CompiledRun {
+  artifacts: CompiledArtifact[];
+  /** Non-blocking issues found while compiling (a load that sends nothing, one scheduled past the
+   *  end of the timeline) — forwarded so the caller can show the user why a run may not do what
+   *  they expect. */
+  warnings: ValidationIssue[];
+  summary: CompiledRunSummary;
+}
+
 export interface EngineRunHandle {
   /** Asks the engine to stop; resolves once it has exited. Idempotent. */
   stop(): Promise<void>;
@@ -115,14 +167,18 @@ export interface EngineAdapter {
   probe(): Promise<EngineAvailability>;
 
   /**
-   * Renders `plan` into whatever inputs the engine needs, under `context.workDir`. Separated from
-   * `start` so a plan can be compiled and inspected (or validated) without being executed — the
-   * dry-run path behind `POST /api/runs { dryRun: true }`.
+   * Validates and compiles `context.timeline` into whatever inputs the engine needs, under
+   * `context.workDir`. Separated from `start` so a plan can be compiled and inspected (or
+   * validated) without being executed — the dry-run path behind `POST /api/runs { dryRun: true }`.
+   *
+   * Throws (`TimelineValidationError` and whatever else is specific to this engine) rather than
+   * returning a result the caller has to inspect for failure — a plan that could not be built is
+   * not a `CompiledRun` with nothing in it.
    */
-  compile(context: EngineRunContext): Promise<CompiledArtifact[]>;
+  compile(context: EngineRunContext): Promise<CompiledRun>;
 
-  /** Launches the engine against previously compiled artifacts. */
-  start(context: EngineRunContext, artifacts: CompiledArtifact[], handlers: EngineHandlers): Promise<EngineRunHandle>;
+  /** Launches the engine against a previously compiled run. */
+  start(context: EngineRunContext, compiled: CompiledRun, handlers: EngineHandlers): Promise<EngineRunHandle>;
 }
 
 /** Adapters available to this build. Only k6 is implemented; ADR 0001 says not to add others

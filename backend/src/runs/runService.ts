@@ -2,19 +2,31 @@
  * Run orchestration: validate a timeline, compile it for an engine, execute it, and project the
  * result into the `RunState` the frontend already knows how to render.
  *
+ * Per ADR 0004, this module hands an adapter the **authored timeline**, not a pre-built plan — it
+ * no longer imports anything from `timeline/compilePlan.ts` (that module does not exist any more)
+ * for the real run path. `compile()` on the adapter does the whole translation itself and hands
+ * back a `CompiledRunSummary` thin enough to project a `RunView` from, nothing more; what happens
+ * between "timeline" and "summary" is entirely the adapter's business. The two inspection-only
+ * endpoints below (`compileOnly`, `concretePlan`) are the deliberate exception: they import k6's
+ * own `compileTimeline`/`compileK6Script`/`resolveIdentifiers`/`buildConcretePlan` directly, the
+ * same way they already did before this change, because there is no adapter method for "compile
+ * and show me" and inventing one for two debug-only callers would be speculative engine-adapter
+ * surface ADR 0001 warns against.
+ *
  * Runs live in memory only. The proposal (section 10) calls for SQLite-backed run history, and
  * that is the right next step — but persistence is orthogonal to executing a timeline, and
  * inventing a schema before there is real result data to shape it would be premature. The seam is
  * `RunStore`: swapping the Map for a database is a change here and nowhere else.
  */
 
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, rm } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 import {
   TimelineValidationError,
+  type ConcretePlan,
   type EngineId,
   type ErrorLogEntry,
   type PhaseExecution,
@@ -27,15 +39,19 @@ import {
   type ValidationIssue,
 } from "@kaigara/shared-types";
 
-import { compilePlan } from "../timeline/compilePlan.ts";
-import type { ExecutionPlan, PlanTarget } from "../timeline/executionPlan.ts";
+import { buildConcretePlan } from "../engines/k6/concretePlan.ts";
+import { compileTimeline } from "../engines/k6/compileTimeline.ts";
 import { compileK6Script } from "../engines/k6/compileScript.ts";
+import type { K6Plan } from "../engines/k6/k6Plan.ts";
+import { resolveIdentifiers } from "../engines/k6/resolveIdentifiers.ts";
 import type {
   CompiledArtifact,
+  CompiledRunSummary,
   EngineExit,
   EngineRegistry,
   EngineRunHandle,
   EngineSummary,
+  ResolvedTarget,
 } from "../engines/adapter.ts";
 import { MetricsAggregator, type MetricsSnapshot } from "./metricsAggregator.ts";
 
@@ -59,7 +75,8 @@ interface RunRecord {
   scenarioName: string;
   connectionId: string;
   engineId: EngineId;
-  plan: ExecutionPlan;
+  target: ResolvedTarget;
+  summary: CompiledRunSummary;
   workDir: string;
   createdAtMs: number;
   startedAtMs?: number;
@@ -105,15 +122,32 @@ export class RunService {
    *
    * This exists so the translation from timeline to HTTP requests is inspectable rather than
    * implicit: the user can see exactly which IDTA-01002 calls their composition produces before
-   * pointing it at a server.
+   * pointing it at a server. Inspection-only, so it goes straight to k6's own compile functions
+   * rather than through the `EngineAdapter` seam — see the module doc.
    */
-  compileOnly(request: CreateRunRequest): { plan: ExecutionPlan; script: string; warnings: ValidationIssue[] } {
-    const { plan, warnings } = compilePlan(request.timeline, {
+  async compileOnly(request: CreateRunRequest): Promise<{ plan: K6Plan; script: string; warnings: ValidationIssue[] }> {
+    const { plan, warnings } = compileTimeline(request.timeline, {
       scenarioName: request.scenarioName,
       target: this.resolveTarget(request.target),
     });
-    const script = compileK6Script(plan, { summaryPath: "<run directory>/summary.json" });
+    // Same compile-time identifier resolution a real run does (resolveIdentifiers.ts), so the
+    // script this hands back is exactly the one `POST /api/runs` would execute — not a preview
+    // that quietly differs because it skipped the harvest.
+    const resolvedIds = await resolveIdentifiers(plan);
+    const script = compileK6Script(plan, resolvedIds, { summaryPath: "<run directory>/summary.json" });
     return { plan, script, warnings };
+  }
+
+  /**
+   * Expands a timeline into the time-ordered request schedule the Run screen's "Concrete plan"
+   * debug view renders. Compiles but executes nothing — the same validation path as `compileOnly`.
+   */
+  concretePlan(request: CreateRunRequest): ConcretePlan {
+    const { plan, warnings } = compileTimeline(request.timeline, {
+      scenarioName: request.scenarioName,
+      target: this.resolveTarget(request.target),
+    });
+    return buildConcretePlan(plan, warnings);
   }
 
   async create(request: CreateRunRequest): Promise<RunView> {
@@ -127,40 +161,41 @@ export class RunService {
       throw new EngineUnavailableError(`Engine "${engineId}" is not available: ${availability.detail}`);
     }
 
-    const { plan, warnings } = compilePlan(request.timeline, {
-      scenarioName: request.scenarioName,
-      target: this.resolveTarget(request.target),
-    });
-
-    if (plan.loads.length === 0) {
-      throw new EmptyPlanError(
-        "This timeline has nothing to execute: every load either has no requests or a rate of zero.",
-      );
-    }
-
+    const target = this.resolveTarget(request.target);
     const id = randomUUID();
     const workDir = join(this.workRoot, id);
     await mkdir(workDir, { recursive: true });
 
+    let compiled;
+    try {
+      // The adapter validates and compiles the timeline itself (ADR 0004) — everything from
+      // "shape → executor" to "which identifiers exist" is its business, not RunService's.
+      compiled = await adapter.compile({ runId: id, timeline: request.timeline, target, scenarioName: request.scenarioName, workDir });
+    } catch (error) {
+      // Nothing has been recorded yet, so a failed compile must not leave a run behind to clean up
+      // — only the work directory needs undoing.
+      await rm(workDir, { recursive: true, force: true }).catch(() => {});
+      throw error;
+    }
+
     const record: RunRecord = {
       id,
       status: "starting",
-      scenarioName: plan.scenarioName,
+      scenarioName: compiled.summary.scenarioName,
       connectionId: request.connectionId ?? "",
       engineId,
-      plan,
+      target,
+      summary: compiled.summary,
       workDir,
       createdAtMs: Date.now(),
       aggregator: new MetricsAggregator(),
-      warnings,
-      artifacts: [],
+      warnings: compiled.warnings,
+      artifacts: compiled.artifacts,
       engineLog: [],
       errorCounts: new Map(),
       subscribers: new Set(),
     };
     this.runs.set(id, record);
-
-    record.artifacts = await adapter.compile({ runId: id, plan, workDir });
 
     if (request.dryRun) {
       record.status = "compiled";
@@ -170,23 +205,27 @@ export class RunService {
     record.startedAtMs = Date.now();
     record.status = "running";
 
-    record.handle = await adapter.start({ runId: id, plan, workDir }, record.artifacts, {
-      onSamples: (samples) => {
-        record.aggregator.add(samples);
-        for (const sample of samples) {
-          if (!sample.failed) continue;
-          const key = `${sample.operation} ${sample.target} → HTTP ${sample.status || "no response"}`;
-          const existing = record.errorCounts.get(key);
-          if (existing) existing.count += 1;
-          else record.errorCounts.set(key, { count: 1, firstOffsetMs: sample.offsetMs });
-        }
+    record.handle = await adapter.start(
+      { runId: id, timeline: request.timeline, target, scenarioName: request.scenarioName, workDir },
+      compiled,
+      {
+        onSamples: (samples) => {
+          record.aggregator.add(samples);
+          for (const sample of samples) {
+            if (!sample.failed) continue;
+            const key = `${sample.operation} ${sample.target} → HTTP ${sample.status || "no response"}`;
+            const existing = record.errorCounts.get(key);
+            if (existing) existing.count += 1;
+            else record.errorCounts.set(key, { count: 1, firstOffsetMs: sample.offsetMs });
+          }
+        },
+        onLog: (line) => {
+          record.engineLog.push(line.message);
+          if (record.engineLog.length > MAX_ENGINE_LOG_LINES) record.engineLog.shift();
+        },
+        onExit: (exit) => this.finish(record, exit),
       },
-      onLog: (line) => {
-        record.engineLog.push(line.message);
-        if (record.engineLog.length > MAX_ENGINE_LOG_LINES) record.engineLog.shift();
-      },
-      onExit: (exit) => this.finish(record, exit),
-    });
+    );
 
     // Elapsed time has to advance even in a second where no request completed, so it is driven by
     // the clock rather than by sample arrival.
@@ -266,7 +305,7 @@ export class RunService {
     for (const subscriber of record.subscribers) subscriber(view);
   }
 
-  private resolveTarget(target: CreateRunRequest["target"]): PlanTarget {
+  private resolveTarget(target: CreateRunRequest["target"]): ResolvedTarget {
     const baseUrl = (target?.baseUrl ?? "").trim().replace(/\/+$/, "");
     if (!baseUrl) throw new InvalidTargetError("A target baseUrl is required, e.g. http://localhost:8081/api/v3.");
     let parsed: URL;
@@ -331,7 +370,7 @@ export class RunService {
       cleanup: phase("skipped", notImplemented),
     };
 
-    const keyToLoadId = new Map(record.plan.loads.map((load) => [load.key, load.loadId]));
+    const keyToLoadId = new Map(record.summary.loads.map((load) => [load.key, load.loadId]));
 
     return {
       id: record.id,
@@ -339,7 +378,7 @@ export class RunService {
       connectionId: record.connectionId,
       engineId: record.engineId,
       elapsedSeconds: this.elapsedSeconds(record),
-      totalSeconds: Math.round(record.plan.totalDurationSeconds),
+      totalSeconds: Math.round(record.summary.totalDurationSeconds),
       phases,
       activeLoadIds: metrics.activeLoadKeys.map((key) => keyToLoadId.get(key) ?? key),
       requestsPerSecondSeries: record.aggregator.requestsPerSecondSeries(LIVE_SERIES_SECONDS),
@@ -355,22 +394,15 @@ export class RunService {
       scenarioName: record.scenarioName,
       connectionId: record.connectionId,
       engineId: record.engineId,
-      targetBaseUrl: record.plan.target.baseUrl,
+      targetBaseUrl: record.target.baseUrl,
       createdAt: new Date(record.createdAtMs).toISOString(),
       endedAt: record.endedAtMs ? new Date(record.endedAtMs).toISOString() : undefined,
       state: this.runState(record, metrics),
       plan: {
-        totalDurationSeconds: record.plan.totalDurationSeconds,
-        loadCount: record.plan.loads.length,
-        expectedRequests: record.plan.expectedRequests,
-        loads: record.plan.loads.map((load) => ({
-          key: load.key,
-          loadId: load.loadId,
-          trackId: load.trackId,
-          label: load.label,
-          startSeconds: load.startSeconds,
-          requestCount: load.requests.length,
-        })),
+        totalDurationSeconds: record.summary.totalDurationSeconds,
+        loadCount: record.summary.loads.length,
+        expectedRequests: record.summary.expectedRequests,
+        loads: record.summary.loads,
       },
       metrics,
       warnings: record.warnings,
@@ -384,6 +416,7 @@ export class RunService {
 
 export class RunNotFoundError extends Error {}
 export class EngineUnavailableError extends Error {}
-export class EmptyPlanError extends Error {}
 export class InvalidTargetError extends Error {}
 export { TimelineValidationError };
+export { EmptyPlanError } from "../engines/k6/k6Adapter.ts";
+export { EmptyServerCorpusError } from "../engines/k6/resolveIdentifiers.ts";

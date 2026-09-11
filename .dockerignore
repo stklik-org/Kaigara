@@ -1,0 +1,36 @@
+# Everything the image builds from is source. Anything derived, vendored or personal is excluded,
+# which keeps the build context small and stops a stale local build leaking into the image.
+.git
+.gitignore
+node_modules
+**/node_modules
+**/dist
+*.tsbuildinfo
+**/*.tsbuildinfo
+
+# Reference material and scratch space, none of it needed to build or run (see .gitignore).
+docs
+basyx-setup
+stress-forge
+sink
+k6-tmp
+.devcontainer
+.github
+
+# The k6 run archive a local backend writes (`backend/k6-logs/` under `npm run dev -w backend`) —
+# `COPY backend/` would otherwise bake someone's past runs into the image.
+k6-logs
+**/k6-logs
+
+# 177 MB of vendored IDTA PDFs and AASX packages. The catalogue's generated index lives in
+# frontend/src and is bundled with the app; the library itself is not needed at runtime.
+frontend/submodel-templates
+
+# Local machine noise.
+.DS_Store
+**/.DS_Store
+*.log
+.env
+.env.*
+.idea
+.vscode

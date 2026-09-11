@@ -1,0 +1,101 @@
+{
+  "id": "idshort-path",
+  "title": "idShort path",
+  "appliesTo": [
+    "submodel"
+  ],
+  "default": "from-template",
+  "description": "Which element inside the submodel is addressed (IDTA-01002 idShortPath).",
+  "strategies": [
+    {
+      "id": "from-template",
+      "label": "Pick from template",
+      "hint": "Choose an element of the submodel template — the path is guaranteed to exist.",
+      "schema": {
+        "type": "object",
+        "required": [
+          "family",
+          "path"
+        ],
+        "properties": {
+          "family": {
+            "type": "string",
+            "title": "Submodel template",
+            "default": "Digital nameplate",
+            "x-options-from": "idta-templates",
+            "description": "Element paths below are read from this template's published JSON."
+          },
+          "path": {
+            "type": "string",
+            "title": "Element",
+            "default": "SerialNumber",
+            "x-options-from": "template-elements"
+          },
+          "depth": {
+            "type": "string",
+            "title": "Depth",
+            "enum": [
+              "leaf property",
+              "collection",
+              "any"
+            ],
+            "default": "leaf property"
+          }
+        }
+      },
+      "sample": "SerialNumber"
+    },
+    {
+      "id": "fixed",
+      "label": "Fixed",
+      "hint": "A literal path, typed by hand.",
+      "schema": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path",
+            "default": "Markings.Marking[0].MarkingName"
+          }
+        }
+      },
+      "sample": "Markings.Marking[0].MarkingName"
+    },
+    {
+      "id": "random-existing",
+      "label": "Random existing",
+      "hint": "A different element of the target submodel per request.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "string",
+            "title": "Element kinds",
+            "enum": [
+              "properties only",
+              "any element"
+            ],
+            "default": "properties only"
+          }
+        }
+      },
+      "sample": "YearOfConstruction"
+    },
+    {
+      "id": "non-existing",
+      "label": "Non-existing",
+      "hint": "A path that is not in the submodel — exercises the 404 path.",
+      "expect": [
+        404
+      ],
+      "schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "sample": "NoSuchElement"
+    }
+  ]
+}

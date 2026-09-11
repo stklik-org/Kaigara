@@ -1,12 +1,11 @@
-import { useRef, useState, type DragEvent } from "react";
-import type React from "react";
-import { Track } from "@kaigara/shared-types";
+import { useRef, useState, type DragEvent, type RefObject } from "react";
+import type { Track } from "@kaigara/shared-types";
 import { useScenarioStore } from "../store/scenarioStore";
-import { resolveTrackColors } from "./shapeVisuals";
+import { createTrack } from "./modelFactories";
+import { SIDEBAR_WIDTH_DEFAULT } from "./timelineConstants";
+import { trackColorLookup } from "./trackColors";
 
-let nextTrackSuffix = 1;
-
-function TrackColorSwatch({ track, color }: { track: Track; color: string }) {
+function TrackColorSwatch({ trackId, color }: { trackId: string; color: string }) {
   const recolorTrack = useScenarioStore((s) => s.recolorTrack);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -25,11 +24,49 @@ function TrackColorSwatch({ track, color }: { track: Track; color: string }) {
         ref={inputRef}
         type="color"
         value={color}
-        onChange={(e) => recolorTrack(track.id, e.target.value)}
-        className="pointer-events-none absolute left-0 top-0 h-0 w-0 opacity-0"
+        onChange={(e) => recolorTrack(trackId, e.target.value)}
+        className="pointer-events-none absolute top-0 left-0 h-0 w-0 opacity-0"
         tabIndex={-1}
       />
     </div>
+  );
+}
+
+/** Deleting a track with Loads on it asks first — the row turns into its own confirmation, rather
+ *  than opening a dialog over a canvas the user is mid-thought in. */
+function DeleteTrackButton({ track, onDelete }: { track: Track; onDelete: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onDelete}
+      title="Delete track"
+      className="flex h-4 w-4 items-center justify-center rounded text-[14px] leading-none text-ink-muted hover:bg-status-fail-bg hover:text-status-fail"
+      aria-label={`Delete track ${track.label}`}
+    >
+      ×
+    </button>
+  );
+}
+
+function ReorderButton({
+  direction,
+  disabled,
+  onClick,
+}: {
+  direction: "up" | "down";
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={`Move track ${direction}`}
+      className="flex h-4 w-4 items-center justify-center text-[11px] text-ink-muted hover:text-ink disabled:opacity-25 disabled:hover:text-ink-muted"
+    >
+      {direction === "up" ? "▲" : "▼"}
+    </button>
   );
 }
 
@@ -65,7 +102,7 @@ function TrackLabelRow({
   const [draft, setDraft] = useState(track.label);
   const [confirming, setConfirming] = useState(false);
 
-  function commit() {
+  function commitRename() {
     setEditing(false);
     const trimmed = draft.trim();
     if (trimmed && trimmed !== track.label) {
@@ -75,27 +112,20 @@ function TrackLabelRow({
     }
   }
 
-  function handleDeleteClick() {
-    if (track.loads.length === 0) {
-      onDelete();
-    } else {
-      setConfirming(true);
-    }
-  }
-
   if (confirming) {
     return (
       <div
         style={{ height: rowHeight }}
         className="flex flex-col items-start justify-center gap-1.5 border-b border-border bg-status-fail-bg px-3"
       >
-        <span className="text-[11px] font-medium text-status-fail">
-          Delete "{track.label}"?
-        </span>
+        <span className="text-[11px] font-medium text-status-fail">Delete "{track.label}"?</span>
         <div className="flex gap-1.5">
           <button
             type="button"
-            onClick={() => { setConfirming(false); onDelete(); }}
+            onClick={() => {
+              setConfirming(false);
+              onDelete();
+            }}
             className="rounded border border-status-fail bg-status-fail px-2 py-0.5 text-[11px] font-medium text-white hover:opacity-80"
           >
             Delete
@@ -113,24 +143,19 @@ function TrackLabelRow({
   }
 
   return (
-    <div style={{ height: rowHeight }} className="flex items-center border-b border-border px-3 gap-1.5">
-      {/* Left column: color swatch on top, delete button below. A compact, vertically-centred
-       *  cluster — `self-stretch justify-between` used to spread these across the row, but the two
-       *  controls are together taller than the 44px row minus padding, so the × spilled ~10px into
-       *  the row below. */}
+    <div style={{ height: rowHeight }} className="flex items-center gap-1.5 border-b border-border px-3">
+      {/* Left column: colour swatch over the delete button. A compact, vertically-centred cluster —
+          `self-stretch justify-between` used to spread these across the row, but the two controls
+          are together taller than the row minus its padding, so the × spilled into the row below. */}
       <div className="flex flex-none flex-col items-center gap-1">
-        <TrackColorSwatch track={track} color={color} />
-        <button
-          type="button"
-          onClick={handleDeleteClick}
-          title="Delete track"
-          className="flex h-4 w-4 items-center justify-center rounded text-[14px] leading-none text-ink-muted hover:bg-status-fail-bg hover:text-status-fail"
-        >
-          ×
-        </button>
+        <TrackColorSwatch trackId={track.id} color={color} />
+        <DeleteTrackButton
+          track={track}
+          onDelete={() => (track.loads.length === 0 ? onDelete() : setConfirming(true))}
+        />
       </div>
 
-      {/* Centre: label (draggable) */}
+      {/* Centre: the label, which is also the drag handle for reordering. */}
       <div
         draggable={!editing}
         onDragStart={onDragStart}
@@ -140,52 +165,44 @@ function TrackLabelRow({
         className={`min-w-0 flex-1 cursor-grab truncate active:cursor-grabbing ${isDragging ? "opacity-40" : ""}`}
       >
         {editing ? (
+          // Same transparent/hover/focus treatment as ComposePage's ScenarioNameField — a track
+          // title is renamed the same way the scenario itself is, so it should look like it.
           <input
             autoFocus
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            onBlur={commit}
+            onBlur={commitRename}
             onKeyDown={(e) => {
-              if (e.key === "Enter") commit();
+              if (e.key === "Enter") commitRename();
               if (e.key === "Escape") {
                 setDraft(track.label);
                 setEditing(false);
               }
             }}
-            className="w-full bg-transparent text-xs font-medium text-ink outline-none"
+            className="w-full rounded-md border border-transparent bg-transparent px-1.5 py-0.5 text-xs font-medium text-ink outline-none hover:border-border-strong focus:border-accent focus:bg-surface"
           />
         ) : (
           <div>
-            <span className="block truncate text-xs font-medium text-ink" onDoubleClick={() => setEditing(true)}>
+            {/* Not an <input> at rest — this span is also the drag handle (draggable sits on its
+                parent), and a native drag won't start off a mousedown that lands on an editable
+                text field. Bordered/hover-highlighted the same way regardless, so double-clicking
+                to rename reads as "opening" this exact box rather than a different affordance. */}
+            <span
+              className="block truncate rounded-md border border-transparent px-1.5 py-0.5 text-xs font-medium text-ink transition-colors hover:border-border-strong"
+              onDoubleClick={() => setEditing(true)}
+            >
               {track.label}
             </span>
-            <span className="truncate text-[11px] text-ink-muted">
+            <span className="truncate px-1.5 text-[11px] text-ink-muted">
               {track.loads.length} load{track.loads.length === 1 ? "" : "s"}
             </span>
           </div>
         )}
       </div>
 
-      {/* Right column: reorder buttons */}
       <div className="flex flex-none flex-col">
-        <button
-          type="button"
-          onClick={onMoveUp}
-          disabled={!canMoveUp}
-          title="Move track up"
-          className="flex h-4 w-4 items-center justify-center text-[11px] text-ink-muted hover:text-ink disabled:opacity-25 disabled:hover:text-ink-muted"
-        >
-          ▲
-        </button>
-        <button
-          type="button"
-          onClick={onMoveDown}
-          disabled={!canMoveDown}
-          title="Move track down"
-          className="flex h-4 w-4 items-center justify-center text-[11px] text-ink-muted hover:text-ink disabled:opacity-25 disabled:hover:text-ink-muted"
-        >
-          ▼
-        </button>
+        <ReorderButton direction="up" disabled={!canMoveUp} onClick={onMoveUp} />
+        <ReorderButton direction="down" disabled={!canMoveDown} onClick={onMoveDown} />
       </div>
     </div>
   );
@@ -193,50 +210,47 @@ function TrackLabelRow({
 
 /** The label column TimelineView renders alongside <Timeline> (the library has no concept of a
  *  track label column at all). Double-click a title to rename it; drag a title onto another
- *  track's title, or use the ▲/▼ buttons, to reorder — both scoped to the label part
- *  specifically, not the whole row. Click the color swatch to open a color picker. "+ Add track"
- *  appends a new empty Track at the bottom with an auto-assigned palette color.
+ *  track's title, or use the ▲/▼ buttons, to reorder — both scoped to the label specifically, not
+ *  the whole row. Click the colour swatch to open a colour picker. "+ Add track" appends an empty
+ *  Track with an auto-assigned palette colour.
  *
- *  Alignment note: the sidebar mirrors the library's own DOM structure — a fixed header div whose
- *  height matches the library's time-area header, followed by a `overflow-y: hidden` rows
- *  container whose scrollTop is driven imperatively by TimelineView (via scrollRef) to stay
- *  pixel-locked with the library's virtualized grid on every scroll event. */
+ *  Alignment note: this mirrors the library's own DOM structure — a fixed header div whose height
+ *  matches the library's time-area header, followed by an `overflow-y: hidden` rows container
+ *  whose scrollTop is driven imperatively by TimelineView (via `scrollRef`) to stay pixel-locked
+ *  with the library's virtualized grid on every scroll event. */
 export function TrackLabelSidebar({
   tracks,
   rowHeight,
   timeAreaHeight,
   scrollRef,
-  width = 180,
+  width = SIDEBAR_WIDTH_DEFAULT,
 }: {
   tracks: Track[];
   rowHeight: number;
   timeAreaHeight: number;
-  scrollRef: React.RefObject<HTMLDivElement | null>;
-  /** Column width in px — user-resizable, owned by ComposePage (default matches the old `w-36`). */
+  scrollRef: RefObject<HTMLDivElement | null>;
+  /** Column width in px — user-resizable, owned by ComposePage. */
   width?: number;
 }) {
   const reorderTracks = useScenarioStore((s) => s.reorderTracks);
   const addTrack = useScenarioStore((s) => s.addTrack);
   const removeTrack = useScenarioStore((s) => s.removeTrack);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const trackColors = resolveTrackColors(tracks);
+  const colorOf = trackColorLookup(tracks);
 
   return (
     <div className="flex flex-none flex-col border-r border-border bg-surface" style={{ width }}>
-      {/* Mirrors .timeline-editor-time-area — same height, same border-bottom, so every track
-       *  row below this header is pixel-aligned with the library's own rows. */}
-      <div
-        className="flex-none border-b border-border bg-surface-sunken"
-        style={{ height: timeAreaHeight }}
-      />
-      {/* overflow-y: hidden so the library's scrollTop can be mirrored here imperatively
-       *  (via scrollRef) without showing a second scrollbar on the sidebar. */}
+      {/* Mirrors .timeline-editor-time-area — same height, same border-bottom, so every track row
+          below is pixel-aligned with the library's own rows. */}
+      <div className="flex-none border-b border-border bg-surface-sunken" style={{ height: timeAreaHeight }} />
+      {/* overflow-y: hidden so the library's scrollTop can be mirrored here imperatively without
+          showing a second scrollbar. */}
       <div ref={scrollRef} className="flex-1 overflow-y-hidden">
         {tracks.map((track, index) => (
           <TrackLabelRow
             key={track.id}
             track={track}
-            color={trackColors.get(track.id)!}
+            color={colorOf(track.id)}
             rowHeight={rowHeight}
             isDragging={dragIndex === index}
             onDragStart={() => setDragIndex(index)}
@@ -254,15 +268,7 @@ export function TrackLabelSidebar({
         ))}
         <button
           type="button"
-          onClick={() =>
-            addTrack(
-              new Track({
-                id: `track-${Date.now()}-${nextTrackSuffix++}`,
-                label: "New track",
-                loads: [],
-              }),
-            )
-          }
+          onClick={() => addTrack(createTrack())}
           title="Add a new track"
           className="flex w-full items-center justify-center gap-1 border-b border-border py-2 text-ink-muted hover:bg-surface-sunken hover:text-ink"
         >

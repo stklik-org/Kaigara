@@ -1,0 +1,27 @@
+{
+  "id": "read-submodel-metadata",
+  "title": "Read $metadata",
+  "operation": "read",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "GET the submodel without any element values.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/submodels/{smId}/$metadata",
+    "expect": [
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    }
+  ],
+  "defaults": {
+    "weight": 6
+  },
+  "kind": "request"
+}

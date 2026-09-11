@@ -1,0 +1,43 @@
+{
+  "id": "delete-aas-cascade",
+  "title": "Delete AAS + its Submodels",
+  "operation": "delete",
+  "target": "both",
+  "execution": "authoring",
+  "kind": "composite",
+  "summary": "Delete the submodels a shell references, then the shell.",
+  "steps": [
+    {
+      "ref": "read-aas",
+      "capture": {
+        "submodelRefs": "$.submodels[*].keys[0].value"
+      }
+    },
+    {
+      "ref": "delete-submodel",
+      "repeatWith": "submodelRefs",
+      "bind": {
+        "smId": "{{submodelRefs[i]}}"
+      }
+    },
+    {
+      "ref": "delete-aas",
+      "bind": {
+        "aasId": "{{aasId}}"
+      }
+    }
+  ],
+  "parameters": [
+    {
+      "id": "aasId",
+      "label": "AAS identifier",
+      "type": "aas-identifier",
+      "bindsTo": "steps[0].path.aasId"
+    }
+  ],
+  "defaults": {
+    "weight": 3
+  },
+  "consumesPool": true,
+  "notes": "The read is part of the measurement: cascade deletes cost a lookup the server did not have to do."
+}

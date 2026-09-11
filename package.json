@@ -8,9 +8,15 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "stop": "node scripts/stop.mjs",
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
+    "build": "npm run build -w frontend",
     "build:frontend": "npm run build -w frontend",
-    "lint:frontend": "npm run lint -w frontend"
+    "lint:frontend": "npm run lint -w frontend",
+    "test": "npm test -w @kaigara/shared-types && npm test -w @kaigara/backend",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
   }
 }

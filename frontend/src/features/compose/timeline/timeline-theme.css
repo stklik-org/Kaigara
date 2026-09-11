@@ -2,8 +2,10 @@
  * Minimal overrides of @xzdarcy/react-timeline-editor's own stylesheet. The library hardcodes a
  * dark theme with fixed hex colors and a fixed 600x600px box — everything below re-points it at
  * our CSS-variable tokens (so it re-themes with the rest of the app) and makes it fill its
- * container instead. Track/Load-specific visuals (glyphs, colors, selection ring) are NOT here —
- * those are owned entirely by ActionRenderer.tsx's returned markup, not the library's own CSS.
+ * container instead. Track/Load-specific visuals (glyphs, colors, the "selected"/"active" ring)
+ * are owned by ActionRenderer.tsx's returned markup, driven from React state, not by the library's
+ * own CSS — except the `:hover` variants of a few of them below, which have to live here since
+ * hover isn't state React tracks for these actions.
  */
 
 .timeline-editor {
@@ -43,6 +45,33 @@
 
 .timeline-editor-action {
   background-color: transparent;
+}
+
+/* Loads within a track can sit right up against each other (or, mid-drag, briefly overlap), and
+   with no fill of their own (ActionRenderer.tsx) an occluded one can be hard to pick out. Each
+   `.timeline-editor-action` is already absolutely positioned directly inside its row, and the row
+   itself opens no stacking context of its own, so its `z-index` on hover only has to beat its
+   siblings *in that row* — never another track's — which is exactly the inspection this is for.
+   The box-shadow is the same accent ring ActionRenderer.tsx draws inline for a *selected* (or, on
+   the Run screen, *active*) Load — reused here rather than duplicated as a variable, so hovering
+   reads as "temporarily selected" rather than a second, different kind of emphasis. Harmless where
+   a Load is genuinely selected too: the inline style sets the identical value, so there is nothing
+   for the two to visibly disagree about. */
+.timeline-editor-action:hover {
+  z-index: 20;
+}
+
+/* The icon+label chip (ActionRenderer.tsx's `.action-chip`) carries no fill at rest — its opaque,
+   per-track colour arrives as the `--action-chip-bg` variable set on the element itself, and only
+   gets painted on hover. That pairs with the z-index rule above: hovering a Load both brings it in
+   front of an overlapping neighbour and gives its icon+label a solid backdrop, right when you're
+   trying to read it against whatever it's overlapping. */
+.action-chip {
+  background-color: transparent;
+}
+
+.timeline-editor-action:hover .action-chip {
+  background-color: var(--action-chip-bg);
 }
 
 .timeline-editor-action .timeline-editor-action-left-stretch:after,

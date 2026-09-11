@@ -1,7 +1,6 @@
 import type { ConnectionTestResult } from "@kaigara/shared-types";
 import type { ApiClient } from "./client";
 import { createConnectionsClient, type ConnectionProbe } from "./connectionsClient";
-import { mockRunState } from "../mock/runs";
 import { mockRunAnalysis } from "../mock/analysis";
 
 const NETWORK_DELAY_MS = 250;
@@ -10,8 +9,8 @@ function delay<T>(value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), NETWORK_DELAY_MS));
 }
 
-/** Stand-in for the real reachability probe: replays whatever the fixture declares, without
- *  sending a request. The default client uses the real one — see `defaultClient.ts`. */
+/** Stand-in for the real reachability probe: replays whatever the seed connection declares,
+ *  without sending a request. The default client uses the real one — see `defaultClient.ts`. */
 const mockProbe: ConnectionProbe = async (connection) => {
   await delay(undefined);
   const reachable = connection.reachable === true;
@@ -32,55 +31,36 @@ const mockProbe: ConnectionProbe = async (connection) => {
   return result;
 };
 
-/** The scenario library is a folder on the orchestrator's disk, so there is nothing to mock: a
- *  hardcoded stand-in would be a *different* library from the one the app actually opens, and the
- *  Load screen's file drop zone works without any of this anyway. The default client uses the
- *  real implementation (see `defaultClient.ts`), which the Vite dev server also serves in-process. */
-const LIBRARY_NEEDS_BACKEND = "The scenario library is served from a folder by the Kaigara backend (npm run dev -w backend).";
+/**
+ * Slices that have no honest mock.
+ *
+ * The scenario library is a folder on the orchestrator's disk, so a hardcoded stand-in would be a
+ * *different* library from the one the app actually opens. Executing a timeline needs a real engine
+ * subprocess, and faking one would put invented latency numbers in front of someone who came here
+ * to measure real ones. Both fail loudly instead, naming the command that fixes it; the default
+ * client replaces them with the real implementations (see `defaultClient.ts`).
+ */
+function requiresBackend(what: string): () => Promise<never> {
+  return () => Promise.reject(new Error(`${what} requires the Kaigara backend (npm run dev -w backend).`));
+}
 
-const scenariosRequireBackend = {
-  library: () => Promise.reject(new Error(LIBRARY_NEEDS_BACKEND)),
-  templates: () => Promise.reject(new Error(LIBRARY_NEEDS_BACKEND)),
-  instantiate: () => Promise.reject(new Error(LIBRARY_NEEDS_BACKEND)),
-} satisfies ApiClient["scenarios"];
-
-/** Executing a timeline needs a real engine subprocess, which only the backend has. Rather than
- *  fake a run — which would put invented latency numbers in front of a user who came here to
- *  measure real ones — these fail loudly. The default client replaces them with the real
- *  implementation (see `defaultClient.ts`); this stub only covers a mock-only composition. */
-const requiresBackend = {
-  start: () => Promise.reject(new Error("Starting a run requires the Kaigara backend (npm run dev -w backend).")),
-  stop: () => Promise.reject(new Error("Stopping a run requires the Kaigara backend.")),
-  detail: () => Promise.reject(new Error("Run detail requires the Kaigara backend.")),
-  subscribeDetail: () => () => {},
-  compile: () => Promise.reject(new Error("Compiling a timeline requires the Kaigara backend.")),
-  engines: () => Promise.resolve([]),
-} satisfies Partial<ApiClient["runs"]>;
-
+/** A client with no backend behind it: real connection bookkeeping against a fake probe, mock
+ *  analysis data, and a loud refusal for everything that genuinely needs the orchestrator. */
 export function createMockApiClient(): ApiClient {
   return {
     connections: createConnectionsClient({ probe: mockProbe, persistLocally: false }),
-    scenarios: scenariosRequireBackend,
+    scenarios: {
+      library: requiresBackend("The scenario library"),
+      instantiate: requiresBackend("Opening a scenario"),
+    },
     runs: {
-      ...requiresBackend,
-      get: () => delay(mockRunState),
-      subscribe: (_runId, onUpdate) => {
-        let elapsed = mockRunState.elapsedSeconds;
-        const rps = [...mockRunState.requestsPerSecondSeries];
-        const errorLog = [...mockRunState.errorLog];
-
-        const interval = setInterval(() => {
-          elapsed = Math.min(elapsed + 1, mockRunState.totalSeconds);
-          if (elapsed % 3 === 0) {
-            const last = rps.at(-1) ?? 400;
-            rps.push(Math.max(50, last + Math.round((Math.random() - 0.45) * 60)));
-            if (rps.length > 30) rps.shift();
-          }
-          onUpdate({ ...mockRunState, elapsedSeconds: elapsed, requestsPerSecondSeries: rps, errorLog });
-        }, 1000);
-
-        return () => clearInterval(interval);
-      },
+      start: requiresBackend("Starting a run"),
+      stop: requiresBackend("Stopping a run"),
+      detail: requiresBackend("Run detail"),
+      subscribeDetail: () => () => {},
+      compile: requiresBackend("Compiling a timeline"),
+      concretePlan: requiresBackend("The concrete execution plan"),
+      engines: () => Promise.resolve([]),
     },
     analysis: {
       get: () => delay(mockRunAnalysis),

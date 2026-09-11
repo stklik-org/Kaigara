@@ -1,0 +1,149 @@
+{
+  "id": "value",
+  "title": "Value",
+  "appliesTo": [
+    "aas",
+    "submodel"
+  ],
+  "default": "random-number",
+  "description": "The value written by an update, or compared against by a query.",
+  "strategies": [
+    {
+      "id": "fixed",
+      "label": "Fixed value",
+      "schema": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value",
+            "default": "42"
+          },
+          "valueType": {
+            "type": "string",
+            "title": "valueType",
+            "enum": [
+              "xs:string",
+              "xs:int",
+              "xs:double",
+              "xs:boolean",
+              "xs:dateTime"
+            ],
+            "default": "xs:string"
+          }
+        }
+      },
+      "sample": "42"
+    },
+    {
+      "id": "random-number",
+      "label": "Random number",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "number",
+            "title": "Min",
+            "default": 0
+          },
+          "max": {
+            "type": "number",
+            "title": "Max",
+            "default": 1000
+          },
+          "distribution": {
+            "type": "string",
+            "title": "Distribution",
+            "enum": [
+              "uniform",
+              "normal",
+              "zipf"
+            ],
+            "default": "uniform"
+          },
+          "decimals": {
+            "type": "integer",
+            "title": "Decimals",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 6
+          }
+        }
+      },
+      "sample": "738"
+    },
+    {
+      "id": "random-string",
+      "label": "Random string",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "length": {
+            "type": "integer",
+            "title": "Length",
+            "default": 12,
+            "minimum": 1,
+            "maximum": 4096
+          },
+          "alphabet": {
+            "type": "string",
+            "title": "Alphabet",
+            "enum": [
+              "alphanumeric",
+              "words",
+              "unicode"
+            ],
+            "default": "alphanumeric"
+          }
+        }
+      },
+      "sample": "k3f9Qz1LmP0a"
+    },
+    {
+      "id": "one-of",
+      "label": "One of a list",
+      "schema": {
+        "type": "object",
+        "required": [
+          "values"
+        ],
+        "properties": {
+          "values": {
+            "type": "string",
+            "title": "Values (one per line)",
+            "format": "textarea",
+            "default": "CE\nUL\nRoHS\nATEX"
+          },
+          "weighted": {
+            "type": "boolean",
+            "title": "Weighted",
+            "default": false
+          }
+        }
+      },
+      "sample": "RoHS"
+    },
+    {
+      "id": "timestamp",
+      "label": "Timestamp",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "title": "Mode",
+            "enum": [
+              "now",
+              "random in range"
+            ],
+            "default": "now"
+          }
+        }
+      },
+      "sample": "2026-09-05T12:04:11Z"
+    }
+  ]
+}

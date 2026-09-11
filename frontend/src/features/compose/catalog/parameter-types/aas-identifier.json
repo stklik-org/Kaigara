@@ -1,0 +1,101 @@
+{
+  "id": "aas-identifier",
+  "title": "AAS identifier",
+  "appliesTo": [
+    "aas"
+  ],
+  "description": "Which shell a request addresses.",
+  "default": "created-in-scenario",
+  "strategies": [
+    {
+      "id": "created-in-scenario",
+      "label": "Created in scenario",
+      "hint": "Drawn at random from the shells this run has created so far — the id exists because this scenario just POSTed it.",
+      "schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "sample": "urn:kaigara:aas:9f2c1b04"
+    },
+    {
+      "id": "from-server",
+      "label": "Existing on server",
+      "hint": "Identifiers are paged off the target before the load starts and shared by every virtual user, so the run measures the corpus already on the server rather than what it just created.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "maxIds": {
+            "type": "integer",
+            "title": "Fetch up to",
+            "default": 1000,
+            "minimum": 1,
+            "maximum": 100000,
+            "description": "Paging follows the collection's cursor and stops here. The harvest runs once, before the first request; an empty result aborts the run."
+          }
+        }
+      },
+      "sample": "urn:cpl:aas:nameplate:8842"
+    },
+    {
+      "id": "fixed",
+      "label": "Fixed",
+      "hint": "A literal identifier, or a counter that increments per request.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "title": "Mode",
+            "enum": [
+              "literal",
+              "sequence"
+            ],
+            "default": "literal"
+          },
+          "value": {
+            "type": "string",
+            "title": "Identifier",
+            "default": "urn:kaigara:aas:demo-0001",
+            "x-show-when": {
+              "field": "mode",
+              "equals": "literal"
+            }
+          },
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "default": "urn:kaigara:aas:%06d",
+            "description": "A printf-style %d or %06d placeholder is replaced with a counter that climbs each request.",
+            "x-show-when": {
+              "field": "mode",
+              "equals": "sequence"
+            }
+          }
+        }
+      },
+      "sample": "urn:kaigara:aas:demo-0001"
+    },
+    {
+      "id": "non-existing",
+      "label": "Non-existing",
+      "hint": "An identifier that is on neither the server nor the set this run created — synthesised after harvesting the server's ids to exclude. Exercises the 404 path.",
+      "expect": [
+        404
+      ],
+      "schema": {
+        "type": "object",
+        "properties": {
+          "maxIds": {
+            "type": "integer",
+            "title": "Check against up to",
+            "default": 1000,
+            "minimum": 1,
+            "maximum": 100000,
+            "description": "How many server identifiers to page in for the exclusion check before the load starts."
+          }
+        }
+      },
+      "sample": "urn:kaigara:aas:missing-4d1c9f"
+    }
+  ]
+}

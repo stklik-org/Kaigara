@@ -1,0 +1,109 @@
+{
+  "id": "payload-template",
+  "title": "Payload",
+  "appliesTo": [
+    "aas",
+    "submodel"
+  ],
+  "default": "idta-template",
+  "description": "The body a create or replace sends.",
+  "strategies": [
+    {
+      "id": "idta-template",
+      "label": "IDTA template",
+      "hint": "An instance of a published submodel template, from frontend/submodel-templates.",
+      "schema": {
+        "type": "object",
+        "required": [
+          "family"
+        ],
+        "properties": {
+          "family": {
+            "type": "string",
+            "title": "Template",
+            "default": "Digital nameplate",
+            "x-options-from": "idta-templates"
+          },
+          "variation": {
+            "type": "string",
+            "title": "Variation",
+            "enum": [
+              "identifiers only",
+              "realistic",
+              "maximal"
+            ],
+            "default": "realistic",
+            "description": "How much of the instance is regenerated per request."
+          },
+          "optionalElements": {
+            "type": "string",
+            "title": "Optional elements",
+            "enum": [
+              "omit all",
+              "as sampled",
+              "include all"
+            ],
+            "default": "as sampled"
+          }
+        }
+      },
+      "sample": "Nameplate · 42 elements · ≈4.1 KB"
+    },
+    {
+      "id": "minimal",
+      "label": "Minimal valid",
+      "hint": "The smallest body the specification accepts — measures request handling, not serialisation.",
+      "schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "sample": "{ id, idShort, modelType } · 180 B"
+    },
+    {
+      "id": "size-target",
+      "label": "Size target",
+      "hint": "Padded to a target size with generated elements. Honest about being synthetic.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "bytes": {
+            "type": "integer",
+            "title": "Target bytes",
+            "default": 4096,
+            "minimum": 128,
+            "maximum": 10485760
+          },
+          "grow": {
+            "type": "string",
+            "title": "Grow by",
+            "enum": [
+              "more elements",
+              "longer values"
+            ],
+            "default": "more elements"
+          }
+        }
+      },
+      "sample": "4 096 B"
+    },
+    {
+      "id": "custom-json",
+      "label": "Custom JSON",
+      "schema": {
+        "type": "object",
+        "required": [
+          "json"
+        ],
+        "properties": {
+          "json": {
+            "type": "string",
+            "title": "Body",
+            "format": "textarea",
+            "default": "{\n  \"modelType\": \"Submodel\"\n}"
+          }
+        }
+      },
+      "sample": "hand-written"
+    }
+  ]
+}

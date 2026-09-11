@@ -7,6 +7,18 @@
  * sections 3.1 and 12). Nothing here imports k6 code; it writes a script, spawns a binary, and
  * reads the binary's output.
  *
+ * Per ADR 0004, `compile()` takes the authored timeline straight from `EngineRunContext` and owns
+ * the whole translation to k6 itself: `compileTimeline()` splits it into one small script per
+ * request type of every load, decides the identifiers each addresses (harvesting the target once),
+ * and renders them plus a thin `main.js` that schedules them in one k6 process (ADR 0005). The
+ * `K6Plan` behind those files never leaves this file: `compile()` stashes it in `plans`, keyed by
+ * run id, purely so `start()` can log a faithful `ExecutionPlan.txt` entry — the public
+ * `CompiledRun` it returns carries only the thin summary `RunService` actually needs.
+ *
+ * Target headers (an Authorization token, typically) reach k6 only through its environment
+ * (`KAIGARA_HEADERS`), never through a file: the generated scripts are written to disk, archived,
+ * and served back over the API.
+ *
  * Results come back through k6's `--out json` stream, which is written to a file and tailed
  * incrementally rather than piped through stdout. Two reasons: k6 interleaves its progress UI
  * with stdout, and a file gives the full-resolution record the proposal (section 7.2) wants kept
@@ -17,18 +29,23 @@ import { spawn } from "node:child_process";
 import { createReadStream } from "node:fs";
 import { open, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { cwd } from "node:process";
 
 import type { EngineId } from "@kaigara/shared-types";
 import type {
   CompiledArtifact,
+  CompiledRun,
   EngineAdapter,
   EngineAvailability,
   EngineHandlers,
   EngineRunContext,
   EngineRunHandle,
 } from "../adapter.ts";
-import { compileK6Script } from "./compileScript.ts";
+import { compileTimeline } from "./compileTimeline.ts";
+import { planScripts, redactPlan, type K6Plan } from "./k6Plan.ts";
 import { K6OutputParser, readSummaryTotals } from "./parseOutput.ts";
+import { K6RunArchive } from "./runArchive.ts";
+import { HEADERS_ENV, SUMMARY_FILE, requestLine } from "./scriptTemplates.ts";
 
 /** How often the metrics file is drained. One second matches the proposal's "one point per second
  *  rather than per request" guidance for the live view (section 7.2). */
@@ -39,19 +56,33 @@ const STOP_GRACE_MS = 5000;
 export interface K6AdapterOptions {
   /** Path to the k6 binary; defaults to whatever is on PATH. */
   binary?: string;
-  assumedLatencySeconds?: number;
+  /** Base folder for the persistent run archive (scripts, plans, ExecutionPlan.txt, payloads).
+   *  Defaults to `KAIGARA_LOG_DIR`, then `<cwd>/k6-logs`. */
+  logDir?: string;
 }
+
+/** Thrown when a timeline validates but has nothing to actually run — every load either has no
+ *  requests or a rate of zero. `RunService.create()` must never record a run that could not
+ *  compile to this, so `compile()` throws it before writing anything. */
+export class EmptyPlanError extends Error {}
 
 export class K6Adapter implements EngineAdapter {
   readonly id: EngineId = "k6";
   readonly name = "Grafana k6";
 
   private readonly binary: string;
-  private readonly assumedLatencySeconds: number | undefined;
+  /** Persistent, human-navigable record of every script generated and every `k6 run` issued, so a
+   *  benchmark can be reproduced after its tmp work dir is gone — see `runArchive.ts`. */
+  private readonly archive: K6RunArchive;
+  /** The `K6Plan` `compile()` built, kept only until the matching `start()` call has logged it to
+   *  the archive — see the module doc. A `dryRun` compile whose `start()` never comes leaves its
+   *  entry here for the life of the process, same as the run itself staying in `RunService`'s
+   *  in-memory map forever; neither is evicted today (proposal §10 is the real fix). */
+  private readonly plans = new Map<string, K6Plan>();
 
   constructor(options: K6AdapterOptions = {}) {
     this.binary = options.binary ?? process.env.KAIGARA_K6_BINARY ?? "k6";
-    this.assumedLatencySeconds = options.assumedLatencySeconds;
+    this.archive = new K6RunArchive(options.logDir ?? process.env.KAIGARA_LOG_DIR ?? join(cwd(), "k6-logs"));
   }
 
   async probe(): Promise<EngineAvailability> {
@@ -87,46 +118,85 @@ export class K6Adapter implements EngineAdapter {
     });
   }
 
-  async compile(context: EngineRunContext): Promise<CompiledArtifact[]> {
-    const scriptPath = join(context.workDir, "script.js");
-    const planPath = join(context.workDir, "plan.json");
-
-    const script = compileK6Script(context.plan, {
-      summaryPath: join(context.workDir, "summary.json"),
-      assumedLatencySeconds: this.assumedLatencySeconds,
+  async compile(context: EngineRunContext): Promise<CompiledRun> {
+    // Everything — validation, shape -> executor, the split per request type, which identifiers
+    // each script addresses, and the files themselves — happens in compileTimeline.ts.
+    const { plan, files, warnings } = await compileTimeline(context.timeline, {
+      scenarioName: context.scenarioName,
+      target: context.target,
     });
+    const scripts = planScripts(plan);
 
-    await writeFile(scriptPath, script, "utf8");
-    // The plan is written alongside the script so a run is reproducible from its own directory,
-    // and so the engine-neutral view of what was executed survives independently of k6.
-    await writeFile(planPath, `${JSON.stringify(context.plan, null, 2)}\n`, "utf8");
+    // A timeline whose every load has no requests (or a rate of zero) compiles to no scripts at
+    // all; k6 would start, schedule nothing, and fail. Refuse before anything is written, so
+    // RunService never records a run for it.
+    if (scripts.length === 0) {
+      throw new EmptyPlanError(
+        "This timeline has nothing to execute: every load either has no requests or a rate of zero.",
+      );
+    }
 
-    return [
-      {
-        name: "script.js",
-        absolutePath: scriptPath,
-        contentType: "application/javascript",
-        description: "Generated k6 script — every IDTA-01002 request this run will issue.",
-      },
+    // main.js and the scripts it imports go side by side into the work dir, which is also where k6
+    // runs — so main.js's relative imports and its relative summary.json both resolve there. The
+    // plan goes alongside, redacted, so the compiled view of what was executed survives on its own.
+    for (const file of files) await writeFile(join(context.workDir, file.name), file.content, "utf8");
+    const planPath = join(context.workDir, "plan.json");
+    await writeFile(planPath, `${JSON.stringify(redactPlan(plan), null, 2)}\n`, "utf8");
+
+    // Also mirror everything into the persistent archive; the work dir above is under the OS tmpdir
+    // and does not survive. Never throws.
+    await this.archive.saveScripts(context.runId, plan, files);
+    // Kept only for start()'s archive logging — see the module doc and the `plans` field comment.
+    this.plans.set(context.runId, plan);
+
+    const scriptByFile = new Map(scripts.map((script) => [script.file, script]));
+    const loadLabel = new Map(plan.loads.map((load) => [load.key, load.label]));
+    const artifacts: CompiledArtifact[] = [
+      ...files.map((file): CompiledArtifact => {
+        const script = scriptByFile.get(file.name);
+        return {
+          name: file.name,
+          absolutePath: join(context.workDir, file.name),
+          contentType: "application/javascript",
+          description: script
+            ? `${requestLine(script)} — ${loadLabel.get(script.loadKey)}.`
+            : "Entry point handed to `k6 run`: schedules every script below as one k6 scenario.",
+        };
+      }),
       {
         name: "plan.json",
         absolutePath: planPath,
         contentType: "application/json",
-        description: "Engine-neutral execution plan the script was rendered from.",
+        description: "The k6 plan the scripts were rendered from: loads, their scripts, executors and identifier lists.",
       },
     ];
+
+    return {
+      artifacts,
+      warnings,
+      summary: {
+        scenarioName: plan.scenarioName,
+        totalDurationSeconds: plan.totalDurationSeconds,
+        expectedRequests: plan.expectedRequests,
+        loads: plan.loads.map((load) => ({
+          key: load.key,
+          loadId: load.loadId,
+          trackId: load.trackId,
+          label: load.label,
+          startSeconds: load.startSeconds,
+          requestCount: load.scripts.length,
+        })),
+      },
+    };
   }
 
-  async start(
-    context: EngineRunContext,
-    artifacts: CompiledArtifact[],
-    handlers: EngineHandlers,
-  ): Promise<EngineRunHandle> {
-    const script = artifacts.find((artifact) => artifact.name === "script.js");
-    if (!script) throw new Error("k6 adapter: compile() must run before start().");
+  async start(context: EngineRunContext, compiled: CompiledRun, handlers: EngineHandlers): Promise<EngineRunHandle> {
+    const entry = compiled.artifacts.find((artifact) => artifact.name === "main.js");
+    if (!entry) throw new Error("k6 adapter: compile() must run before start().");
 
     const metricsPath = join(context.workDir, "metrics.ndjson");
-    const summaryPath = join(context.workDir, "summary.json");
+    // main.js's handleSummary writes this relative to where k6 runs — the work dir, see spawn().
+    const summaryPath = join(context.workDir, SUMMARY_FILE);
     const startEpochMs = Date.now();
 
     // `--quiet` drops the progress bar (which would otherwise dominate stdout and tell us nothing
@@ -138,10 +208,30 @@ export class K6Adapter implements EngineAdapter {
       "--no-usage-report",
       "--out",
       `json=${metricsPath}`,
-      script.absolutePath,
+      entry.absolutePath,
     ];
 
-    const child = spawn(this.binary, args, { cwd: context.workDir, stdio: ["ignore", "pipe", "pipe"] });
+    // Record when this script is being called and with exactly which command line, so the run can
+    // be reproduced from the archive folder later. Never throws.
+    const plan = this.plans.get(context.runId);
+    this.plans.delete(context.runId);
+    if (plan) {
+      await this.archive.logInvocation(context.runId, plan, {
+        binary: this.binary,
+        argv: args,
+        workDir: context.workDir,
+        entryPath: entry.absolutePath,
+        metricsPath,
+        headerNames: Object.keys(context.target.headers),
+      });
+    }
+
+    // The target's headers reach the scripts through the environment, never through a file.
+    const child = spawn(this.binary, args, {
+      cwd: context.workDir,
+      env: { ...process.env, [HEADERS_ENV]: JSON.stringify(context.target.headers) },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
 
     const parser = new K6OutputParser(startEpochMs);
     let droppedIterations = 0;
@@ -244,7 +334,7 @@ export class K6Adapter implements EngineAdapter {
         if (skippedNoId > 0) {
           handlers.onLog({
             stream: "stderr",
-            message: `${skippedNoId} request(s) were skipped: no identifier was available to update or delete. Seed the target, or add a create operation to the same load.`,
+            message: `${skippedNoId} request(s) were skipped: their script had no identifier left to address (see the compile warnings). Seed the target, or create the entities earlier in the timeline.`,
           });
         }
       })();

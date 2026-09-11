@@ -1,0 +1,73 @@
+# Kaigara, launched as one thing.
+#
+#   docker compose up --build                 built from this checkout, on http://localhost:5174
+#   docker compose --profile demo up --build  ... plus a stub AAS server to point it at
+#   docker compose down
+#
+#   KAIGARA_IMAGE=ghcr.io/<owner>/kaigara:latest docker compose --profile demo up
+#                                             the same, from the published image — no build
+#
+# KAIGARA_IMAGE picks the image both services run. Unset, it is `kaigara:local`, built from here;
+# set to the published one, Compose pulls it instead of building (as long as `--build` is left off,
+# which would build from this checkout and tag the result with that name).
+#
+# The stub is behind a profile on purpose. It exists so the tool has something to talk to on a
+# machine with no AAS server, but co-locating the target with the load generator means they compete
+# for the same CPU — fine for a walkthrough, worthless as a measurement. Real numbers come from
+# aiming the Connect screen at a real server. The stub answers the orchestrator at
+# http://stub-aas:8081/api/v3 — not 127.0.0.1, which inside the container is the container itself.
+#
+# No `init: true`: the image runs tini as PID 1 itself (see the Dockerfile's ENTRYPOINT).
+
+services:
+  kaigara:
+    build:
+      context: .
+      # Uncomment to pin a different engine or runtime than the Dockerfile's defaults:
+      # args: { K6_VERSION: "2.1.0", NODE_VERSION: "24" }
+    image: ${KAIGARA_IMAGE:-kaigara:local}
+    ports:
+      - "5174:5174"
+    environment:
+      # Where the Load screen's library reads from. Bound to the mount below so scenarios can be
+      # added by dropping a file in, without rebuilding the image.
+      KAIGARA_SCENARIOS_DIR: /app/scenarios
+    volumes:
+      - ./backend/scenarios:/app/scenarios:ro
+      # The run archive — every generated k6 script and command line — outlives `down` in a named
+      # volume. A volume rather than a host folder because it takes its ownership from the image,
+      # so the unprivileged `node` user can write it on every host; `docker compose cp
+      # kaigara:/app/k6-logs .` fetches it.
+      - k6-logs:/app/k6-logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5174/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  stub-aas:
+    profiles: ["demo"]
+    image: ${KAIGARA_IMAGE:-kaigara:local}
+    build:
+      context: .
+    command: ["node", "backend/src/devtools/stubAasServer.ts"]
+    environment:
+      HOST: 0.0.0.0
+      # The image sets PORT=5174 for the orchestrator, and the stub reads the same variable — without
+      # this it binds 5174 inside its own container and nothing answers on 8081.
+      PORT: 8081
+      SEED_COUNT: 50
+    ports:
+      - "8081:8081"
+    # The image's own healthcheck asks for /api/health, which the stub does not serve; ask it for the
+    # shell collection instead, which is the thing a benchmark will actually hit.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8081/api/v3/shells?limit=1').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  k6-logs:

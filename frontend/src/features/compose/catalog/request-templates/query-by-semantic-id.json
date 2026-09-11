@@ -1,0 +1,32 @@
+{
+  "id": "query-by-semantic-id",
+  "title": "Find by semanticId",
+  "operation": "query",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "The most common real query: every submodel of one template.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/submodels/$query",
+    "expect": [
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "condition",
+      "label": "Template",
+      "type": "query-condition",
+      "bindsTo": "body.$condition",
+      "strategies": [
+        "by-semantic-id"
+      ],
+      "default": "by-semantic-id"
+    }
+  ],
+  "defaults": {
+    "weight": 10
+  },
+  "kind": "request"
+}

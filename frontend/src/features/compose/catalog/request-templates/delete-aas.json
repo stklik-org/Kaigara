@@ -1,0 +1,36 @@
+{
+  "id": "delete-aas",
+  "title": "Delete AAS",
+  "operation": "delete",
+  "target": "aas",
+  "execution": "engine",
+  "summary": "DELETE one shell.",
+  "endpoint": {
+    "method": "DELETE",
+    "path": "/shells/{aasId}",
+    "expect": [
+      204,
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "aasId",
+      "label": "AAS identifier",
+      "type": "aas-identifier",
+      "bindsTo": "path.aasId",
+      "strategies": [
+        "created-in-scenario",
+        "from-server",
+        "fixed",
+        "non-existing"
+      ]
+    }
+  ],
+  "defaults": {
+    "weight": 5
+  },
+  "consumesPool": true,
+  "notes": "Consumes the id from the pool — a second delete of the same id would answer 404 and skew the error rate.",
+  "kind": "request"
+}

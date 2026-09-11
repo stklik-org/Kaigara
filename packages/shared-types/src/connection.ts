@@ -17,6 +17,15 @@ export interface ServerConnection {
   active: boolean;
   defaultTimeoutSeconds: number;
   scrapeResourceMetrics: boolean;
+  /** Extra headers sent with every request to this target — an `Authorization` bearer token, an
+   *  API key header, whatever this particular server wants. Applied to both the reachability
+   *  probe and every request an actual run issues (`PlanTarget.headers`), so "Test" and "Run" see
+   *  the same server. There is no token-exchange support yet: a value here is sent verbatim on
+   *  every request, so it has to already be whatever the server accepts (a static API key, or a
+   *  bearer token you refresh by hand) rather than a client secret needing an OAuth2 exchange.
+   *  Stored in `localStorage` like the rest of the connection (`backend/README.md`) — this is
+   *  dev-grade credential storage, not a secrets vault. */
+  headers?: Record<string, string>;
   /** Result of the most recent reachability probe, if one has been run this session. */
   lastTest?: ConnectionTestResult;
 }
@@ -30,6 +39,7 @@ export interface ConnectionInput {
   conformanceProfile?: string;
   defaultTimeoutSeconds?: number;
   scrapeResourceMetrics?: boolean;
+  headers?: Record<string, string>;
 }
 
 export type ConnectionErrorKind =
@@ -75,4 +85,6 @@ export interface ConnectionTestResult {
 export interface ConnectionTestRequest {
   baseUrl: string;
   timeoutSeconds?: number;
+  /** Same headers a run against this connection would send — see `ServerConnection.headers`. */
+  headers?: Record<string, string>;
 }

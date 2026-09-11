@@ -1,0 +1,36 @@
+{
+  "id": "replace-submodel",
+  "title": "Replace Submodel",
+  "operation": "update",
+  "target": "submodel",
+  "execution": "engine",
+  "summary": "PUT a whole submodel over an existing one — the heaviest write.",
+  "endpoint": {
+    "method": "PUT",
+    "path": "/submodels/{smId}",
+    "expect": [
+      204,
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "payload",
+      "label": "Replacement payload",
+      "type": "payload-template",
+      "bindsTo": "body",
+      "default": "idta-template"
+    }
+  ],
+  "defaults": {
+    "weight": 8
+  },
+  "kind": "request"
+}

@@ -1,135 +1,137 @@
-import { useEffect, useRef, useState, type DragEvent as ReactDragEvent } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { ScenarioLibraryView } from "@kaigara/shared-types";
-import { useApi } from "../../lib/api/ApiContext";
-import { Panel, SectionLabel } from "../../components/ui/Panel";
-import { Button } from "../../components/ui/Button";
-import { Badge } from "../../components/ui/Badge";
+import { ScenarioFileError, type ScenarioLibraryEntry } from "@kaigara/shared-types";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { IssueList } from "@/components/ui/IssueList";
+import { Panel, SectionLabel } from "@/components/ui/Panel";
+import { generateScenario } from "@/lib/assist/generateScenario";
+import { loadLlmConfig } from "@/lib/assist/llmConfig";
+import { useApi } from "@/lib/api/ApiContext";
+import { useAsyncData } from "@/lib/useAsyncData";
 import { useScenarioStore } from "../compose/store/scenarioStore";
-import { MAX_SCENARIO_FILE_BYTES, ScenarioFileError, formatBytes, readScenarioFile } from "./scenarioFile";
-
-/** How many validation issues the error panel spells out before collapsing the rest into a
- *  "+ N more" line — enough to see a pattern, not enough to bury the page. */
-const MAX_LISTED_ISSUES = 6;
+import { readScenarioFile } from "./scenarioFile";
+import { ScenarioDropZone } from "./ScenarioDropZone";
+import { GenerateFromDescription } from "./GenerateFromDescription";
 
 interface LoadFailure {
   message: string;
   issues: { path: string; message: string }[];
 }
 
-/** Mirrors the wireframe's Load screen (2b/2bL): a file loader (drop zone + Browse files, see
- *  scenarioFile.ts for the accepted document shapes) alongside the scenario library — a folder of
- *  serialized scenario documents the backend serves (`backend/scenarios/`). Both are the same
- *  kind of document read by the same parser, so the two halves of this screen differ only in
- *  where the bytes come from. Picking anything here hands the Scenario to scenarioStore and jumps
- *  to Compose, which reads whatever was just loaded instead of re-fetching its own default. */
+/** Anything that came back with issues cannot be opened — but it is still listed, because "where
+ *  did my scenario go?" is a worse question than a stated reason it won't open. */
+function issuesOf(entry: ScenarioLibraryEntry) {
+  return entry.issues ?? [];
+}
+
+function FailurePanel({
+  title,
+  failure,
+  className = "",
+}: {
+  /** Headline when the message itself is detail rather than a summary. */
+  title?: string;
+  failure: LoadFailure;
+  className?: string;
+}) {
+  return (
+    <Panel role="alert" className={`border-status-fail bg-status-fail-bg p-3 ${className}`}>
+      <div className="text-sm font-medium text-status-fail">{title ?? failure.message}</div>
+      {title && <div className="mt-1 text-xs text-ink-muted">{failure.message}</div>}
+      {failure.issues.length > 0 && <IssueList issues={failure.issues} />}
+    </Panel>
+  );
+}
+
+function LibraryCard({
+  entry,
+  opening,
+  onOpen,
+}: {
+  entry: ScenarioLibraryEntry;
+  opening: boolean;
+  onOpen: () => void;
+}) {
+  const issues = issuesOf(entry);
+  const broken = issues.length > 0;
+
+  return (
+    <Panel className={`flex flex-col gap-2 p-4 ${broken ? "border-status-fail" : ""}`}>
+      <div>
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-semibold text-ink">{entry.name}</div>
+          {broken && <Badge tone="fail">Unreadable</Badge>}
+        </div>
+        <div className={`mt-1 text-xs ${broken ? "text-status-fail" : "text-ink-muted"}`}>{entry.description}</div>
+        {broken && <IssueList issues={issues} />}
+      </div>
+      <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+        <span className="font-mono text-xs text-ink-muted">{entry.file}</span>
+        <Button variant="primary" disabled={broken || opening} onClick={onOpen}>
+          {opening ? "Opening…" : "Open"}
+        </Button>
+      </div>
+    </Panel>
+  );
+}
+
+/** Mirrors the wireframe's Load screen (2b/2bL): a file loader (drop zone + Browse files) beside
+ *  the scenario library — a folder of serialized scenario documents the backend serves
+ *  (`backend/scenarios/`). Both halves are the same kind of document read by the same parser, so
+ *  they differ only in where the bytes come from. Picking anything here hands the Scenario to
+ *  scenarioStore and jumps to Compose, which reads whatever was just loaded instead of re-fetching
+ *  its own default. */
 export function LoadPage() {
   const api = useApi();
   const navigate = useNavigate();
   const loadScenario = useScenarioStore((s) => s.loadScenario);
-  const [library, setLibrary] = useState<ScenarioLibraryView | null>(null);
-  const [libraryError, setLibraryError] = useState<string | null>(null);
+  // The library is a folder on the orchestrator's disk, so "no backend" is the usual reason this
+  // fails — the error is shown rather than leaving the section spinning forever.
+  const { data: library, error: libraryError } = useAsyncData(() => api.scenarios.library(), [api]);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [readingFilename, setReadingFilename] = useState<string | null>(null);
   const [failure, setFailure] = useState<LoadFailure | null>(null);
-  // Counter, not a boolean: dragging over a child element fires dragleave on the parent, so a
-  // plain flag would flicker the highlight off as the pointer crosses the zone's own text.
-  const dragDepth = useRef(0);
-  const [dragActive, setDragActive] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    api.scenarios.library().then(
-      (view) => {
-        if (!cancelled) setLibrary(view);
-      },
-      // The library is a folder on the orchestrator's disk, so "no backend" is the usual reason
-      // this fails — say so instead of leaving the section spinning forever.
-      (error: Error) => {
-        if (!cancelled) setLibraryError(error.message);
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [api]);
+  function open(scenario: Parameters<typeof loadScenario>[0]) {
+    loadScenario(scenario);
+    navigate("/compose");
+  }
 
-  // A file dropped anywhere *outside* the zone would otherwise make the browser navigate away to
-  // it, silently discarding whatever is loaded. Swallow those drops app-wide while this screen
-  // is mounted; the zone's own handler stops propagation before this sees them.
-  useEffect(() => {
-    const swallow = (event: DragEvent) => event.preventDefault();
-    window.addEventListener("dragover", swallow);
-    window.addEventListener("drop", swallow);
-    return () => {
-      window.removeEventListener("dragover", swallow);
-      window.removeEventListener("drop", swallow);
-    };
-  }, []);
-
-  async function openFile(file: File) {
+  async function openFiles(files: File[]) {
     setFailure(null);
+    if (files.length > 1) {
+      setFailure({ message: "Drop a single scenario file — loading several at once isn't supported.", issues: [] });
+      return;
+    }
+    const file = files[0];
     setReadingFilename(file.name);
     try {
-      const scenario = await readScenarioFile(file);
-      setReadingFilename(null);
-      loadScenario(scenario);
-      navigate("/compose");
+      open(await readScenarioFile(file));
     } catch (error) {
-      setReadingFilename(null);
       setFailure(
         error instanceof ScenarioFileError
           ? { message: error.message, issues: error.issues.filter((issue) => issue.severity === "error") }
           : { message: `Could not read ${file.name} — ${(error as Error).message}`, issues: [] },
       );
+    } finally {
+      setReadingFilename(null);
     }
   }
 
-  function acceptFiles(files: FileList | null) {
-    if (!files || files.length === 0) return;
-    if (files.length > 1) {
-      setFailure({ message: "Drop a single scenario file — loading several at once isn't supported.", issues: [] });
-      return;
-    }
-    void openFile(files[0]);
-  }
-
-  function handleDrop(event: ReactDragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    dragDepth.current = 0;
-    setDragActive(false);
-    acceptFiles(event.dataTransfer.files);
-  }
-
-  function handleDragEnter(event: ReactDragEvent) {
-    event.preventDefault();
-    dragDepth.current += 1;
-    setDragActive(true);
-  }
-
-  function handleDragLeave() {
-    dragDepth.current = Math.max(0, dragDepth.current - 1);
-    if (dragDepth.current === 0) setDragActive(false);
-  }
-
-  function handleDragOver(event: ReactDragEvent) {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "copy";
-  }
-
-  function browse() {
-    fileInputRef.current?.click();
+  /** The description box hands its text here; `generateScenario` calls the configured LLM, validates
+   *  the reply with the same gate as the drop zone, and returns a Scenario to open in Compose.
+   *  Errors propagate to the panel, which shows the message. */
+  async function generateFromDescription(description: string) {
+    setFailure(null);
+    open(await generateScenario(description, loadLlmConfig()));
   }
 
   async function openFromLibrary(id: string) {
     setPendingId(id);
     setFailure(null);
     try {
-      const scenario = await api.scenarios.instantiate(id);
-      loadScenario(scenario);
-      navigate("/compose");
+      open(await api.scenarios.instantiate(id));
     } catch (error) {
       setPendingId(null);
       setFailure({
@@ -139,146 +141,46 @@ export function LoadPage() {
     }
   }
 
-  const busy = readingFilename !== null;
-
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-6">
+      <GenerateFromDescription onGenerate={generateFromDescription} />
+
       <div>
         <SectionLabel>Scenario file</SectionLabel>
-        <Panel
-          dashed
-          role="button"
-          tabIndex={0}
-          aria-label="Drop a scenario file here, or press Enter to browse"
-          aria-busy={busy}
-          onClick={browse}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              browse();
-            }
-          }}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          className={`mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 p-10 text-center transition-colors ${
-            dragActive ? "border-accent bg-accent-bg" : "hover:border-border-strong hover:bg-surface-sunken"
-          }`}
-        >
-          <div className="text-sm font-medium text-ink">
-            {busy ? `Reading ${readingFilename}…` : dragActive ? "Release to load" : "Drop a scenario file here"}
-          </div>
-          <div className="text-xs text-ink-muted">
-            JSON — a full scenario, or a bare method timeline (max {formatBytes(MAX_SCENARIO_FILE_BYTES)})
-          </div>
-          <Button
-            variant="secondary"
-            className="mt-1"
-            disabled={busy}
-            onClick={(event) => {
-              // The panel itself is the picker trigger; without this the click would bubble up
-              // and open the dialog a second time.
-              event.stopPropagation();
-              browse();
-            }}
-          >
-            Browse files…
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json,application/json"
-            className="hidden"
-            onChange={(event) => {
-              acceptFiles(event.target.files);
-              // Reset so re-picking the same file (e.g. after fixing it on disk) still fires.
-              event.target.value = "";
-            }}
-          />
-        </Panel>
-
-        {failure && (
-          <Panel role="alert" className="mt-3 border-status-fail bg-status-fail-bg p-3">
-            <div className="text-sm font-medium text-status-fail">{failure.message}</div>
-            {failure.issues.length > 0 && (
-              <ul className="mt-2 space-y-1">
-                {failure.issues.slice(0, MAX_LISTED_ISSUES).map((issue, index) => (
-                  <li key={`${issue.path}-${index}`} className="text-xs text-ink-muted">
-                    <span className="font-mono text-ink">{issue.path || "<root>"}</span> — {issue.message}
-                  </li>
-                ))}
-                {failure.issues.length > MAX_LISTED_ISSUES && (
-                  <li className="text-xs text-ink-muted">+ {failure.issues.length - MAX_LISTED_ISSUES} more</li>
-                )}
-              </ul>
-            )}
-          </Panel>
-        )}
+        <ScenarioDropZone busyWith={readingFilename} onFiles={openFiles} />
+        {failure && <FailurePanel failure={failure} className="mt-3" />}
       </div>
 
       <div>
         <SectionLabel>Scenario library</SectionLabel>
-        {library !== null && (
+        {library && (
           <div className="mt-2 text-xs text-ink-muted">
-            Served from{" "}
-            <span className="font-mono text-ink">{library.directory}</span> — copy a scenario file
-            in there and it shows up here.
+            Served from <span className="font-mono text-ink">{library.directory}</span> — copy a scenario file in there
+            and it shows up here.
           </div>
         )}
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {libraryError !== null ? (
-            <Panel role="alert" className="col-span-full border-status-fail bg-status-fail-bg p-3">
-              <div className="text-sm font-medium text-status-fail">The scenario library is unavailable</div>
-              <div className="mt-1 text-xs text-ink-muted">{libraryError}</div>
-            </Panel>
-          ) : library === null ? (
+          {libraryError ? (
+            <FailurePanel
+              title="The scenario library is unavailable"
+              failure={{ message: libraryError.message, issues: [] }}
+              className="col-span-full"
+            />
+          ) : !library ? (
             <div className="text-sm text-ink-muted">Loading…</div>
           ) : library.entries.length === 0 ? (
             <Panel className="col-span-full p-4 text-sm text-ink-muted">
               No scenario files in the library folder yet.
             </Panel>
           ) : (
-            library.entries.map((entry) => {
-              // A file that failed to load is shown rather than hidden — "where did my scenario
-              // go?" is a worse question than a stated reason it cannot be opened.
-              const broken = entry.issues !== undefined && entry.issues.length > 0;
-              return (
-                <Panel key={entry.id} className={`flex flex-col gap-2 p-4 ${broken ? "border-status-fail" : ""}`}>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm font-semibold text-ink">{entry.name}</div>
-                      {broken && <Badge tone="fail">Unreadable</Badge>}
-                    </div>
-                    <div className={`mt-1 text-xs ${broken ? "text-status-fail" : "text-ink-muted"}`}>
-                      {entry.description}
-                    </div>
-                    {broken && (
-                      <ul className="mt-2 space-y-1">
-                        {entry.issues!.slice(0, MAX_LISTED_ISSUES).map((issue, index) => (
-                          <li key={`${issue.path}-${index}`} className="text-xs text-ink-muted">
-                            <span className="font-mono text-ink">{issue.path || "<root>"}</span> — {issue.message}
-                          </li>
-                        ))}
-                        {entry.issues!.length > MAX_LISTED_ISSUES && (
-                          <li className="text-xs text-ink-muted">+ {entry.issues!.length - MAX_LISTED_ISSUES} more</li>
-                        )}
-                      </ul>
-                    )}
-                  </div>
-                  <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-                    <span className="font-mono text-xs text-ink-muted">{entry.file}</span>
-                    <Button
-                      variant="primary"
-                      disabled={broken || pendingId === entry.id}
-                      onClick={() => openFromLibrary(entry.id)}
-                    >
-                      {pendingId === entry.id ? "Opening…" : "Open"}
-                    </Button>
-                  </div>
-                </Panel>
-              );
-            })
+            library.entries.map((entry) => (
+              <LibraryCard
+                key={entry.id}
+                entry={entry}
+                opening={pendingId === entry.id}
+                onOpen={() => openFromLibrary(entry.id)}
+              />
+            ))
           )}
         </div>
       </div>

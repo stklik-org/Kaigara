@@ -1,0 +1,43 @@
+{
+  "id": "update-element-value",
+  "title": "Update element value",
+  "operation": "update",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "PATCH a single property — the smallest write the API offers.",
+  "endpoint": {
+    "method": "PATCH",
+    "path": "/submodels/{smId}/submodel-elements/{path}/$value",
+    "expect": [
+      204,
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "path",
+      "label": "Element to update",
+      "type": "idshort-path",
+      "bindsTo": "path.path",
+      "default": "from-template"
+    },
+    {
+      "id": "value",
+      "label": "New value",
+      "type": "value",
+      "bindsTo": "body",
+      "default": "random-number"
+    }
+  ],
+  "defaults": {
+    "weight": 20
+  },
+  "kind": "request"
+}

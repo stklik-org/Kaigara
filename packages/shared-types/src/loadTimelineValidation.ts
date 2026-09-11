@@ -52,7 +52,11 @@ export class TimelineValidationError extends Error {
   }
 }
 
-const REQUEST_OPERATIONS = ["create", "update", "delete", "query"] as const;
+const REQUEST_OPERATIONS = ["create", "read", "update", "delete", "query"] as const;
+const ID_POOL_SOURCES = ["created", "server"] as const;
+/** Operations that address a single entity by identifier, and therefore have an id pool at all.
+ *  A create mints its own identifier and a query pages a collection; neither draws from a pool. */
+const ID_ADDRESSING_OPERATIONS: readonly string[] = ["read", "update", "delete"];
 const REQUEST_TARGETS = ["shell", "submodel"] as const;
 const GENERATOR_KINDS = ["randomized", "exact", "mutate"] as const;
 const SHAPE_KINDS = ["ramp", "constant", "spike", "sine", "bell", "individual"] as const;
@@ -200,6 +204,66 @@ function validateGenerator(c: IssueCollector, value: unknown, path: string): voi
   }
 }
 
+/**
+ * Checks the catalogue provenance a request spec may carry (`templateId` + `bindings`).
+ *
+ * Deliberately structural only: which templates and strategies exist is decided by the catalogue
+ * folder the editor loads, and this validator also runs in the backend, which has no business
+ * knowing that folder. So it enforces the shape and the one cross-field rule that matters —
+ * bindings without a templateId name parameters of nothing.
+ */
+function validateBindings(c: IssueCollector, request: Record<string, unknown>, path: string): void {
+  if (request.templateId !== undefined) {
+    readString(c, request.templateId, join(path, "templateId"), { nonEmpty: true });
+  }
+  if (request.bindings === undefined) return;
+
+  if (request.templateId === undefined) {
+    c.error(join(path, "bindings"), "bindings name the parameters of a request template, so templateId is required alongside them");
+  }
+
+  const bindings = readObject(c, request.bindings, join(path, "bindings"), "a bindings");
+  if (!bindings) return;
+
+  for (const [parameterId, value] of Object.entries(bindings)) {
+    const bindingPath = join(join(path, "bindings"), parameterId);
+    const binding = readObject(c, value, bindingPath, "a parameter binding");
+    if (!binding) continue;
+    rejectUnknownKeys(c, binding, bindingPath, ["strategy", "config"]);
+    readString(c, binding.strategy, join(bindingPath, "strategy"), { nonEmpty: true });
+    if (binding.config !== undefined) {
+      readObject(c, binding.config, join(bindingPath, "config"), "a strategy config");
+    }
+  }
+}
+
+/**
+ * Checks `idPool` — where a request draws the identifier it addresses.
+ *
+ * The one rule worth enforcing beyond the shape: an id pool on an operation that does not address
+ * an identifier is a misunderstanding, not a preference. It is a warning rather than an error
+ * because the request still runs correctly; it just carries a setting nothing can act on.
+ */
+function validateIdPool(c: IssueCollector, request: Record<string, unknown>, path: string): void {
+  if (request.idPool === undefined) return;
+
+  const idPoolPath = join(path, "idPool");
+  const idPool = readObject(c, request.idPool, idPoolPath, "an id pool");
+  if (!idPool) return;
+
+  rejectUnknownKeys(c, idPool, idPoolPath, ["source", "maxIds"]);
+  const source = readEnum(c, idPool.source, join(idPoolPath, "source"), ID_POOL_SOURCES);
+  if (idPool.maxIds !== undefined) readNumber(c, idPool.maxIds, join(idPoolPath, "maxIds"), { min: 1 });
+
+  const operation = typeof request.operation === "string" ? request.operation : undefined;
+  if (source && operation && !ID_ADDRESSING_OPERATIONS.includes(operation)) {
+    c.warn(
+      idPoolPath,
+      `"${operation}" does not address an entity by identifier, so its id pool is never consulted`,
+    );
+  }
+}
+
 function validateRequestComposition(c: IssueCollector, value: unknown, path: string, loadLabel: string): void {
   const obj = readObject(c, value, path, "a request composition");
   if (!obj) return;
@@ -220,7 +284,16 @@ function validateRequestComposition(c: IssueCollector, value: unknown, path: str
     const requestPath = join(join(path, "requests"), index);
     const request = readObject(c, entry, requestPath, "a request spec");
     if (!request) return;
-    rejectUnknownKeys(c, request, requestPath, ["id", "operation", "target", "weight", "generator"]);
+    rejectUnknownKeys(c, request, requestPath, [
+      "id",
+      "operation",
+      "target",
+      "weight",
+      "generator",
+      "templateId",
+      "bindings",
+      "idPool",
+    ]);
 
     const id = readString(c, request.id, join(requestPath, "id"), { nonEmpty: true });
     if (id !== undefined) {
@@ -235,6 +308,8 @@ function validateRequestComposition(c: IssueCollector, value: unknown, path: str
     if (weight !== undefined) totalWeight += weight;
 
     validateGenerator(c, request.generator, join(requestPath, "generator"));
+    validateBindings(c, request, requestPath);
+    validateIdPool(c, request, requestPath);
   });
 
   if (requests.length > 0 && totalWeight === 0) {

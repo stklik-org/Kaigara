@@ -22,7 +22,7 @@ export const loadTimelineSchema = {
     tracks: { type: "array", items: { $ref: "#/definitions/Track" } },
   },
   definitions: {
-    RequestOperation: { type: "string", enum: ["create", "update", "delete", "query"] },
+    RequestOperation: { type: "string", enum: ["create", "read", "update", "delete", "query"] },
     RequestTargetEntity: { type: "string", enum: ["shell", "submodel"] },
     RandomizedGenerator: {
       type: "object",
@@ -69,6 +69,34 @@ export const loadTimelineSchema = {
         target: { $ref: "#/definitions/RequestTargetEntity" },
         weight: { type: "number", minimum: 0 },
         generator: { $ref: "#/definitions/RequestGenerator" },
+        templateId: { type: "string" },
+        bindings: { $ref: "#/definitions/ParameterBindings" },
+        idPool: { $ref: "#/definitions/RequestIdPool" },
+      },
+    },
+    RequestIdPool: {
+      type: "object",
+      additionalProperties: false,
+      required: ["source"],
+      description: "Where the identifier a request addresses comes from. Absent means \"created\".",
+      properties: {
+        source: { type: "string", enum: ["created", "server"] },
+        maxIds: { type: "number", minimum: 1 },
+      },
+    },
+    ParameterBindings: {
+      type: "object",
+      description: "Parameter id -> how it was bound in the catalogue template named by templateId.",
+      additionalProperties: {
+        type: "object",
+        additionalProperties: false,
+        required: ["strategy"],
+        properties: {
+          strategy: { type: "string" },
+          // Shaped by the chosen strategy's own JSON Schema, which lives in the catalogue folder
+          // rather than here — so this stays deliberately open.
+          config: { type: "object" },
+        },
       },
     },
     RequestComposition: {

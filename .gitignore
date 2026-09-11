@@ -25,6 +25,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Archived k6 run inputs (scripts, plans, ExecutionPlan.txt, request payloads).
+# One timestamped session folder per backend process — see backend/README.md, KAIGARA_LOG_DIR.
+k6-logs/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -32,3 +36,27 @@ Thumbs.db
 # Editors
 .idea/
 *.swp
+
+docs/
+basyx-setup/
+sink/
+AAS-Benchmarking-Tool-Proposal.md
+
+# Claude Code — keep shared project config, ignore machine-local settings
+.claude/
+CLAUDE.md
+
+# .NET (stress-forge reference slice)
+stress-forge/
+
+# throwaway k6 learning sandbox (see k6-tmp/README.md) — not project code
+k6-tmp/
+
+# Vendored IDTA reference material (177 MB of upstream PDFs/AASX/schemas).
+# Reproducible from a clean checkout with frontend/submodel-templates/refresh.sh,
+# so only the scripts and the README are tracked.
+frontend/submodel-templates/*
+!frontend/submodel-templates/README.md
+!frontend/submodel-templates/refresh.sh
+!frontend/submodel-templates/index.py
+!frontend/submodel-templates/inventory.json

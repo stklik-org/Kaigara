@@ -1,0 +1,30 @@
+{
+  "id": "list-shells",
+  "title": "List shells (paged)",
+  "operation": "read",
+  "target": "aas",
+  "execution": "engine",
+  "summary": "GET the shell collection with limit/cursor paging.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/shells",
+    "expect": [
+      200
+    ],
+    "query": {
+      "limit": "{pageSize}"
+    }
+  },
+  "parameters": [
+    {
+      "id": "pageSize",
+      "label": "Page size",
+      "type": "page-size",
+      "bindsTo": "query.limit"
+    }
+  ],
+  "defaults": {
+    "weight": 10
+  },
+  "kind": "request"
+}

@@ -1,0 +1,3495 @@
+{
+ "generated": "2026-09-05",
+ "sources": {
+  "submodelTemplates": "https://github.com/admin-shell-io/submodel-templates (main)",
+  "metamodel": "https://github.com/admin-shell-io/aas-specs-metamodel (master)",
+  "specifications": "https://industrialdigitaltwin.org/en/content-hub/aasspecifications",
+  "license": "CC-BY-4.0"
+ },
+ "counts": {
+  "families": 54,
+  "templateFiles": 161,
+  "submodels": 175,
+  "unparseable": 0
+ },
+ "templates": [
+  {
+   "family": "Artificial Intelligence Dataset",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02058",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Artificial Intelligence Dataset/1/0/1/IDTA 02058-1-0-1_Template_AIDataset.json",
+   "bytes": 109028,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 49,
+   "submodels": [
+    {
+     "idShort": "AIDataset",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+     "kind": "Template",
+     "elementCount": 50
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Dataset",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02058",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Artificial Intelligence Dataset/1/0/1/IDTA 02058-1-0-1_Template_AIDataset_forAASMetamodelV3.1.json",
+   "bytes": 109028,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 49,
+   "submodels": [
+    {
+     "idShort": "AIDataset",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+     "kind": "Template",
+     "elementCount": 50
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Dataset",
+   "versionPath": "1/0",
+   "idtaNumber": "02058",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Artificial Intelligence Dataset/1/0/IDTA 02058-1-0_Template_AIDataset.json",
+   "bytes": 112387,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 49,
+   "submodels": [
+    {
+     "idShort": "AIDataset",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+     "kind": "Template",
+     "elementCount": 50
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Deployment",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02059",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Artificial Intelligence Deployment/1/0/1/IDTA 02059-1-0-1_Template_AIDeployment.json",
+   "bytes": 80833,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 39,
+   "submodels": [
+    {
+     "idShort": "AIDeployment",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+     "kind": "Template",
+     "elementCount": 38
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Deployment",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02059",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Artificial Intelligence Deployment/1/0/1/IDTA 02059-1-0-1_Template_AIDeployment_forAASMetamodelV3.1.json",
+   "bytes": 80833,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 39,
+   "submodels": [
+    {
+     "idShort": "AIDeployment",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+     "kind": "Template",
+     "elementCount": 38
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Deployment",
+   "versionPath": "1/0",
+   "idtaNumber": "02059",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Artificial Intelligence Deployment/1/0/IDTA 02059-1-0_Template_AIDeployment.json",
+   "bytes": 83477,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 39,
+   "submodels": [
+    {
+     "idShort": "AIDeployment",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+     "kind": "Template",
+     "elementCount": 38
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Model Nameplate",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02060",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Artificial Intelligence Model Nameplate/1/0/1/IDTA 02060-1-0-1_Template_AIModelNameplate.json",
+   "bytes": 105383,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 42,
+   "submodels": [
+    {
+     "idShort": "AIModelNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+     "kind": "Template",
+     "elementCount": 44
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Model Nameplate",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02060",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Artificial Intelligence Model Nameplate/1/0/1/IDTA 02060-1-0-1_Template_AIModelNameplate_forAASMetamodelV3.1.json",
+   "bytes": 105383,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 42,
+   "submodels": [
+    {
+     "idShort": "AIModelNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+     "kind": "Template",
+     "elementCount": 44
+    }
+   ]
+  },
+  {
+   "family": "Artificial Intelligence Model Nameplate",
+   "versionPath": "1/0",
+   "idtaNumber": "02060",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Artificial Intelligence Model Nameplate/1/0/IDTA 02060-1-0_Template_AIModelNameplate.json",
+   "bytes": 108645,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 42,
+   "submodels": [
+    {
+     "idShort": "AIModelNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+     "kind": "Template",
+     "elementCount": 44
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Description",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02017",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Asset Interfaces Description/1/0/1/IDTA 02017-1-0-1_Template_Asset Interfaces Description.json",
+   "bytes": 501384,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 74,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesDescription",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesDescription",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Submodel",
+     "kind": "Template",
+     "elementCount": 360
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Description",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02017",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Asset Interfaces Description/1/0/1/IDTA 02017-1-0-1_Template_Asset Interfaces Description_forAASMetamodelV3.1.json",
+   "bytes": 501384,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 74,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesDescription",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesDescription",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Submodel",
+     "kind": "Template",
+     "elementCount": 360
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Description",
+   "versionPath": "1/0",
+   "idtaNumber": "02017",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Asset Interfaces Description/1/0/IDTA 02017-1-0_Template_Asset Interfaces Description.json",
+   "bytes": 442272,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 0,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesDescription",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesDescription",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/0/Submodel",
+     "kind": "Template",
+     "elementCount": 360
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Description",
+   "versionPath": "1/1",
+   "idtaNumber": "02017",
+   "idtaVersion": "1.1",
+   "file": "submodels/published/Asset Interfaces Description/1/1/IDTA 02017-1-1_Template_Asset Interfaces Description.json",
+   "bytes": 1569634,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 109,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesDescription",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesDescription/1/1",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel",
+     "kind": "Template",
+     "elementCount": 784
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Mapping Configuration",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02027",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Asset Interfaces Mapping Configuration/1/0/1/IDTA 02027-1-0-1_Template_AIMC.json",
+   "bytes": 11392,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 4,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesMappingConfiguration",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesMappingConfiguration/1/0/",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/Submodel",
+     "kind": "Template",
+     "elementCount": 5
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Mapping Configuration",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02027",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Asset Interfaces Mapping Configuration/1/0/1/IDTA 02027-1-0-1_Template_AIMC_forAASMetamodelV3.1.json",
+   "bytes": 11392,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 4,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesMappingConfiguration",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesMappingConfiguration/1/0/",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/Submodel",
+     "kind": "Template",
+     "elementCount": 5
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Mapping Configuration",
+   "versionPath": "1/0",
+   "idtaNumber": "02027",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Asset Interfaces Mapping Configuration/1/0/IDTA 02027-1-0_Template_AIMC .json",
+   "bytes": 124001,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 105,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesMappingConfiguration",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesMappingConfiguration/1/0/",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/1/0/Submodel",
+     "kind": "Template",
+     "elementCount": 5
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Mapping Configuration",
+   "versionPath": "2/0",
+   "idtaNumber": "02027",
+   "idtaVersion": null,
+   "file": "submodels/published/Asset Interfaces Mapping Configuration/2/0/IDTA 02027_Template_AIMC.json",
+   "bytes": 49380,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 14,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesMappingConfiguration",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesMappingConfiguration/2/0",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/Submodel",
+     "kind": "Template",
+     "elementCount": 13
+    }
+   ]
+  },
+  {
+   "family": "Asset Interfaces Mapping Configuration",
+   "versionPath": "2/0",
+   "idtaNumber": "02027",
+   "idtaVersion": null,
+   "file": "submodels/published/Asset Interfaces Mapping Configuration/2/0/IDTA 02027_Template_AIMC_without_examplevalues.json",
+   "bytes": 49305,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 14,
+   "submodels": [
+    {
+     "idShort": "AssetInterfacesMappingConfiguration",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/AssetInterfacesMappingConfiguration/2/0",
+     "semanticId": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/Submodel",
+     "kind": "Template",
+     "elementCount": 13
+    }
+   ]
+  },
+  {
+   "family": "Capability Description",
+   "versionPath": "1/0",
+   "idtaNumber": "02020",
+   "idtaVersion": null,
+   "file": "submodels/published/Capability Description/1/0/IDTA 02020_Template_Capability_Description.json",
+   "bytes": 149905,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "CapabilityDescription",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/CapabilityDescription/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/CapabilityDescription/1/0",
+     "kind": "Template",
+     "elementCount": 37
+    }
+   ]
+  },
+  {
+   "family": "Carbon Footprint",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02023",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Carbon Footprint/1/0/1/IDTA 02023-1-0-1 _Template_CarbonFootprint.json",
+   "bytes": 109032,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 29,
+   "submodels": [
+    {
+     "idShort": "CarbonFootprint",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/CarbonFootprint/1/0",
+     "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+     "kind": "Template",
+     "elementCount": 27
+    }
+   ]
+  },
+  {
+   "family": "Carbon Footprint",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02023",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Carbon Footprint/1/0/1/IDTA 02023-1-0-1 _Template_CarbonFootprint_forAASMetamodelV3.1.json",
+   "bytes": 109032,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 29,
+   "submodels": [
+    {
+     "idShort": "CarbonFootprint",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/CarbonFootprint/1/0",
+     "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+     "kind": "Template",
+     "elementCount": 27
+    }
+   ]
+  },
+  {
+   "family": "Carbon Footprint",
+   "versionPath": "1/0",
+   "idtaNumber": "02023",
+   "idtaVersion": null,
+   "file": "submodels/published/Carbon Footprint/1/0/IDTA 02023 _Template_CarbonFootprint.json",
+   "bytes": 112177,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 29,
+   "submodels": [
+    {
+     "idShort": "CarbonFootprint",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/CarbonFootprint/1/0",
+     "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+     "kind": "Template",
+     "elementCount": 27
+    }
+   ]
+  },
+  {
+   "family": "Contact Information",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02002",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Contact Information/1/0/1/IDTA 02002-1-0-1_Template_ContactInformation.json",
+   "bytes": 68877,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "ContactInformations",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ContactInformation/1/0",
+     "semanticId": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations",
+     "kind": "Template",
+     "elementCount": 57
+    }
+   ]
+  },
+  {
+   "family": "Contact Information",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02002",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Contact Information/1/0/1/IDTA 02002-1-0-1_Template_ContactInformation_forAASMetamodelV3.1.json",
+   "bytes": 68877,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "ContactInformations",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ContactInformation/1/0",
+     "semanticId": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations",
+     "kind": "Template",
+     "elementCount": 57
+    }
+   ]
+  },
+  {
+   "family": "Contact Information",
+   "versionPath": "1/0",
+   "idtaNumber": "02002",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Contact Information/1/0/IDTA 02002-1-0_Template_ContactInformation.json",
+   "bytes": 67559,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "ContactInformations",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ContactInformation/1/0",
+     "semanticId": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations",
+     "kind": "Template",
+     "elementCount": 49
+    }
+   ]
+  },
+  {
+   "family": "Control Component Instance",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02016",
+   "idtaVersion": "2.0.1",
+   "file": "submodels/published/Control Component Instance/2/0/1/IDTA 02016-2-0-1 _Template_ControlComponentInstance.json",
+   "bytes": 65146,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 26,
+   "submodels": [
+    {
+     "idShort": "ControlComponentInstance",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlComponent/Instance/2/0",
+     "semanticId": "https://admin-shell.io/idta/ControlComponent/Instance/2/0",
+     "kind": "Template",
+     "elementCount": 19
+    }
+   ]
+  },
+  {
+   "family": "Control Component Instance",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02016",
+   "idtaVersion": "2.0.1",
+   "file": "submodels/published/Control Component Instance/2/0/1/IDTA 02016-2-0-1 _Template_ControlComponentInstance_forAASMetamodelV3.1.json",
+   "bytes": 65146,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 26,
+   "submodels": [
+    {
+     "idShort": "ControlComponentInstance",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlComponent/Instance/2/0",
+     "semanticId": "https://admin-shell.io/idta/ControlComponent/Instance/2/0",
+     "kind": "Template",
+     "elementCount": 19
+    }
+   ]
+  },
+  {
+   "family": "Control Component Instance",
+   "versionPath": "2/0",
+   "idtaNumber": "02016",
+   "idtaVersion": "2.0",
+   "file": "submodels/published/Control Component Instance/2/0/IDTA 02016-2-0 _Template_ControlComponentInstance.json",
+   "bytes": 67141,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 26,
+   "submodels": [
+    {
+     "idShort": "ControlComponentInstance",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlComponent/Instance/2/0",
+     "semanticId": "https://admin-shell.io/idta/ControlComponent/Instance/2/0",
+     "kind": "Template",
+     "elementCount": 19
+    }
+   ]
+  },
+  {
+   "family": "Control Component Type",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02015",
+   "idtaVersion": "2.0.1",
+   "file": "submodels/published/Control Component Type/2/0/1/IDTA 02015-2-0-1 _Template_ControlComponentType.json",
+   "bytes": 67057,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 21,
+   "submodels": [
+    {
+     "idShort": "ControlComponentType",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlComponentType/2/0",
+     "semanticId": "https://admin-shell.io/idta/ControlComponent/Type/2/0",
+     "kind": "Template",
+     "elementCount": 22
+    }
+   ]
+  },
+  {
+   "family": "Control Component Type",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02015",
+   "idtaVersion": "2.0.1",
+   "file": "submodels/published/Control Component Type/2/0/1/IDTA 02015-2-0-1 _Template_ControlComponentType_forAASMetamodelV3.1.json",
+   "bytes": 67057,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 21,
+   "submodels": [
+    {
+     "idShort": "ControlComponentType",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlComponentType/2/0",
+     "semanticId": "https://admin-shell.io/idta/ControlComponent/Type/2/0",
+     "kind": "Template",
+     "elementCount": 22
+    }
+   ]
+  },
+  {
+   "family": "Control Component Type",
+   "versionPath": "2/0",
+   "idtaNumber": "02015",
+   "idtaVersion": "2.0",
+   "file": "submodels/published/Control Component Type/2/0/IDTA 02015-2-0 _Template_ControlComponentType.json",
+   "bytes": 69055,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 21,
+   "submodels": [
+    {
+     "idShort": "ControlComponentType",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlComponentType/2/0",
+     "semanticId": "https://admin-shell.io/idta/ControlComponent/Type/2/0",
+     "kind": "Template",
+     "elementCount": 22
+    }
+   ]
+  },
+  {
+   "family": "Control Configuration and Parametrization for NC and CNC Machines",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02053",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Control Configuration and Parametrization for NC and CNC Machines/1/0/1/IDTA 02053-1-0-1_Template_ControlConfig.json",
+   "bytes": 127930,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 50,
+   "submodels": [
+    {
+     "idShort": "ControlConfig__00__",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlConfigurationofCNCMachines/1/0",
+     "semanticId": "https://admin-shell.io/idta/ControlConfig/1/0",
+     "kind": "Template",
+     "elementCount": 51
+    }
+   ]
+  },
+  {
+   "family": "Control Configuration and Parametrization for NC and CNC Machines",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02053",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Control Configuration and Parametrization for NC and CNC Machines/1/0/1/IDTA 02053-1-0-1_Template_ControlConfig_forAASMetamodelV3.1.json",
+   "bytes": 127930,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 50,
+   "submodels": [
+    {
+     "idShort": "ControlConfig__00__",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlConfigurationofCNCMachines/1/0",
+     "semanticId": "https://admin-shell.io/idta/ControlConfig/1/0",
+     "kind": "Template",
+     "elementCount": 51
+    }
+   ]
+  },
+  {
+   "family": "Control Configuration and Parametrization for NC and CNC Machines",
+   "versionPath": "1/0",
+   "idtaNumber": "02053",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Control Configuration and Parametrization for NC and CNC Machines/1/0/IDTA 02053-1-0_Template_ControlConfig.json",
+   "bytes": 122271,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 50,
+   "submodels": [
+    {
+     "idShort": "ControlConfig__00__",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ControlConfigurationofCNCMachines/1/0",
+     "semanticId": "https://admin-shell.io/idta/ControlConfig/1/0",
+     "kind": "Template",
+     "elementCount": 51
+    }
+   ]
+  },
+  {
+   "family": "Creation and Classification of Materials",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02034",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Creation and Classification of Materials/1/0/1/IDTA 02034-1-0-1 Template_BackendSpecificMaterialInformation.json",
+   "bytes": 18390,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 10,
+   "submodels": [
+    {
+     "idShort": "BackendSpecificMaterialInformation",
+     "id": "https://admin-shell.io/idta/BackendSpecificMaterialInformation/1/0",
+     "semanticId": "https://admin-shell.io/idta/BackendSpecificMaterialInformation/1/0",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "Creation and Classification of Materials",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02034",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Creation and Classification of Materials/1/0/1/IDTA 02034-1-0-1 Template_BackendSpecificMaterialInformation_forAASMetamodelV3.1.json",
+   "bytes": 18390,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 10,
+   "submodels": [
+    {
+     "idShort": "BackendSpecificMaterialInformation",
+     "id": "https://admin-shell.io/idta/BackendSpecificMaterialInformation/1/0",
+     "semanticId": "https://admin-shell.io/idta/BackendSpecificMaterialInformation/1/0",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "Creation and Classification of Materials",
+   "versionPath": "1/0",
+   "idtaNumber": "02034",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Creation and Classification of Materials/1/0/IDTA 02034-1-0 Template_BackendSpecificMaterialInformation.json",
+   "bytes": 6152,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 0,
+   "submodels": [
+    {
+     "idShort": "BackendSpecificMaterialInformation",
+     "id": "https://example.com/ids/sm/8251_4151_4042_6668",
+     "semanticId": "https://admin-shell.io/idta/BackendSpecificMaterialInformation/1/0/",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "DEXPI",
+   "versionPath": "1/0",
+   "idtaNumber": "02012",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/DEXPI/1/0/IDTA 02012-1-0_Template_DEXPI.json",
+   "bytes": 409903,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 0,
+   "submodels": [
+    {
+     "idShort": "DEXPI",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DEXPI/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/DEXPI/1/0",
+     "kind": "Template",
+     "elementCount": 289
+    }
+   ]
+  },
+  {
+   "family": "Data Model for Asset Location",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02045",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Data Model for Asset Location/1/0/1/IDTA 02045-1-0-1_Template_DataModelForAssetLocation.json",
+   "bytes": 178170,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 27,
+   "submodels": [
+    {
+     "idShort": "AssetLocation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DataModelforAssetLocation/1/0",
+     "semanticId": "https://admin-shell.io/idta/smt/assetlocation/1/0",
+     "kind": "Template",
+     "elementCount": 80
+    }
+   ]
+  },
+  {
+   "family": "Data Model for Asset Location",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02045",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Data Model for Asset Location/1/0/1/IDTA 02045-1-0-1_Template_DataModelForAssetLocation_forAASMetamodelV3.1.json",
+   "bytes": 178170,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 27,
+   "submodels": [
+    {
+     "idShort": "AssetLocation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DataModelforAssetLocation/1/0",
+     "semanticId": "https://admin-shell.io/idta/smt/assetlocation/1/0",
+     "kind": "Template",
+     "elementCount": 80
+    }
+   ]
+  },
+  {
+   "family": "Data Model for Asset Location",
+   "versionPath": "1/0",
+   "idtaNumber": "02045",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Data Model for Asset Location/1/0/IDTA 02045-1-0_Template_DataModelForAssetLocation.json",
+   "bytes": 183201,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "AssetLocation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DataModelforAssetLocation/1/0",
+     "semanticId": "https://admin-shell.io/idta/smt/assetlocation/1/0",
+     "kind": "Template",
+     "elementCount": 80
+    }
+   ]
+  },
+  {
+   "family": "Data Retention Policies",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02056",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Data Retention Policies/1/0/1/IDTA 02056-1-0-1_Template_Data Retention Policies.json",
+   "bytes": 73675,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "DataRetentionPolicies",
+     "id": "https://admin-shell.io/idta/DataRetentionPolicies/1/0",
+     "semanticId": "https://admin-shell.io/idta/DataRetentionPolicies/1/0",
+     "kind": "Template",
+     "elementCount": 28
+    }
+   ]
+  },
+  {
+   "family": "Data Retention Policies",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02056",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Data Retention Policies/1/0/1/IDTA 02056-1-0-1_Template_Data Retention Policies_forAASMetamodelV3.1.json",
+   "bytes": 73675,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "DataRetentionPolicies",
+     "id": "https://admin-shell.io/idta/DataRetentionPolicies/1/0",
+     "semanticId": "https://admin-shell.io/idta/DataRetentionPolicies/1/0",
+     "kind": "Template",
+     "elementCount": 28
+    }
+   ]
+  },
+  {
+   "family": "Data Retention Policies",
+   "versionPath": "1/0",
+   "idtaNumber": "02056",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Data Retention Policies/1/0/IDTA 02056-1-0_Template_Data Retention Policies.json",
+   "bytes": 71004,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "DataRetentionPolicies",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DataRetentionPolicies/1/0",
+     "semanticId": "https://admin-shell.io/idta/DataRetentionPolicies/1/0",
+     "kind": "Template",
+     "elementCount": 28
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "1_Digital Nameplate/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "1",
+   "file": "submodels/published/Digital Battery Passport/1_Digital Nameplate/1/0/IDTA 02035-1_DBP-Part-1_Digital Nameplate.json",
+   "bytes": 74219,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 19,
+   "submodels": [
+    {
+     "idShort": "BatteryNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/DigitalNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/digitalbatterypassport/nameplate/1/0/Nameplate",
+     "kind": "Template",
+     "elementCount": 23
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "1_Digital Nameplate/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "1",
+   "file": "submodels/published/Digital Battery Passport/1_Digital Nameplate/1/0/IDTA 02035-1_DBP-Part-1_Digital Nameplate_without_examplevalues.json",
+   "bytes": 73717,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 19,
+   "submodels": [
+    {
+     "idShort": "BatteryNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/DigitalNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/digitalbatterypassport/nameplate/1/0/Nameplate",
+     "kind": "Template",
+     "elementCount": 23
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "2_Handover Documentation/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "2",
+   "file": "submodels/published/Digital Battery Passport/2_Handover Documentation/1/0/IDTA 02035-2_DBP-Part-2_HandoverDocumentation.json",
+   "bytes": 107616,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 21,
+   "submodels": [
+    {
+     "idShort": "HandoverDocumentation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/HandoverDocumentation/1/0",
+     "semanticId": "0173-1#01-AHF578#003",
+     "kind": "Template",
+     "elementCount": 22
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "2_Handover Documentation/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "2",
+   "file": "submodels/published/Digital Battery Passport/2_Handover Documentation/1/0/IDTA 02035-2_DBP-Part-2_HandoverDocumentation_without_examplevalues.json",
+   "bytes": 107570,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 21,
+   "submodels": [
+    {
+     "idShort": "HandoverDocumentation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/HandoverDocumentation/1/0",
+     "semanticId": "0173-1#01-AHF578#003",
+     "kind": "Template",
+     "elementCount": 22
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "3_Product Carbon Footprint/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "3",
+   "file": "submodels/published/Digital Battery Passport/3_Product Carbon Footprint/1/0/IDTA 02035-3_DBP-Part-3_ProductCarbonFootprint.json",
+   "bytes": 56305,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 8,
+   "submodels": [
+    {
+     "idShort": "CarbonFootprint",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/CarbonFootprint/1/0",
+     "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "3_Product Carbon Footprint/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "3",
+   "file": "submodels/published/Digital Battery Passport/3_Product Carbon Footprint/1/0/IDTA 02035-3_DBP-Part-3_ProductCarbonFootprint_without_examplevalues.json",
+   "bytes": 56261,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 8,
+   "submodels": [
+    {
+     "idShort": "CarbonFootprint",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/CarbonFootprint/1/0",
+     "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "4_Technical Data/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "4",
+   "file": "submodels/published/Digital Battery Passport/4_Technical Data/1/0/1/IDTA 02035-4_DBP-Part-4_TechnicalData.json",
+   "bytes": 144142,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/TechnicalData/1/0",
+     "semanticId": "https://admin-shell.io/idta/digitalbatterypassport/TechnicalData/1/0",
+     "kind": "Template",
+     "elementCount": 46
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "4_Technical Data/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "4",
+   "file": "submodels/published/Digital Battery Passport/4_Technical Data/1/0/1/IDTA 02035-4_DBP-Part-4_TechnicalData_without_examplevalues.json",
+   "bytes": 143231,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/TechnicalData/1/0",
+     "semanticId": "https://admin-shell.io/idta/digitalbatterypassport/TechnicalData/1/0",
+     "kind": "Template",
+     "elementCount": 46
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "4_Technical Data/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "4",
+   "file": "submodels/published/Digital Battery Passport/4_Technical Data/1/0/IDTA 02035-4_DBP-Part-4_TechnicalData.json",
+   "bytes": 159951,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 36,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/TechnicalData/1/0",
+     "semanticId": "https://admin-shell.io/idta/digitalbatterypassport/TechnicalData/1/0",
+     "kind": "Template",
+     "elementCount": 51
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "4_Technical Data/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "4",
+   "file": "submodels/published/Digital Battery Passport/4_Technical Data/1/0/IDTA 02035-4_DBP-Part-4_TechnicalData_without_examplevalues.json",
+   "bytes": 158785,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 36,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalBatteryPassport/TechnicalData/1/0",
+     "semanticId": "https://admin-shell.io/idta/digitalbatterypassport/TechnicalData/1/0",
+     "kind": "Template",
+     "elementCount": 51
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "5_Product Condition/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "5",
+   "file": "submodels/published/Digital Battery Passport/5_Product Condition/1/0/1/IDTA 02035-5_DBP-Part-5_ProductCondition.json",
+   "bytes": 131595,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 38,
+   "submodels": [
+    {
+     "idShort": "ProductCondition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition",
+     "kind": "Template",
+     "elementCount": 49
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "5_Product Condition/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "5",
+   "file": "submodels/published/Digital Battery Passport/5_Product Condition/1/0/1/IDTA 02035-5_DBP-Part-5_ProductCondition_without_examplevalues.json",
+   "bytes": 130414,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 38,
+   "submodels": [
+    {
+     "idShort": "ProductCondition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition",
+     "kind": "Template",
+     "elementCount": 49
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "5_Product Condition/1/0/2",
+   "idtaNumber": "02035",
+   "idtaVersion": "5",
+   "file": "submodels/published/Digital Battery Passport/5_Product Condition/1/0/2/IDTA 02035-5_DBP-Part-5_ProductCondition_V1.0.2.json",
+   "bytes": 138271,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 38,
+   "submodels": [
+    {
+     "idShort": "ProductCondition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.2#ProductCondition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.2#ProductCondition",
+     "kind": "Template",
+     "elementCount": 49
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "5_Product Condition/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "5",
+   "file": "submodels/published/Digital Battery Passport/5_Product Condition/1/0/IDTA 02035-5_DBP-Part-5_ProductCondition.json",
+   "bytes": 129145,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "ProductCondition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition",
+     "kind": "Template",
+     "elementCount": 48
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "5_Product Condition/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "5",
+   "file": "submodels/published/Digital Battery Passport/5_Product Condition/1/0/IDTA 02035-5_DBP-Part-5_ProductCondition_without_examplevalues.json",
+   "bytes": 127943,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "ProductCondition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.product_condition:1.0.0#ProductCondition",
+     "kind": "Template",
+     "elementCount": 48
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "6_Material Composition/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "6",
+   "file": "submodels/published/Digital Battery Passport/6_Material Composition/1/0/1/IDTA 02035-6_DBP-Part-6_MaterialComposition.json",
+   "bytes": 74680,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "MaterialComposition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition",
+     "kind": "Template",
+     "elementCount": 23
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "6_Material Composition/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "6",
+   "file": "submodels/published/Digital Battery Passport/6_Material Composition/1/0/1/IDTA 02035-6_DBP-Part-6_MaterialComposition_without_examplevalues.json",
+   "bytes": 74470,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "MaterialComposition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition",
+     "kind": "Template",
+     "elementCount": 23
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "6_Material Composition/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "6",
+   "file": "submodels/published/Digital Battery Passport/6_Material Composition/1/0/IDTA 02035-6_DBP-Part-6_MaterialComposition.json",
+   "bytes": 68569,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "MaterialComposition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition",
+     "kind": "Template",
+     "elementCount": 23
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "6_Material Composition/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "6",
+   "file": "submodels/published/Digital Battery Passport/6_Material Composition/1/0/IDTA 02035-6_DBP-Part-6_MaterialComposition_without_examplevalues.json",
+   "bytes": 68280,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 25,
+   "submodels": [
+    {
+     "idShort": "MaterialComposition",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.material_composition:1.0.0#MaterialComposition",
+     "kind": "Template",
+     "elementCount": 23
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "7_Circularity/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "7",
+   "file": "submodels/published/Digital Battery Passport/7_Circularity/1/0/1/IDTA 02035-7_DBP-Part-7_Circularity.json",
+   "bytes": 112078,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 33,
+   "submodels": [
+    {
+     "idShort": "Circularity",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity",
+     "kind": "Template",
+     "elementCount": 37
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "7_Circularity/1/0/1",
+   "idtaNumber": "02035",
+   "idtaVersion": "7",
+   "file": "submodels/published/Digital Battery Passport/7_Circularity/1/0/1/IDTA 02035-7_DBP-Part-7_Circularity_without_examplevalues.json",
+   "bytes": 112151,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 33,
+   "submodels": [
+    {
+     "idShort": "Circularity",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity",
+     "kind": "Template",
+     "elementCount": 37
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "7_Circularity/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "7",
+   "file": "submodels/published/Digital Battery Passport/7_Circularity/1/0/IDTA 02035-7_DBP-Part-7_Circularity.json",
+   "bytes": 111890,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 33,
+   "submodels": [
+    {
+     "idShort": "Circularity",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity",
+     "kind": "Template",
+     "elementCount": 37
+    }
+   ]
+  },
+  {
+   "family": "Digital Battery Passport",
+   "versionPath": "7_Circularity/1/0",
+   "idtaNumber": "02035",
+   "idtaVersion": "7",
+   "file": "submodels/published/Digital Battery Passport/7_Circularity/1/0/IDTA 02035-7_DBP-Part-7_Circularity_without_examplevalues.json",
+   "bytes": 111889,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 33,
+   "submodels": [
+    {
+     "idShort": "Circularity",
+     "id": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity/submodel",
+     "semanticId": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity",
+     "kind": "Template",
+     "elementCount": 37
+    }
+   ]
+  },
+  {
+   "family": "Digital Product Passport",
+   "versionPath": "Digital Product Passport Part-1/1/0/0",
+   "idtaNumber": "02099",
+   "idtaVersion": "1",
+   "file": "submodels/published/Digital Product Passport/Digital Product Passport Part-1/1/0/0/IDTA 02099-1_Template Digital Product Passport - Part 1.json",
+   "bytes": 50842,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 14,
+   "submodels": [
+    {
+     "idShort": "DppMetadata",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/dppMetadata/1/0",
+     "semanticId": "https://admin-shell.io/idta/cds/dppMetadata/1",
+     "kind": "Template",
+     "elementCount": 10
+    }
+   ]
+  },
+  {
+   "family": "Digital Product Passport",
+   "versionPath": "Digital Product Passport Part-1/1/0/1",
+   "idtaNumber": "02099",
+   "idtaVersion": "1",
+   "file": "submodels/published/Digital Product Passport/Digital Product Passport Part-1/1/0/1/IDTA 02099-1_Template Digital Product Passport - Part 1.json",
+   "bytes": 50842,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 14,
+   "submodels": [
+    {
+     "idShort": "DppMetadata",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/dppMetadata/1/0",
+     "semanticId": "https://admin-shell.io/idta/cds/dppMetadata/1",
+     "kind": "Template",
+     "elementCount": 10
+    }
+   ]
+  },
+  {
+   "family": "Digital Quality Documents",
+   "versionPath": "Part 1 Core Elements/1/0",
+   "idtaNumber": "02065",
+   "idtaVersion": "1",
+   "file": "submodels/published/Digital Quality Documents/Part 1 Core Elements/1/0/IDTA 02065-1_Template_DigitalQualityDocuments-part-1.json",
+   "bytes": 154536,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 21,
+   "submodels": [
+    {
+     "idShort": "DigitalQualityDocuments",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalQualityDocument/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/DigitalQualityDocument/1/0",
+     "kind": "Template",
+     "elementCount": 75
+    }
+   ]
+  },
+  {
+   "family": "Digital nameplate",
+   "versionPath": "3/0/1",
+   "idtaNumber": "02006",
+   "idtaVersion": "3.0.1",
+   "file": "submodels/published/Digital nameplate/3/0/1/IDTA 02006-3-0-1_Template_Digital Nameplate.json",
+   "bytes": 84687,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 30,
+   "submodels": [
+    {
+     "idShort": "Nameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalNameplate/3/0",
+     "semanticId": "https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+     "kind": "Template",
+     "elementCount": 42
+    }
+   ]
+  },
+  {
+   "family": "Digital nameplate",
+   "versionPath": "3/0",
+   "idtaNumber": "02006",
+   "idtaVersion": "3.0",
+   "file": "submodels/published/Digital nameplate/3/0/IDTA 02006-3-0_Template_Digital Nameplate.json",
+   "bytes": 84780,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 30,
+   "submodels": [
+    {
+     "idShort": "Nameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/DigitalNameplate/3/0",
+     "semanticId": "https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+     "kind": "Template",
+     "elementCount": 42
+    }
+   ]
+  },
+  {
+   "family": "Energy Flexibility Data Model",
+   "versionPath": "1/0",
+   "idtaNumber": "02076",
+   "idtaVersion": null,
+   "file": "submodels/published/Energy Flexibility Data Model/1/0/IDTA 02076_Template_EnergyFlexibilityDataModel.json",
+   "bytes": 612535,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 71,
+   "submodels": [
+    {
+     "idShort": "EnergyFlexibilityDataModel",
+     "id": "https://admin-shell.io/idta/EnergyFlexibilityDataModel/1/0/EnergyFlexibilityDataModel",
+     "semanticId": null,
+     "kind": "Template",
+     "elementCount": 268
+    }
+   ]
+  },
+  {
+   "family": "Factory Automation Data for Plant Planning",
+   "versionPath": "1/0",
+   "idtaNumber": "02075",
+   "idtaVersion": null,
+   "file": "submodels/published/Factory Automation Data for Plant Planning/1/0/IDTA 02075_Template_FactoryAutomationDataForPlantPlanning.json",
+   "bytes": 184723,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "FactoryAutomationDataForPlant",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/FactoryAutomationDataForPlantPlanning/1/0",
+     "semanticId": "https://admin-shell.io/idta/cds/factoryAutomationDataForPlant/1",
+     "kind": "Template",
+     "elementCount": 67
+    }
+   ]
+  },
+  {
+   "family": "Fire Protection on Railway Vehicles",
+   "versionPath": "1/0",
+   "idtaNumber": "02102",
+   "idtaVersion": null,
+   "file": "submodels/published/Fire Protection on Railway Vehicles/1/0/IDTA 02102_Example Fire Protection on Railway Vehicles.json",
+   "bytes": 113969,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 38,
+   "submodels": [
+    {
+     "idShort": "RailwayFireProtection",
+     "id": "https://admin-shell.io/idta/Submodel/RailwayFireProtection/Example/1/0",
+     "semanticId": "https://admin-shell.io/idta/cds/RailwayFireProtection/1",
+     "kind": "Instance",
+     "elementCount": 62
+    }
+   ]
+  },
+  {
+   "family": "Fire Protection on Railway Vehicles",
+   "versionPath": "1/0",
+   "idtaNumber": "02102",
+   "idtaVersion": null,
+   "file": "submodels/published/Fire Protection on Railway Vehicles/1/0/IDTA 02102_Template Fire Protection on Railway Vehicles.json",
+   "bytes": 129733,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 38,
+   "submodels": [
+    {
+     "idShort": "RailwayFireProtection",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/RailwayFireProtection/1/0",
+     "semanticId": "https://admin-shell.io/idta/cds/RailwayFireProtection/1",
+     "kind": "Template",
+     "elementCount": 37
+    }
+   ]
+  },
+  {
+   "family": "Functional Safety",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02014",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Functional Safety/1/0/1/IDTA 02014-1-0-1_Template_FunctionalSafety.json",
+   "bytes": 86574,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "FunctionalSafety",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/FunctionalSafety/1/0",
+     "semanticId": "https://admin-shell.io/idta/iec62683/1/0/FunctionalSafety",
+     "kind": "Template",
+     "elementCount": 31
+    }
+   ]
+  },
+  {
+   "family": "Functional Safety",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02014",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Functional Safety/1/0/1/IDTA 02014-1-0-1_Template_FunctionalSafety_forAASMetamodelV3.1.json",
+   "bytes": 86574,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "FunctionalSafety",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/FunctionalSafety/1/0",
+     "semanticId": "https://admin-shell.io/idta/iec62683/1/0/FunctionalSafety",
+     "kind": "Template",
+     "elementCount": 31
+    }
+   ]
+  },
+  {
+   "family": "Functional Safety",
+   "versionPath": "1/0",
+   "idtaNumber": "02014",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Functional Safety/1/0/IDTA 02014-1-0_Template_FunctionalSafety.json",
+   "bytes": 88739,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "FunctionalSafety",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/FunctionalSafety/1/0",
+     "semanticId": "https://admin-shell.io/idta/iec62683/1/0/FunctionalSafety",
+     "kind": "Template",
+     "elementCount": 31
+    }
+   ]
+  },
+  {
+   "family": "Handover Documentation",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02004",
+   "idtaVersion": "2.0.1",
+   "file": "submodels/published/Handover Documentation/2/0/1/IDTA 02004-2-0-1_Template_HandoverDocumentation.json",
+   "bytes": 154259,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 34,
+   "submodels": [
+    {
+     "idShort": "HandoverDocumentation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HandoverDocumentation/2/0",
+     "semanticId": "0173-1#01-AHF578#003",
+     "kind": "Template",
+     "elementCount": 38
+    }
+   ]
+  },
+  {
+   "family": "Handover Documentation",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02004",
+   "idtaVersion": "2.0.1",
+   "file": "submodels/published/Handover Documentation/2/0/1/IDTA 02004-2-0-1_Template_HandoverDocumentation__forAASMetamodelV3.1.json",
+   "bytes": 154259,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 34,
+   "submodels": [
+    {
+     "idShort": "HandoverDocumentation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HandoverDocumentation/2/0",
+     "semanticId": "0173-1#01-AHF578#003",
+     "kind": "Template",
+     "elementCount": 38
+    }
+   ]
+  },
+  {
+   "family": "Handover Documentation",
+   "versionPath": "2/0",
+   "idtaNumber": "02004",
+   "idtaVersion": "2.0",
+   "file": "submodels/published/Handover Documentation/2/0/IDTA 02004-2-0_Example_HandoverDocumentation.json",
+   "bytes": 293321,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "HandoverDocumentation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HandoverDocumentation/2/0",
+     "semanticId": "0173-1#01-AHF578#003",
+     "kind": "Instance",
+     "elementCount": 173
+    }
+   ]
+  },
+  {
+   "family": "Handover Documentation",
+   "versionPath": "2/0",
+   "idtaNumber": "02004",
+   "idtaVersion": "2.0",
+   "file": "submodels/published/Handover Documentation/2/0/IDTA 02004-2-0_Template_HandoverDocumentation.json",
+   "bytes": 158467,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 34,
+   "submodels": [
+    {
+     "idShort": "HandoverDocumentation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HandoverDocumentation/2/0",
+     "semanticId": "0173-1#01-AHF578#003",
+     "kind": "Template",
+     "elementCount": 38
+    }
+   ]
+  },
+  {
+   "family": "Hierarchical Structures enabling Bills of Material",
+   "versionPath": "1/1/1",
+   "idtaNumber": "02011",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Hierarchical Structures enabling Bills of Material/1/1/1/IDTA 02011-1-1-1_Template_HSEBoM.json",
+   "bytes": 33945,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 8,
+   "submodels": [
+    {
+     "idShort": "HierarchicalStructures",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HierarchicalStructuresBoM/1/1",
+     "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/1/1/Submodel",
+     "kind": "Template",
+     "elementCount": 11
+    }
+   ]
+  },
+  {
+   "family": "Hierarchical Structures enabling Bills of Material",
+   "versionPath": "1/1/1",
+   "idtaNumber": "02011",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Hierarchical Structures enabling Bills of Material/1/1/1/IDTA 02011-1-1-1_Template_HSEBoM_forAASMetamodelV3.1.json",
+   "bytes": 33945,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 8,
+   "submodels": [
+    {
+     "idShort": "HierarchicalStructures",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HierarchicalStructuresBoM/1/1",
+     "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/1/1/Submodel",
+     "kind": "Template",
+     "elementCount": 11
+    }
+   ]
+  },
+  {
+   "family": "Hierarchical Structures enabling Bills of Material",
+   "versionPath": "1/1",
+   "idtaNumber": "02011",
+   "idtaVersion": "1.1",
+   "file": "submodels/published/Hierarchical Structures enabling Bills of Material/1/1/IDTA 02011-1-1_Template_HSEBoM.json",
+   "bytes": 23599,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 0,
+   "submodels": [
+    {
+     "idShort": "HierarchicalStructures",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HierarchicalStructuresBoM/1/1",
+     "semanticId": "https://admin-shell.io/idta/HierarchicalStructures/1/1/Submodel",
+     "kind": "Template",
+     "elementCount": 11
+    }
+   ]
+  },
+  {
+   "family": "Hierarchical Structures enabling Bills of Material",
+   "versionPath": "Extension based on IEC 81346/1/0/1",
+   "idtaNumber": "02011",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Hierarchical Structures enabling Bills of Material/Extension based on IEC 81346/1/0/1/IDTA 02011-1-1-1 _Template_BoM_ExtensionbasedonIEC81346.json",
+   "bytes": 62449,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 19,
+   "submodels": [
+    {
+     "idShort": "IEC81346Structure",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HierarchicalStructures/ExtensionIEC81346/1/0",
+     "semanticId": null,
+     "kind": "Template",
+     "elementCount": 19
+    }
+   ]
+  },
+  {
+   "family": "Hierarchical Structures enabling Bills of Material",
+   "versionPath": "Extension based on IEC 81346/1/0/1",
+   "idtaNumber": "02011",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Hierarchical Structures enabling Bills of Material/Extension based on IEC 81346/1/0/1/IDTA 02011-1-1-1 _Template_BoM_ExtensionbasedonIEC81346_forAASMetamodelV3.1.json",
+   "bytes": 62449,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 19,
+   "submodels": [
+    {
+     "idShort": "IEC81346Structure",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HierarchicalStructures/ExtensionIEC81346/1/0",
+     "semanticId": null,
+     "kind": "Template",
+     "elementCount": 19
+    }
+   ]
+  },
+  {
+   "family": "Hierarchical Structures enabling Bills of Material",
+   "versionPath": "Extension based on IEC 81346/1/0",
+   "idtaNumber": "02011",
+   "idtaVersion": "1",
+   "file": "submodels/published/Hierarchical Structures enabling Bills of Material/Extension based on IEC 81346/1/0/IDTA 02011-1_Template_BoM_ExtensionbasedonIEC81346.json",
+   "bytes": 62449,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 19,
+   "submodels": [
+    {
+     "idShort": "IEC81346Structure",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/HierarchicalStructures/ExtensionIEC81346/1/0",
+     "semanticId": null,
+     "kind": "Template",
+     "elementCount": 19
+    }
+   ]
+  },
+  {
+   "family": "Inspection Documents of Steel Products",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02032",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Inspection Documents of Steel Products/1/0/1/IDTA 02032-1-0-1_Template Inspection Documents of Steel Products.json",
+   "bytes": 307588,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 71,
+   "submodels": [
+    {
+     "idShort": "InspectionDocumentsOfSteelProducts",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+     "kind": "Template",
+     "elementCount": 129
+    }
+   ]
+  },
+  {
+   "family": "Inspection Documents of Steel Products",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02032",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Inspection Documents of Steel Products/1/0/1/IDTA 02032-1-0-1_Template Inspection Documents of Steel Products_forAASMetamodelV3.1.json",
+   "bytes": 307588,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 71,
+   "submodels": [
+    {
+     "idShort": "InspectionDocumentsOfSteelProducts",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+     "kind": "Template",
+     "elementCount": 129
+    }
+   ]
+  },
+  {
+   "family": "Inspection Documents of Steel Products",
+   "versionPath": "1/0",
+   "idtaNumber": "02032",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Inspection Documents of Steel Products/1/0/IDTA 02032-1-0_Template Inspection Documents of Steel Products.json",
+   "bytes": 307406,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 71,
+   "submodels": [
+    {
+     "idShort": "InspectionDocumentsOfSteelProducts",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+     "kind": "Template",
+     "elementCount": 129
+    }
+   ]
+  },
+  {
+   "family": "Intelligent Information  for Use",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02063",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Intelligent Information  for Use/1/0/1/IDTA 02063-1-0-1_Template__IntelligentInformationForUse.json",
+   "bytes": 536659,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 249,
+   "submodels": [
+    {
+     "idShort": "IntelligentInformationforUse",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/IntelligentInformationForUse/1/0",
+     "semanticId": "https://admin-shell.io/idta/IntelligentInformationForUse/1/0",
+     "kind": "Template",
+     "elementCount": 176
+    }
+   ]
+  },
+  {
+   "family": "Intelligent Information  for Use",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02063",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Intelligent Information  for Use/1/0/1/IDTA 02063-1-0-1_Template__IntelligentInformationForUse_forAASMetamodelV3.1.json",
+   "bytes": 536659,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 249,
+   "submodels": [
+    {
+     "idShort": "IntelligentInformationforUse",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/IntelligentInformationForUse/1/0",
+     "semanticId": "https://admin-shell.io/idta/IntelligentInformationForUse/1/0",
+     "kind": "Template",
+     "elementCount": 176
+    }
+   ]
+  },
+  {
+   "family": "Intelligent Information  for Use",
+   "versionPath": "1/0",
+   "idtaNumber": "02063",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Intelligent Information  for Use/1/0/IDTA 02063-1-0_Template__IntelligentInformationForUse.json",
+   "bytes": 553150,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 249,
+   "submodels": [
+    {
+     "idShort": "IntelligentInformationforUse",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/IntelligentInformationForUse/1/0",
+     "semanticId": "https://admin-shell.io/idta/IntelligentInformationForUse/1/0",
+     "kind": "Template",
+     "elementCount": 176
+    }
+   ]
+  },
+  {
+   "family": "MTP",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02001",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/MTP/1/0/1/IDTA_02001-1-0-1_Submodel_MTPv1.0-rc2-with-documentation1_en.json",
+   "bytes": 270236,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 2,
+   "conceptDescriptions": 26,
+   "submodels": [
+    {
+     "idShort": "AssetIdentification",
+     "id": "www.vendor.com/ids/sm/5324_9041_1002_7612",
+     "semanticId": null,
+     "kind": "Instance",
+     "elementCount": 1
+    },
+    {
+     "idShort": "Documentation",
+     "id": "https://example.com/ids/sm/0455_7003_3012_9891",
+     "semanticId": "http://admin-shell.io/vdi/2770/1/0/Documentation",
+     "kind": "Instance",
+     "elementCount": 244
+    },
+    {
+     "idShort": "AssetIdentification",
+     "id": "www.vendor.com/ids/sm/4594_9041_1002_9069",
+     "semanticId": null,
+     "kind": "Instance",
+     "elementCount": 2
+    },
+    {
+     "idShort": "ModuleTypePackage",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ModuleTypePackage/1/0",
+     "semanticId": "https://admin-shell.io/vdi/2658/1/0/MTPSubmodel",
+     "kind": "Template",
+     "elementCount": 4
+    },
+    {
+     "idShort": "ProcessEquipmentAssembly",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ModuleTypePackageInstance/1/0",
+     "semanticId": "https://admin-shell.io/vdi/2658/1/0/PEASubmodel",
+     "kind": "Template",
+     "elementCount": 11
+    },
+    {
+     "idShort": "Documentation",
+     "id": "http://example.com/id/instance/99920200206160529000012810",
+     "semanticId": "http://admin-shell.io/vdi/2770/1/0/Documentation",
+     "kind": "Instance",
+     "elementCount": 244
+    }
+   ]
+  },
+  {
+   "family": "MTP",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02001",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/MTP/1/0/1/IDTA_02001-1-0-1_Submodel_MTPv1.0-rc2-with-documentation1_en_forAASMetamodelV3.1.json",
+   "bytes": 270236,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 2,
+   "conceptDescriptions": 26,
+   "submodels": [
+    {
+     "idShort": "AssetIdentification",
+     "id": "www.vendor.com/ids/sm/5324_9041_1002_7612",
+     "semanticId": null,
+     "kind": "Instance",
+     "elementCount": 1
+    },
+    {
+     "idShort": "Documentation",
+     "id": "https://example.com/ids/sm/0455_7003_3012_9891",
+     "semanticId": "http://admin-shell.io/vdi/2770/1/0/Documentation",
+     "kind": "Instance",
+     "elementCount": 244
+    },
+    {
+     "idShort": "AssetIdentification",
+     "id": "www.vendor.com/ids/sm/4594_9041_1002_9069",
+     "semanticId": null,
+     "kind": "Instance",
+     "elementCount": 2
+    },
+    {
+     "idShort": "ModuleTypePackage",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ModuleTypePackage/1/0",
+     "semanticId": "https://admin-shell.io/vdi/2658/1/0/MTPSubmodel",
+     "kind": "Template",
+     "elementCount": 4
+    },
+    {
+     "idShort": "ProcessEquipmentAssembly",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ModuleTypePackageInstance/1/0",
+     "semanticId": "https://admin-shell.io/vdi/2658/1/0/PEASubmodel",
+     "kind": "Template",
+     "elementCount": 11
+    },
+    {
+     "idShort": "Documentation",
+     "id": "http://example.com/id/instance/99920200206160529000012810",
+     "semanticId": "http://admin-shell.io/vdi/2770/1/0/Documentation",
+     "kind": "Instance",
+     "elementCount": 244
+    }
+   ]
+  },
+  {
+   "family": "MTP",
+   "versionPath": "1/0",
+   "idtaNumber": "02001",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/MTP/1/0/IDTA 02001-1-0_Subomdel_MTPv1.0-rc2-with-documentation.json",
+   "bytes": 273856,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 2,
+   "conceptDescriptions": 26,
+   "submodels": [
+    {
+     "idShort": "ModuleTypePackage",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ModuleTypePackage/1/0",
+     "semanticId": "https://admin-shell.io/vdi/2658/1/0/MTPSubmodel",
+     "kind": "Template",
+     "elementCount": 4
+    },
+    {
+     "idShort": "AssetIdentification",
+     "id": "www.vendor.com/ids/sm/5324_9041_1002_7612",
+     "semanticId": null,
+     "kind": "Instance",
+     "elementCount": 1
+    },
+    {
+     "idShort": "AssetIdentification",
+     "id": "www.vendor.com/ids/sm/4594_9041_1002_9069",
+     "semanticId": null,
+     "kind": "Instance",
+     "elementCount": 2
+    },
+    {
+     "idShort": "ProcessEquipmentAssembly",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ModuleTypePackageInstance/1/0",
+     "semanticId": "https://admin-shell.io/vdi/2658/1/0/PEASubmodel",
+     "kind": "Template",
+     "elementCount": 11
+    },
+    {
+     "idShort": "Documentation",
+     "id": "http://example.com/id/instance/99920200206160529000012810",
+     "semanticId": "http://admin-shell.io/vdi/2770/1/0/Documentation",
+     "kind": "Instance",
+     "elementCount": 244
+    },
+    {
+     "idShort": "Documentation",
+     "id": "https://example.com/ids/sm/0455_7003_3012_9891",
+     "semanticId": "http://admin-shell.io/vdi/2770/1/0/Documentation",
+     "kind": "Instance",
+     "elementCount": 244
+    }
+   ]
+  },
+  {
+   "family": "Maintenance Instructions",
+   "versionPath": "1/0",
+   "idtaNumber": "02018",
+   "idtaVersion": null,
+   "file": "submodels/published/Maintenance Instructions/1/0/IDTA_02018_Template_MaintenanceInstructions.json",
+   "bytes": 296625,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 115,
+   "submodels": [
+    {
+     "idShort": "MaintenanceInstructions",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/MaintenanceInstructions/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/MaintenanceInstructions/1/0",
+     "kind": "Template",
+     "elementCount": 127
+    }
+   ]
+  },
+  {
+   "family": "Material Data for Plastic Waste",
+   "versionPath": "1/0",
+   "idtaNumber": "02080",
+   "idtaVersion": null,
+   "file": "submodels/published/Material Data for Plastic Waste/1/0/IDTA_02080_Template_Material Data for Plastic Waste.json",
+   "bytes": 215787,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 52,
+   "submodels": [
+    {
+     "idShort": "MaterialDataForEN18065ClassificationOfPlastics",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/en18065materialdata/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/en18065materialdata/en18065MaterialData/1/0",
+     "kind": "Template",
+     "elementCount": 82
+    }
+   ]
+  },
+  {
+   "family": "OPC UA Server Datasheet",
+   "versionPath": "1/0",
+   "idtaNumber": "02009",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/OPC UA Server Datasheet/1/0/IDTA 02009-1-0-Template-OPCUA-Server Datasheet.json",
+   "bytes": 102052,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 39,
+   "submodels": [
+    {
+     "idShort": "UAServerDataSheet",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/opcuaserverdatasheet/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/opcuaserverdatasheet/1/0",
+     "kind": "Template",
+     "elementCount": 44
+    }
+   ]
+  },
+  {
+   "family": "Plant Asset Management Specification Sheet",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02019",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Plant Asset Management Specification Sheet/1/0/1/IDTA 02019-1-0-1_Template_PlantAssetManagement.json",
+   "bytes": 323405,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 68,
+   "submodels": [
+    {
+     "idShort": "PAMSpecificationSheet",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PAMSpecificationSheet/1/0",
+     "semanticId": "0173-1#01-AGC973#003",
+     "kind": "Template",
+     "elementCount": 80
+    }
+   ]
+  },
+  {
+   "family": "Plant Asset Management Specification Sheet",
+   "versionPath": "1/0",
+   "idtaNumber": "02019",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Plant Asset Management Specification Sheet/1/0/IDTA 02019-1-0-1_Template_PlantAssetManagement_forAASMetamodelV3.1.json",
+   "bytes": 323405,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 68,
+   "submodels": [
+    {
+     "idShort": "PAMSpecificationSheet",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PAMSpecificationSheet/1/0",
+     "semanticId": "0173-1#01-AGC973#003",
+     "kind": "Template",
+     "elementCount": 80
+    }
+   ]
+  },
+  {
+   "family": "Plant Asset Management Specification Sheet",
+   "versionPath": "1/0",
+   "idtaNumber": "02019",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Plant Asset Management Specification Sheet/1/0/IDTA 02019-1-0_Template_PlantAssetManagement.json",
+   "bytes": 332735,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 68,
+   "submodels": [
+    {
+     "idShort": "PAMSpecificationSheet",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PAMSpecificationSheet/1/0",
+     "semanticId": "0173-1#01-AGC973#003",
+     "kind": "Template",
+     "elementCount": 80
+    }
+   ]
+  },
+  {
+   "family": "Plastic and Rubber Moulds",
+   "versionPath": "Part 1 Identification/1/0",
+   "idtaNumber": "02038",
+   "idtaVersion": "1",
+   "file": "submodels/published/Plastic and Rubber Moulds/Part 1 Identification/1/0/IDTA 02038-1_Template_Plastic and Rubber Moulds-Identification.json",
+   "bytes": 91803,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 47,
+   "submodels": [
+    {
+     "idShort": "PlasticsAndRubberMouldsIdentification",
+     "id": "https://admin-shell.io/idta/euromap/Moulds/Identification/1/0",
+     "semanticId": "https://admin-shell.io/idta/euromap/Moulds/Identification/1/0",
+     "kind": "Template",
+     "elementCount": 64
+    }
+   ]
+  },
+  {
+   "family": "Plastic and Rubber Moulds",
+   "versionPath": "Part 1 Identification/1/0",
+   "idtaNumber": "02038",
+   "idtaVersion": "1",
+   "file": "submodels/published/Plastic and Rubber Moulds/Part 1 Identification/1/0/IDTA 02038-1_Template_Plastic and Rubber Moulds-Identification_forAASMetamodelV3.1.json",
+   "bytes": 91803,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 47,
+   "submodels": [
+    {
+     "idShort": "PlasticsAndRubberMouldsIdentification",
+     "id": "https://admin-shell.io/idta/euromap/Moulds/Identification/1/0",
+     "semanticId": "https://admin-shell.io/idta/euromap/Moulds/Identification/1/0",
+     "kind": "Template",
+     "elementCount": 64
+    }
+   ]
+  },
+  {
+   "family": "Predictive Maintenance",
+   "versionPath": "1/0",
+   "idtaNumber": "02048",
+   "idtaVersion": null,
+   "file": "submodels/published/Predictive Maintenance/1/0/IDTA 02048_Template_PredictiveMaintenance.json",
+   "bytes": 120410,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "PredictiveMaintenance",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PredictiveMaintenance/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/PredictiveMaintenance/1/0",
+     "kind": "Template",
+     "elementCount": 32
+    }
+   ]
+  },
+  {
+   "family": "Predictive Maintenance",
+   "versionPath": "1/0",
+   "idtaNumber": "02048",
+   "idtaVersion": null,
+   "file": "submodels/published/Predictive Maintenance/1/0/IDTA 02048_Template_PredictiveMaintenance_forAASMetamodelV3.1.json",
+   "bytes": 117169,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 35,
+   "submodels": [
+    {
+     "idShort": "PredictiveMaintenance",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PredictiveMaintenance/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/PredictiveMaintenance/1/0",
+     "kind": "Template",
+     "elementCount": 32
+    }
+   ]
+  },
+  {
+   "family": "Process Parameters Instance",
+   "versionPath": "1/0",
+   "idtaNumber": "02031",
+   "idtaVersion": "2",
+   "file": "submodels/published/Process Parameters Instance/1/0/IDTA 02031-2_Template_ProcessParameters_Instance.json",
+   "bytes": 72255,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 27,
+   "submodels": [
+    {
+     "idShort": "ExecutedProcesses",
+     "id": "https://admin-shell.io/idta/ExecutedProcesses/1/0",
+     "semanticId": "https://admin-shell.io/idta/ExecutedProcesses/1/0",
+     "kind": "Template",
+     "elementCount": 26
+    }
+   ]
+  },
+  {
+   "family": "Process Parameters Instance",
+   "versionPath": "1/0",
+   "idtaNumber": "02031",
+   "idtaVersion": "2",
+   "file": "submodels/published/Process Parameters Instance/1/0/IDTA 02031-2_Template_ProcessParameters_Instance_forAASMetamodelV3.1.json",
+   "bytes": 70160,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 27,
+   "submodels": [
+    {
+     "idShort": "ExecutedProcesses",
+     "id": "https://admin-shell.io/idta/ExecutedProcesses/1/0",
+     "semanticId": "https://admin-shell.io/idta/ExecutedProcesses/1/0",
+     "kind": "Template",
+     "elementCount": 26
+    }
+   ]
+  },
+  {
+   "family": "Process Parameters Type",
+   "versionPath": "1/0",
+   "idtaNumber": "02031",
+   "idtaVersion": "1",
+   "file": "submodels/published/Process Parameters Type/1/0/IDTA 02031-1_Template_ProcessParameters_Type.json",
+   "bytes": 29046,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 11,
+   "submodels": [
+    {
+     "idShort": "ProcessParameters",
+     "id": "https://admin-shell-io/idta/SubmodelTemplate/ProcessParameters/1/0",
+     "semanticId": "https://admin-shell-io/idta/SubmodelTemplate/ProcessParameters/1/0",
+     "kind": "Template",
+     "elementCount": 11
+    }
+   ]
+  },
+  {
+   "family": "Process Parameters Type",
+   "versionPath": "1/0",
+   "idtaNumber": "02031",
+   "idtaVersion": "1",
+   "file": "submodels/published/Process Parameters Type/1/0/IDTA 02031-1_Template_ProcessParameters_Type_forAASMetamodelV3.1.json",
+   "bytes": 28186,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 11,
+   "submodels": [
+    {
+     "idShort": "ProcessParameters",
+     "id": "https://admin-shell-io/idta/SubmodelTemplate/ProcessParameters/1/0",
+     "semanticId": "https://admin-shell-io/idta/SubmodelTemplate/ProcessParameters/1/0",
+     "kind": "Template",
+     "elementCount": 11
+    }
+   ]
+  },
+  {
+   "family": "Process Variables for Manufacturing Key Performance Indicators",
+   "versionPath": "1/0",
+   "idtaNumber": "02066",
+   "idtaVersion": null,
+   "file": "submodels/published/Process Variables for Manufacturing Key Performance Indicators/1/0/IDTA 02066_Template_PVM.json",
+   "bytes": 148383,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 23,
+   "submodels": [
+    {
+     "idShort": "ProcessVariablesForManufacturingKPICalculation",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ProcessVariablesForManufacturingKPICalculation/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/ProcessVariablesForManufacturingKPICalculation/1/0",
+     "kind": "Template",
+     "elementCount": 76
+    }
+   ]
+  },
+  {
+   "family": "Product Change Notifications",
+   "versionPath": "1/0",
+   "idtaNumber": "02036",
+   "idtaVersion": null,
+   "file": "submodels/published/Product Change Notifications/1/0/IDTA_02036_Template_ProductChangeNotifications.json",
+   "bytes": 237650,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 67,
+   "submodels": [
+    {
+     "idShort": "ProductChangeNotifications",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/productchangenotifications/1/0",
+     "semanticId": "0173-1#01-AHE582#003",
+     "kind": "Template",
+     "elementCount": 88
+    }
+   ]
+  },
+  {
+   "family": "Production Calendar",
+   "versionPath": "1/0",
+   "idtaNumber": "02067",
+   "idtaVersion": null,
+   "file": "submodels/published/Production Calendar/1/0/IDTA 02067_Template_ProductionCalendar.json",
+   "bytes": 26326,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 6,
+   "submodels": [
+    {
+     "idShort": "ProductionCalendar",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ProductionCalendar/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/ProductionCalendar/1/0",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "Production Calendar",
+   "versionPath": "1/0",
+   "idtaNumber": "02067",
+   "idtaVersion": null,
+   "file": "submodels/published/Production Calendar/1/0/IDTA 02067_Template_ProductionCalendar_forAASMetamodelV3.1.json",
+   "bytes": 25581,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 6,
+   "submodels": [
+    {
+     "idShort": "ProductionCalendar",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ProductionCalendar/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/ProductionCalendar/1/0",
+     "kind": "Template",
+     "elementCount": 12
+    }
+   ]
+  },
+  {
+   "family": "Provision of 3D Models",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02026",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Provision of 3D Models/1/0/1/IDTA 02026-1-0-1_Template_ProvisionOf3DModels.json",
+   "bytes": 250118,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 98,
+   "submodels": [
+    {
+     "idShort": "Models3D",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ProvisionOf3DModels/1/0",
+     "semanticId": "https://admin-shell.io/idta/Models3D/1/0",
+     "kind": "Template",
+     "elementCount": 117
+    }
+   ]
+  },
+  {
+   "family": "Provision of 3D Models",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02026",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Provision of 3D Models/1/0/1/IDTA 02026-1-0-1_Template_ProvisionOf3DModels_forAASMetamodelV3.1.json",
+   "bytes": 250118,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 98,
+   "submodels": [
+    {
+     "idShort": "Models3D",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ProvisionOf3DModels/1/0",
+     "semanticId": "https://admin-shell.io/idta/Models3D/1/0",
+     "kind": "Template",
+     "elementCount": 117
+    }
+   ]
+  },
+  {
+   "family": "Provision of 3D Models",
+   "versionPath": "1/0",
+   "idtaNumber": "02026",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Provision of 3D Models/1/0/IDTA02026-1-0_Template_ProvisionOf3DModels.json",
+   "bytes": 256634,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 98,
+   "submodels": [
+    {
+     "idShort": "Models3D",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ProvisionOf3DModels/1/0",
+     "semanticId": "https://admin-shell.io/idta/Models3D/1/0",
+     "kind": "Template",
+     "elementCount": 117
+    }
+   ]
+  },
+  {
+   "family": "Provision of Company Data",
+   "versionPath": "1/0",
+   "idtaNumber": "02068",
+   "idtaVersion": null,
+   "file": "submodels/published/Provision of Company Data/1/0/IDTA 02068_Template_Provision Of Company Data.json",
+   "bytes": 250750,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 106,
+   "submodels": [
+    {
+     "idShort": "CompanyData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/CompanyData/1/0",
+     "semanticId": "https://admin-shell.io/idta/CompanyData/1/0/CompanyData",
+     "kind": "Template",
+     "elementCount": 114
+    }
+   ]
+  },
+  {
+   "family": "Provision of Company Data",
+   "versionPath": "1/0",
+   "idtaNumber": "02068",
+   "idtaVersion": null,
+   "file": "submodels/published/Provision of Company Data/1/0/IDTA 02068_Template_Provision Of Company Data_forAASMetamodelV3.1.json",
+   "bytes": 250750,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 106,
+   "submodels": [
+    {
+     "idShort": "CompanyData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/CompanyData/1/0",
+     "semanticId": "https://admin-shell.io/idta/CompanyData/1/0/CompanyData",
+     "kind": "Template",
+     "elementCount": 114
+    }
+   ]
+  },
+  {
+   "family": "Provision of Simulation Models",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02005",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Provision of Simulation Models/1/0/1/IDTA 02005-1-0-1_Template_ProvisionOfSimulationModels.json",
+   "bytes": 215489,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 71,
+   "submodels": [
+    {
+     "idShort": "SimulationModels",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SimulationModels/1/0",
+     "semanticId": "https://admin-shell.io/idta/SimulationModels/SimulationModels/1/0",
+     "kind": "Template",
+     "elementCount": 69
+    }
+   ]
+  },
+  {
+   "family": "Provision of Simulation Models",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02005",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Provision of Simulation Models/1/0/1/IDTA 02005-1-0-1_Template_ProvisionOfSimulationModels_forAASMetamodelV3.1.json",
+   "bytes": 215489,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 71,
+   "submodels": [
+    {
+     "idShort": "SimulationModels",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SimulationModels/1/0",
+     "semanticId": "https://admin-shell.io/idta/SimulationModels/SimulationModels/1/0",
+     "kind": "Template",
+     "elementCount": 69
+    }
+   ]
+  },
+  {
+   "family": "Provision of Simulation Models",
+   "versionPath": "1/0",
+   "idtaNumber": "02005",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Provision of Simulation Models/1/0/IDTA 02005-1-0_GenericForm_ProvisionOfSimulationModels.json",
+   "bytes": 278447,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 0,
+   "conceptDescriptions": 0,
+   "submodels": []
+  },
+  {
+   "family": "Provision of Simulation Models",
+   "versionPath": "1/0",
+   "idtaNumber": "02005",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Provision of Simulation Models/1/0/IDTA 02005-1-0_Template_ProvisionOfSimulationModels.json",
+   "bytes": 397855,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 230,
+   "submodels": [
+    {
+     "idShort": "SimulationModels",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SimulationModels/1/0",
+     "semanticId": "https://admin-shell.io/idta/SimulationModels/SimulationModels/1/0",
+     "kind": "Template",
+     "elementCount": 69
+    }
+   ]
+  },
+  {
+   "family": "Provision of Simulation Models",
+   "versionPath": "1/1",
+   "idtaNumber": "02005",
+   "idtaVersion": null,
+   "file": "submodels/published/Provision of Simulation Models/1/1/IDTA 02005_Template_ProvisionOfSimulationModel.json",
+   "bytes": 274839,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 74,
+   "submodels": [
+    {
+     "idShort": "SimulationModels",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SimulationModels/1/1",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/SimulationModels/1/1",
+     "kind": "Template",
+     "elementCount": 76
+    }
+   ]
+  },
+  {
+   "family": "Purchase Order",
+   "versionPath": "1/0",
+   "idtaNumber": "02050",
+   "idtaVersion": null,
+   "file": "submodels/published/Purchase Order/1/0/IDTA-02050_Template_PurchaseOrder.json",
+   "bytes": 2103207,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 330,
+   "submodels": [
+    {
+     "idShort": "PurchaseOrder",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PurchaseOrder/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/PurchaseOrder/1/0",
+     "kind": "Template",
+     "elementCount": 836
+    }
+   ]
+  },
+  {
+   "family": "Purchase Order",
+   "versionPath": "1/0",
+   "idtaNumber": "02050",
+   "idtaVersion": null,
+   "file": "submodels/published/Purchase Order/1/0/IDTA-02050_Template_PurchaseOrder_forAASMetamodelV3.1.json",
+   "bytes": 2102877,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 330,
+   "submodels": [
+    {
+     "idShort": "PurchaseOrder",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/PurchaseOrder/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/PurchaseOrder/1/0",
+     "kind": "Template",
+     "elementCount": 836
+    }
+   ]
+  },
+  {
+   "family": "Quality Control for Machining",
+   "versionPath": "1/0",
+   "idtaNumber": "02049",
+   "idtaVersion": null,
+   "file": "submodels/published/Quality Control for Machining/1/0/IDTA_02049_Template_QualityControlForMachining.json",
+   "bytes": 765695,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 222,
+   "submodels": [
+    {
+     "idShort": "QualityControlForMachining",
+     "id": "https://admin-shell.io/idta/QualityControlForMachining/1/0",
+     "semanticId": null,
+     "kind": "Template",
+     "elementCount": 183
+    }
+   ]
+  },
+  {
+   "family": "Reliability",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02013",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Reliability/1/0/1/IDTA 02013-1-0-1_Template_Reliability.json",
+   "bytes": 44029,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 16,
+   "submodels": [
+    {
+     "idShort": "Reliability",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/Reliability/1/0",
+     "semanticId": "https://admin-shell.io/idta/iec62683/1/0/Reliability",
+     "kind": "Template",
+     "elementCount": 15
+    }
+   ]
+  },
+  {
+   "family": "Reliability",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02013",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Reliability/1/0/1/IDTA 02013-1-0-1_Template_Reliability_forAASMetamodelV3.1.json",
+   "bytes": 44029,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 16,
+   "submodels": [
+    {
+     "idShort": "Reliability",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/Reliability/1/0",
+     "semanticId": "https://admin-shell.io/idta/iec62683/1/0/Reliability",
+     "kind": "Template",
+     "elementCount": 15
+    }
+   ]
+  },
+  {
+   "family": "Reliability",
+   "versionPath": "1/0",
+   "idtaNumber": "02013",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Reliability/1/0/IDTA 02013-1-0_Template_Reliability.json",
+   "bytes": 44955,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 16,
+   "submodels": [
+    {
+     "idShort": "Reliability",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/Reliability/1/0",
+     "semanticId": "https://admin-shell.io/idta/iec62683/1/0/Reliability",
+     "kind": "Template",
+     "elementCount": 15
+    }
+   ]
+  },
+  {
+   "family": "Service Request Notification",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02010",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Service Request Notification/1/0/1/IDTA 02010-1-0-1_Template_ServiceRequestNotification.json",
+   "bytes": 103053,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 55,
+   "submodels": [
+    {
+     "idShort": "ServiceRequestNotification",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ServiceRequestNotification/1/0",
+     "semanticId": "0173-1#01-AHX443#001",
+     "kind": "Template",
+     "elementCount": 28
+    }
+   ]
+  },
+  {
+   "family": "Service Request Notification",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02010",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Service Request Notification/1/0/1/IDTA 02010-1-0-1_Template_ServiceRequestNotification_forAASMetamodelV3.1.json",
+   "bytes": 103053,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 55,
+   "submodels": [
+    {
+     "idShort": "ServiceRequestNotification",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ServiceRequestNotification/1/0",
+     "semanticId": "0173-1#01-AHX443#001",
+     "kind": "Template",
+     "elementCount": 28
+    }
+   ]
+  },
+  {
+   "family": "Service Request Notification",
+   "versionPath": "1/0",
+   "idtaNumber": "02010",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Service Request Notification/1/0/IDTA 02010-1-0_Template_ServiceRequestNotification.json",
+   "bytes": 106094,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 55,
+   "submodels": [
+    {
+     "idShort": "ServiceRequestNotification",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/ServiceRequestNotification/1/0",
+     "semanticId": "0173-1#01-AHX443#001",
+     "kind": "Template",
+     "elementCount": 28
+    }
+   ]
+  },
+  {
+   "family": "Sizing of Power Drive Trains",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02021",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Sizing of Power Drive Trains/1/0/1/IDTA 02021-1-0-1_Template_Sizing of Power Drive Trains.json",
+   "bytes": 481137,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 112,
+   "submodels": [
+    {
+     "idShort": "PowerDriveTrainSizing",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SizingofPowerDriveTrains/1/0",
+     "semanticId": "https://admin-shell.io/idta/PowerDriveTrainSizing/1/0",
+     "kind": "Template",
+     "elementCount": 221
+    }
+   ]
+  },
+  {
+   "family": "Sizing of Power Drive Trains",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02021",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Sizing of Power Drive Trains/1/0/1/IDTA 02021-1-0-1_Template_Sizing of Power Drive Trains_forAASMetamodelV3.1.json",
+   "bytes": 481137,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 112,
+   "submodels": [
+    {
+     "idShort": "PowerDriveTrainSizing",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SizingofPowerDriveTrains/1/0",
+     "semanticId": "https://admin-shell.io/idta/PowerDriveTrainSizing/1/0",
+     "kind": "Template",
+     "elementCount": 221
+    }
+   ]
+  },
+  {
+   "family": "Sizing of Power Drive Trains",
+   "versionPath": "1/0",
+   "idtaNumber": "02021",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Sizing of Power Drive Trains/1/0/IDTA 02021-1-0_Template_Sizing of Power Drive Trains.json",
+   "bytes": 494147,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 112,
+   "submodels": [
+    {
+     "idShort": "PowerDriveTrainSizing",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SizingofPowerDriveTrains/1/0",
+     "semanticId": "https://admin-shell.io/idta/PowerDriveTrainSizing/1/0",
+     "kind": "Template",
+     "elementCount": 221
+    }
+   ]
+  },
+  {
+   "family": "Software Nameplate",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02007",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Software Nameplate/1/0/1/IDTA 02007-1-0-1_Template_Software Nameplate.json",
+   "bytes": 125374,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "SoftwareNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SoftwareNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/SoftwareNameplate/1/0",
+     "kind": "Template",
+     "elementCount": 91
+    }
+   ]
+  },
+  {
+   "family": "Software Nameplate",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02007",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Software Nameplate/1/0/1/IDTA 02007-1-0-1_Template_Software Nameplate_forAASMetamodelV3.1.json",
+   "bytes": 125374,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "SoftwareNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SoftwareNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/SoftwareNameplate/1/0",
+     "kind": "Template",
+     "elementCount": 91
+    }
+   ]
+  },
+  {
+   "family": "Software Nameplate",
+   "versionPath": "1/0",
+   "idtaNumber": "02007",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Software Nameplate/1/0/IDTA 02007-1-0_Template_Software Nameplate.json",
+   "bytes": 128024,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "SoftwareNameplate",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/SoftwareNameplate/1/0",
+     "semanticId": "https://admin-shell.io/idta/SoftwareNameplate/1/0",
+     "kind": "Template",
+     "elementCount": 91
+    }
+   ]
+  },
+  {
+   "family": "Technical Data for Automated Guided Vehicles",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02047",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Technical Data for Automated Guided Vehicles/1/0/1/IDTA 02047-1-0-1 Template_TechnicalDataForAGV.json",
+   "bytes": 310523,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 88,
+   "submodels": [
+    {
+     "idShort": "TechnicalDataAGV",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+     "kind": "Template",
+     "elementCount": 99
+    }
+   ]
+  },
+  {
+   "family": "Technical Data for Automated Guided Vehicles",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02047",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Technical Data for Automated Guided Vehicles/1/0/1/IDTA 02047-1-0-1 Template_TechnicalDataForAGV_forAASMetamodelV3.1.json",
+   "bytes": 310523,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 88,
+   "submodels": [
+    {
+     "idShort": "TechnicalDataAGV",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+     "kind": "Template",
+     "elementCount": 99
+    }
+   ]
+  },
+  {
+   "family": "Technical Data for Automated Guided Vehicles",
+   "versionPath": "1/0",
+   "idtaNumber": "02047",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Technical Data for Automated Guided Vehicles/1/0/IDTA 02047-1-0 Template_TechnicalDataForAGV.json",
+   "bytes": 318901,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 88,
+   "submodels": [
+    {
+     "idShort": "TechnicalDataAGV",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+     "kind": "Template",
+     "elementCount": 99
+    }
+   ]
+  },
+  {
+   "family": "Technical_Data",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02003",
+   "idtaVersion": null,
+   "file": "submodels/published/Technical_Data/2/0/1/IDTA 02003_2-0-1_Template_TechnicalData.json",
+   "bytes": 157908,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TechnicalData/2/0",
+     "semanticId": "0173-1#01-AHX837#002",
+     "kind": "Template",
+     "elementCount": 69
+    }
+   ]
+  },
+  {
+   "family": "Technical_Data",
+   "versionPath": "2/0/1",
+   "idtaNumber": "02003",
+   "idtaVersion": null,
+   "file": "submodels/published/Technical_Data/2/0/1/IDTA 02003_2-0-1_Template_TechnicalData_forAASMetamodelV3.1.json",
+   "bytes": 157908,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TechnicalData/2/0",
+     "semanticId": "0173-1#01-AHX837#002",
+     "kind": "Template",
+     "elementCount": 69
+    }
+   ]
+  },
+  {
+   "family": "Technical_Data",
+   "versionPath": "2/0",
+   "idtaNumber": "02003",
+   "idtaVersion": null,
+   "file": "submodels/published/Technical_Data/2/0/IDTA 02003_Sample_TechnicalData.json",
+   "bytes": 149648,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 48,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TechnicalData/2/0",
+     "semanticId": "0173-1#01-AHX837#002",
+     "kind": "Instance",
+     "elementCount": 74
+    }
+   ]
+  },
+  {
+   "family": "Technical_Data",
+   "versionPath": "2/0",
+   "idtaNumber": "02003",
+   "idtaVersion": null,
+   "file": "submodels/published/Technical_Data/2/0/IDTA 02003_Template_TechnicalData.json",
+   "bytes": 157877,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 28,
+   "submodels": [
+    {
+     "idShort": "TechnicalData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TechnicalData/2/0",
+     "semanticId": "0173-1#01-AHX837#002",
+     "kind": "Template",
+     "elementCount": 69
+    }
+   ]
+  },
+  {
+   "family": "Time Series Data",
+   "versionPath": "1/1/1",
+   "idtaNumber": "02008",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Time Series Data/1/1/1/IDTA 02008-1-1-1_Template_TimeSeriesData.json",
+   "bytes": 84026,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 24,
+   "submodels": [
+    {
+     "idShort": "TimeSeries",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TimeSeries/1/1",
+     "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+     "kind": "Template",
+     "elementCount": 60
+    }
+   ]
+  },
+  {
+   "family": "Time Series Data",
+   "versionPath": "1/1/1",
+   "idtaNumber": "02008",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Time Series Data/1/1/1/IDTA 02008-1-1-1_Template_TimeSeriesData_forAASMetamodelV3.1.json",
+   "bytes": 84026,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 24,
+   "submodels": [
+    {
+     "idShort": "TimeSeries",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TimeSeries/1/1",
+     "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+     "kind": "Template",
+     "elementCount": 60
+    }
+   ]
+  },
+  {
+   "family": "Time Series Data",
+   "versionPath": "1/1/1",
+   "idtaNumber": "02008",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Time Series Data/1/1/1/IDTA 02008-1-1-1_Template_withOperations_TimeSeriesData.json",
+   "bytes": 97504,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 29,
+   "submodels": [
+    {
+     "idShort": "TimeSeries",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TimeSeries/1/1",
+     "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+     "kind": "Template",
+     "elementCount": 63
+    }
+   ]
+  },
+  {
+   "family": "Time Series Data",
+   "versionPath": "1/1/1",
+   "idtaNumber": "02008",
+   "idtaVersion": "1.1.1",
+   "file": "submodels/published/Time Series Data/1/1/1/IDTA 02008-1-1-1_Template_withOperations_TimeSeriesData_forAASMetamodelV3.1.json",
+   "bytes": 97504,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 29,
+   "submodels": [
+    {
+     "idShort": "TimeSeries",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TimeSeries/1/1",
+     "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+     "kind": "Template",
+     "elementCount": 63
+    }
+   ]
+  },
+  {
+   "family": "Time Series Data",
+   "versionPath": "1/1",
+   "idtaNumber": "02008",
+   "idtaVersion": "1.1",
+   "file": "submodels/published/Time Series Data/1/1/IDTA 02008-1-1_Template_TimeSeriesData.json",
+   "bytes": 86597,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 24,
+   "submodels": [
+    {
+     "idShort": "TimeSeries",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TimeSeries/1/1",
+     "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+     "kind": "Template",
+     "elementCount": 60
+    }
+   ]
+  },
+  {
+   "family": "Time Series Data",
+   "versionPath": "1/1",
+   "idtaNumber": "02008",
+   "idtaVersion": "1.1",
+   "file": "submodels/published/Time Series Data/1/1/IDTA 02008-1-1_Template_withOperations_TimeSeriesData.json",
+   "bytes": 100203,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 29,
+   "submodels": [
+    {
+     "idShort": "TimeSeries",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/TimeSeries/1/1",
+     "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+     "kind": "Template",
+     "elementCount": 63
+    }
+   ]
+  },
+  {
+   "family": "Wireless Communication",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02022",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Wireless Communication/1/0/1/IDTA 02022-1-0-1_Template_Wireless Communication.json",
+   "bytes": 203570,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 86,
+   "submodels": [
+    {
+     "idShort": "WirelessCommunication",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+     "kind": "Template",
+     "elementCount": 90
+    }
+   ]
+  },
+  {
+   "family": "Wireless Communication",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02022",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Wireless Communication/1/0/1/IDTA 02022-1-0-1_Template_Wireless Communication_forAASMetamodelV3.1.json",
+   "bytes": 203570,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 86,
+   "submodels": [
+    {
+     "idShort": "WirelessCommunication",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+     "kind": "Template",
+     "elementCount": 90
+    }
+   ]
+  },
+  {
+   "family": "Wireless Communication",
+   "versionPath": "1/0",
+   "idtaNumber": "02022",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Wireless Communication/1/0/IDTA 02022-1-0_Template_Wireless Communication.json",
+   "bytes": 116041,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 14,
+   "submodels": [
+    {
+     "idShort": "WirelessCommunication",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+     "kind": "Template",
+     "elementCount": 90
+    }
+   ]
+  },
+  {
+   "family": "Worskstation Worker Matching Data",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02046",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Worskstation Worker Matching Data/1/0/1/IDTA 02046-1-0-1_Template_WWMD.json",
+   "bytes": 170059,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "WorkstationWorkerMatchingData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/workstationMatching/1/0",
+     "semanticId": "https://admin-shell.io/idta/sm/workstationworkermatchingdata",
+     "kind": "Template",
+     "elementCount": 85
+    }
+   ]
+  },
+  {
+   "family": "Worskstation Worker Matching Data",
+   "versionPath": "1/0/1",
+   "idtaNumber": "02046",
+   "idtaVersion": "1.0.1",
+   "file": "submodels/published/Worskstation Worker Matching Data/1/0/1/IDTA 02046-1-0-1_Template_WWMD_forAASMetamodelV3.1.json",
+   "bytes": 170059,
+   "hasAasx": true,
+   "hasPdf": false,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "WorkstationWorkerMatchingData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/workstationMatching/1/0",
+     "semanticId": "https://admin-shell.io/idta/sm/workstationworkermatchingdata",
+     "kind": "Template",
+     "elementCount": 85
+    }
+   ]
+  },
+  {
+   "family": "Worskstation Worker Matching Data",
+   "versionPath": "1/0",
+   "idtaNumber": "02046",
+   "idtaVersion": "1.0",
+   "file": "submodels/published/Worskstation Worker Matching Data/1/0/IDTA 02046-1-0_Template_WWMD.json",
+   "bytes": 174761,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 37,
+   "submodels": [
+    {
+     "idShort": "WorkstationWorkerMatchingData",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/workstationMatching/1/0",
+     "semanticId": "https://admin-shell.io/idta/sm/workstationworkermatchingdata",
+     "kind": "Template",
+     "elementCount": 85
+    }
+   ]
+  },
+  {
+   "family": "sensor4.0",
+   "versionPath": "Part 1 Measurement Value/1/0",
+   "idtaNumber": "02029",
+   "idtaVersion": "1",
+   "file": "submodels/published/sensor4.0/Part 1 Measurement Value/1/0/IDTA 02029-1_Template_Sensor4.0_MeasurementValue.json",
+   "bytes": 41127,
+   "hasAasx": true,
+   "hasPdf": true,
+   "shells": 1,
+   "conceptDescriptions": 17,
+   "submodels": [
+    {
+     "idShort": "MeasurementValue",
+     "id": "https://admin-shell.io/idta/SubmodelTemplate/measurementValue/1/0",
+     "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/measurementValue/1/0",
+     "kind": "Template",
+     "elementCount": 16
+    }
+   ]
+  }
+ ]
+}

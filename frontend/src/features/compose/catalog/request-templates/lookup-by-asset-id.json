@@ -1,0 +1,36 @@
+{
+  "id": "lookup-by-asset-id",
+  "title": "Lookup by assetId",
+  "operation": "read",
+  "target": "aas",
+  "execution": "authoring",
+  "summary": "GET /lookup/shells — the discovery path, not the repository path.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/lookup/shells",
+    "expect": [
+      200
+    ],
+    "query": {
+      "assetIds": "{assetId}"
+    }
+  },
+  "parameters": [
+    {
+      "id": "assetId",
+      "label": "Asset identifier",
+      "type": "aas-identifier",
+      "bindsTo": "query.assetIds",
+      "strategies": [
+        "created-in-scenario",
+        "fixed",
+        "non-existing"
+      ]
+    }
+  ],
+  "defaults": {
+    "weight": 8
+  },
+  "notes": "Served by the Discovery interface; a repository that does not implement it answers 404 for every request.",
+  "kind": "request"
+}

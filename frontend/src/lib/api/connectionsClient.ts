@@ -4,8 +4,10 @@ import type {
   ConnectionTestResult,
   ServerConnection,
 } from "@kaigara/shared-types";
-import type { ApiClient } from "./client";
+import type { ConnectionsClient } from "./client";
+import { readJson, writeJson } from "../storage";
 import { mockConnections } from "../mock/connections";
+import { applyTwinsphereDevDefaults } from "./twinsphereDevDefaults";
 
 /**
  * Connections are the one part of the API seam that is real rather than mocked: `test()` actually
@@ -22,9 +24,25 @@ import { mockConnections } from "../mock/connections";
 const STORAGE_KEY = "kaigara.connections.v1";
 const PROBE_ENDPOINT = "/api/connections/test";
 
+const DEFAULT_CONNECTION = {
+  name: "New connection",
+  environment: "",
+  baseUrl: "",
+  apiVersion: "IDTA-01002-3.1",
+  conformanceProfile: "not declared",
+  conformanceStatus: "unknown",
+  reachable: "unknown",
+  active: false,
+  defaultTimeoutSeconds: 30,
+  scrapeResourceMetrics: false,
+  headers: {},
+} as const satisfies Omit<ServerConnection, "id">;
+
 export type ConnectionProbe = (connection: ServerConnection) => Promise<ConnectionTestResult>;
 
-function unreachableProbeResult(connection: ServerConnection, detail: string): ConnectionTestResult {
+/** A result that says nothing about the target server, only that Kaigara could not ask. Kept
+ *  distinct from "unreachable" so a missing backend never gets reported as a dead server. */
+function probeUnavailable(connection: ServerConnection, detail: string): ConnectionTestResult {
   return {
     reachable: false,
     probedUrl: connection.baseUrl,
@@ -36,13 +54,18 @@ function unreachableProbeResult(connection: ServerConnection, detail: string): C
 }
 
 /** Asks the backend to probe the server. The request never leaves the browser's own origin — the
- *  target server is contacted from Node, where CORS does not apply and TLS/DNS/connection errors
- *  can be told apart. */
+ *  target is contacted from Node, where CORS does not apply and TLS/DNS/connection errors can be
+ *  told apart. */
 const httpProbe: ConnectionProbe = async (connection) => {
   const request: ConnectionTestRequest = {
     baseUrl: connection.baseUrl,
     timeoutSeconds: connection.defaultTimeoutSeconds,
+    // So "Test" sees exactly what a run against this connection would send — a probe that
+    // succeeds unauthenticated but a run that then 401s would be a worse surprise than the
+    // reverse.
+    headers: connection.headers,
   };
+
   let response: Response;
   try {
     response = await fetch(PROBE_ENDPOINT, {
@@ -51,7 +74,7 @@ const httpProbe: ConnectionProbe = async (connection) => {
       body: JSON.stringify(request),
     });
   } catch {
-    return unreachableProbeResult(
+    return probeUnavailable(
       connection,
       `Kaigara's probe service is not reachable at ${PROBE_ENDPOINT}. Start the backend (npm run dev -w backend) — this says nothing about the target server.`,
     );
@@ -62,36 +85,20 @@ const httpProbe: ConnectionProbe = async (connection) => {
   try {
     payload = JSON.parse(text);
   } catch {
-    return unreachableProbeResult(
+    return probeUnavailable(
       connection,
       `The probe service answered HTTP ${response.status} with a non-JSON body — is ${PROBE_ENDPOINT} routed to the Kaigara backend?`,
     );
   }
   if (!response.ok) {
     const message = (payload as { error?: string })?.error ?? `HTTP ${response.status}`;
-    return unreachableProbeResult(connection, `The probe service rejected the request: ${message}`);
+    return probeUnavailable(connection, `The probe service rejected the request: ${message}`);
   }
   return payload as ConnectionTestResult;
 };
 
-function loadStored(): ServerConnection[] | null {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? (parsed as ServerConnection[]) : null;
-  } catch {
-    return null;
-  }
-}
-
-function persist(connections: ServerConnection[], enabled: boolean) {
-  if (!enabled) return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(connections));
-  } catch {
-    // Private-mode / quota failures are not worth interrupting the user over.
-  }
+function isConnectionList(value: unknown): value is ServerConnection[] {
+  return Array.isArray(value) && value.length > 0;
 }
 
 function applyInput(connection: ServerConnection, input: ConnectionInput): ServerConnection {
@@ -104,58 +111,58 @@ function applyInput(connection: ServerConnection, input: ConnectionInput): Serve
     conformanceProfile: input.conformanceProfile?.trim() || connection.conformanceProfile,
     defaultTimeoutSeconds: input.defaultTimeoutSeconds ?? connection.defaultTimeoutSeconds,
     scrapeResourceMetrics: input.scrapeResourceMetrics ?? connection.scrapeResourceMetrics,
+    headers: input.headers ?? connection.headers,
   };
 }
 
 export function createConnectionsClient(
   options: { probe?: ConnectionProbe; persistLocally?: boolean } = {},
-): ApiClient["connections"] {
+): ConnectionsClient {
   const { probe = httpProbe, persistLocally = true } = options;
-  const seeded = persistLocally ? loadStored() : null;
-  let connections: ServerConnection[] = seeded ?? mockConnections.map((c) => ({ ...c }));
+  const stored = persistLocally ? readJson(STORAGE_KEY, isConnectionList) : null;
+  let connections: ServerConnection[] = applyTwinsphereDevDefaults(stored ?? mockConnections.map((c) => ({ ...c })));
 
-  const save = () => persist(connections, persistLocally);
+  const save = () => {
+    if (persistLocally) writeJson(STORAGE_KEY, connections);
+  };
+  save();
+  // Handed out as copies so a screen holding the previous list can't mutate this one's state.
   const copy = (connection: ServerConnection) => ({ ...connection });
-  const find = (id: string) => connections.find((c) => c.id === id);
+  const mustFind = (id: string): ServerConnection => {
+    const found = connections.find((c) => c.id === id);
+    if (!found) throw new Error(`No connection with id "${id}".`);
+    return found;
+  };
+  /** Rewrites one connection from whatever the list holds *now*, and persists. Reading the current
+   *  value here rather than at the call site matters for `test()`: the probe is awaited first, and
+   *  an edit made in the meantime must not be rolled back by its result. */
+  const patch = (id: string, change: (current: ServerConnection) => ServerConnection): ServerConnection => {
+    const next = change(mustFind(id));
+    connections = connections.map((c) => (c.id === id ? next : c));
+    save();
+    return next;
+  };
 
   return {
     list: async () => connections.map(copy),
 
     create: async (input) => {
-      const created: ServerConnection = applyInput(
-        {
-          id: crypto.randomUUID(),
-          name: "New connection",
-          environment: "",
-          baseUrl: "",
-          apiVersion: "IDTA-01002-3.1",
-          conformanceProfile: "not declared",
-          conformanceStatus: "unknown",
-          reachable: "unknown",
-          active: false,
-          defaultTimeoutSeconds: 30,
-          scrapeResourceMetrics: false,
-        },
-        input,
-      );
+      const created = applyInput({ id: crypto.randomUUID(), ...DEFAULT_CONNECTION }, input);
       connections = [...connections, created];
       save();
       return copy(created);
     },
 
-    update: async (id, input) => {
-      const existing = find(id);
-      if (!existing) throw new Error(`No connection with id "${id}".`);
-      // A changed base URL invalidates whatever the last probe found.
-      const edited = applyInput(existing, input);
-      const changedTarget = edited.baseUrl !== existing.baseUrl;
-      const next: ServerConnection = changedTarget
-        ? { ...edited, reachable: "unknown", lastTest: undefined }
-        : edited;
-      connections = connections.map((c) => (c.id === id ? next : c));
-      save();
-      return copy(next);
-    },
+    update: async (id, input) =>
+      copy(
+        patch(id, (current) => {
+          const edited = applyInput(current, input);
+          // A changed base URL invalidates whatever the last probe found.
+          return edited.baseUrl === current.baseUrl
+            ? edited
+            : { ...edited, reachable: "unknown" as const, lastTest: undefined };
+        }),
+      ),
 
     remove: async (id) => {
       connections = connections.filter((c) => c.id !== id);
@@ -168,14 +175,14 @@ export function createConnectionsClient(
     },
 
     test: async (id) => {
-      const connection = find(id);
-      if (!connection) throw new Error(`No connection with id "${id}".`);
-      const result = await probe(connection);
-      // A probe service that never ran says nothing about the target server, so the connection's
-      // own reachability must not be overwritten in that case.
-      const reachable = result.error?.kind === "probe-unavailable" ? connection.reachable : result.reachable;
-      connections = connections.map((c) => (c.id === id ? { ...c, reachable, lastTest: result } : c));
-      save();
+      const result = await probe(mustFind(id));
+      patch(id, (current) => ({
+        ...current,
+        // A probe service that never ran says nothing about the target server, so the connection's
+        // own reachability must not be overwritten in that case.
+        reachable: result.error?.kind === "probe-unavailable" ? current.reachable : result.reachable,
+        lastTest: result,
+      }));
       return result;
     },
   };

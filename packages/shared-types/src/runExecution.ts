@@ -12,6 +12,7 @@
 import type { EngineId } from "./engine.ts";
 import type { LoadTimelineData } from "./loadTimeline.ts";
 import type { ValidationIssue } from "./loadTimelineValidation.ts";
+import type { RequestOperation, RequestTargetEntity } from "./requestComposition.ts";
 import type { RunState } from "./run.ts";
 
 /** Where a run points. Sent explicitly rather than referenced by connection id: the backend does
@@ -56,6 +57,70 @@ export interface RunPlanSummary {
    *  plus every fixed iteration count, i.e. the same number the Compose overlay previews. */
   expectedRequests: number;
   loads: RunPlanLoadSummary[];
+}
+
+/** One request type within a {@link ConcretePlanEntry} — a row of the debug view. */
+export interface ConcretePlanRequestLine {
+  /** The authored RequestSpec id this line came from. */
+  requestId: string;
+  operation: RequestOperation;
+  target: RequestTargetEntity;
+  method: string;
+  /** Path relative to the target base URL. `{id}` stays a placeholder — the engine substitutes a
+   *  base64url-encoded identifier from its pool at run time. Any query string is included. */
+  path: string;
+  /** This request's share of the load, 0..1 (the authored weights, normalised). */
+  share: number;
+  /** Expected requests of this kind over the whole load, if the target keeps up. */
+  expectedRequests: number;
+}
+
+/**
+ * One compiled load — i.e. one engine scenario. Mirrors what the k6 adapter emits (see
+ * `backend/src/engines/k6/compileScript.ts`): a start time, a duration, an executor, and the rate
+ * or iteration count it runs at. The load's request composition is broken out into `requests`,
+ * one line per authored request type with its expected total.
+ */
+export interface ConcretePlanEntry {
+  loadId: string;
+  loadKey: string;
+  loadLabel: string;
+  trackLabel: string;
+  shapeKind: string;
+  /** Offset from the start of the run at which the engine starts this load, seconds. */
+  startSeconds: number;
+  /** How long the executor runs, seconds. For instantaneous shapes (spike, individual) this is the
+   *  window they are spread over, not the authored 0. */
+  durationSeconds: number;
+  /** The k6 executor this load compiles to — the only engine implemented (ADR 0001). */
+  executor: "constant-arrival-rate" | "ramping-arrival-rate" | "shared-iterations";
+  /** Human-readable rate profile, e.g. "constant 100 req/s", "ramp 380 → 0 req/s", "50 iterations". */
+  rateSummary: string;
+  /** Peak arrival rate, req/s. Absent for `shared-iterations`, which has a count, not a rate. */
+  peakRatePerSec?: number;
+  /** Total expected requests from this load across every request type. */
+  expectedRequests: number;
+  requests: ConcretePlanRequestLine[];
+}
+
+/**
+ * The execution plan as a load-tool debug view: one entry per compiled load (engine scenario),
+ * saying when the engine starts it, for how long, at what rate, and which IDTA-01002 calls it
+ * issues. Returned by `POST /api/runs/concrete-plan`; nothing is executed to produce it.
+ *
+ * Request totals are expectations — the engine picks each request with a weighted random draw, so
+ * the real per-request sequence varies run to run.
+ */
+export interface ConcretePlan {
+  scenarioName: string;
+  targetBaseUrl: string;
+  totalDurationSeconds: number;
+  /** Total the plan expects to issue if the target keeps up — the same number the Compose overlay
+   *  previews and `RunPlanSummary.expectedRequests` reports. */
+  expectedRequests: number;
+  entries: ConcretePlanEntry[];
+  /** Non-blocking issues found in the source timeline. */
+  warnings: ValidationIssue[];
 }
 
 export interface RunRequestTotals {

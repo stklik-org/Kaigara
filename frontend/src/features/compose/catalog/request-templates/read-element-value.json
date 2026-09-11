@@ -1,0 +1,33 @@
+{
+  "id": "read-element-value",
+  "title": "Read element $value",
+  "operation": "read",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "GET one property's value — the smallest read the API offers.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/submodels/{smId}/submodel-elements/{path}/$value",
+    "expect": [
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "path",
+      "label": "Element",
+      "type": "idshort-path",
+      "bindsTo": "path.path"
+    }
+  ],
+  "defaults": {
+    "weight": 15
+  },
+  "kind": "request"
+}

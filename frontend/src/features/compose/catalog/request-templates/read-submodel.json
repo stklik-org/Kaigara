@@ -1,0 +1,27 @@
+{
+  "id": "read-submodel",
+  "title": "Read Submodel",
+  "operation": "read",
+  "target": "submodel",
+  "execution": "engine",
+  "summary": "GET one whole submodel.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/submodels/{smId}",
+    "expect": [
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    }
+  ],
+  "defaults": {
+    "weight": 25
+  },
+  "kind": "request"
+}

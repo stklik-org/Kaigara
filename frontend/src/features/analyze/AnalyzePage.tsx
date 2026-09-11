@@ -1,31 +1,24 @@
-import { useEffect, useState } from "react";
-import type { RunAnalysis } from "@kaigara/shared-types";
-import { useApi } from "../../lib/api/ApiContext";
-import { Panel, SectionLabel } from "../../components/ui/Panel";
-import { Badge } from "../../components/ui/Badge";
-import { AreaCIChart } from "../../components/charts/AreaCIChart";
-import { PercentileChart } from "../../components/charts/PercentileChart";
-import { HistogramChart } from "../../components/charts/HistogramChart";
-import { BoxPlotChart } from "../../components/charts/BoxPlotChart";
-import { DualLineChart } from "../../components/charts/DualLineChart";
-import { BarChart } from "../../components/charts/BarChart";
+import { Badge } from "@/components/ui/Badge";
+import { Panel, SectionLabel } from "@/components/ui/Panel";
+import { AreaCIChart } from "@/components/charts/AreaCIChart";
+import { BarChart } from "@/components/charts/BarChart";
+import { BoxPlotChart } from "@/components/charts/BoxPlotChart";
+import { DualLineChart } from "@/components/charts/DualLineChart";
+import { HistogramChart } from "@/components/charts/HistogramChart";
+import { PercentileChart } from "@/components/charts/PercentileChart";
+import { useApi } from "@/lib/api/ApiContext";
+import { useAsyncData } from "@/lib/useAsyncData";
 
-/** Mirrors the wireframe's Analyze screen (2e/2eL) — same layout as the old 1e, but every
- *  breakdown is now per load Track instead of per graph branch (throughputByTrack, latencyByTrack
- *  — see packages/shared-types/src/analysis.ts). */
+/** The run this screen reports on. Hardcoded because `analysis` is the one slice still served from
+ *  mock data — it becomes the `?runId=` the Run screen already carries once the backend can
+ *  produce a real analysis. */
+const MOCK_RUN_ID = "run-482";
+
+/** Mirrors the wireframe's Analyze screen (2e/2eL) — every breakdown is per load Track rather than
+ *  per graph branch (`throughputByTrack`, `latencyByTrack`; see shared-types' analysis.ts). */
 export function AnalyzePage() {
   const api = useApi();
-  const [analysis, setAnalysis] = useState<RunAnalysis | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    api.analysis.get("run-482").then((result) => {
-      if (!cancelled) setAnalysis(result);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [api]);
+  const { data: analysis } = useAsyncData(() => api.analysis.get(MOCK_RUN_ID), [api]);
 
   if (!analysis) {
     return <div className="p-6 text-sm text-ink-muted">Loading analysis…</div>;
@@ -96,8 +89,8 @@ export function AnalyzePage() {
           <div className="mt-2">
             <DualLineChart
               series={[
-                { label: "CPU", points: analysis.resourceUsage.cpu, className: "stroke-status-warn" },
-                { label: "Memory", points: analysis.resourceUsage.memory, className: "stroke-accent" },
+                { label: "CPU", points: analysis.resourceUsage.cpu, color: "warn" },
+                { label: "Memory", points: analysis.resourceUsage.memory, color: "accent" },
               ]}
             />
           </div>
@@ -114,8 +107,8 @@ export function AnalyzePage() {
       <Panel className="p-4">
         <SectionLabel>Correctness checks</SectionLabel>
         <div className="mt-2 space-y-1.5">
-          {analysis.correctnessChecks.map((check, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
+          {analysis.correctnessChecks.map((check) => (
+            <div key={`${check.phase}-${check.name}`} className="flex items-center justify-between text-sm">
               <span className="text-ink">
                 <span className="text-ink-muted">{check.phase}:</span> {check.name}
               </span>

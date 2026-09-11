@@ -1,0 +1,107 @@
+{
+  "id": "query-condition",
+  "title": "Query condition",
+  "appliesTo": [
+    "aas",
+    "submodel"
+  ],
+  "default": "by-semantic-id",
+  "description": "The $condition sent to the IDTA-01002 query endpoints.",
+  "strategies": [
+    {
+      "id": "by-semantic-id",
+      "label": "By semanticId",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string",
+            "title": "Template",
+            "default": "Digital nameplate",
+            "x-options-from": "idta-templates"
+          },
+          "vary": {
+            "type": "boolean",
+            "title": "Randomise across templates",
+            "default": true,
+            "description": "One fixed filter value per run lets the server answer from cache."
+          }
+        }
+      },
+      "sample": "$sm#semanticId $eq …/nameplate/3/0/Nameplate"
+    },
+    {
+      "id": "by-idshort-prefix",
+      "label": "By idShort prefix",
+      "schema": {
+        "type": "object",
+        "required": [
+          "prefix"
+        ],
+        "properties": {
+          "prefix": {
+            "type": "string",
+            "title": "Prefix",
+            "default": "Nameplate_"
+          }
+        }
+      },
+      "sample": "$sm#idShort $starts-with \"Nameplate_\""
+    },
+    {
+      "id": "by-property-value",
+      "label": "By property value",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "idShortPath",
+            "default": "YearOfConstruction"
+          },
+          "operator": {
+            "type": "string",
+            "title": "Operator",
+            "enum": [
+              "$eq",
+              "$ne",
+              "$gt",
+              "$ge",
+              "$lt",
+              "$le",
+              "$contains",
+              "$starts-with",
+              "$regex"
+            ],
+            "default": "$ge"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value",
+            "default": "2020"
+          }
+        }
+      },
+      "sample": "$sme.YearOfConstruction#value $ge 2020"
+    },
+    {
+      "id": "raw",
+      "label": "Raw $condition",
+      "schema": {
+        "type": "object",
+        "required": [
+          "json"
+        ],
+        "properties": {
+          "json": {
+            "type": "string",
+            "title": "$condition",
+            "format": "textarea",
+            "default": "{\n  \"$eq\": [\n    { \"$field\": \"$sm#idShort\" },\n    { \"$strVal\": \"Nameplate_0417\" }\n  ]\n}"
+          }
+        }
+      },
+      "sample": "hand-written"
+    }
+  ]
+}

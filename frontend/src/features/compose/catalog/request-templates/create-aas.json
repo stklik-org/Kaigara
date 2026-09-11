@@ -1,0 +1,50 @@
+{
+  "id": "create-aas",
+  "title": "Create AAS",
+  "operation": "create",
+  "target": "aas",
+  "execution": "engine",
+  "summary": "POST one Asset Administration Shell.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/shells",
+    "expect": [
+      201
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "aasId",
+      "label": "New identifier",
+      "type": "aas-identifier",
+      "bindsTo": "body.id",
+      "strategies": [
+        "fixed"
+      ],
+      "default": "fixed",
+      "config": {
+        "mode": "sequence"
+      }
+    },
+    {
+      "id": "payload",
+      "label": "Shell payload",
+      "type": "payload-template",
+      "bindsTo": "body",
+      "strategies": [
+        "minimal",
+        "size-target",
+        "custom-json"
+      ],
+      "default": "minimal"
+    }
+  ],
+  "captures": {
+    "aasId": "$.id"
+  },
+  "defaults": {
+    "weight": 10
+  },
+  "kind": "request"
+}

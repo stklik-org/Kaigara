@@ -1,0 +1,34 @@
+{
+  "id": "delete-element",
+  "title": "Delete element",
+  "operation": "delete",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "DELETE one element out of a submodel.",
+  "endpoint": {
+    "method": "DELETE",
+    "path": "/submodels/{smId}/submodel-elements/{path}",
+    "expect": [
+      204,
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "path",
+      "label": "Element",
+      "type": "idshort-path",
+      "bindsTo": "path.path"
+    }
+  ],
+  "defaults": {
+    "weight": 4
+  },
+  "kind": "request"
+}

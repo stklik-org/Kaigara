@@ -1,0 +1,54 @@
+// Dev Container for Kaigara. See README.md ("Development environment") for how to use it.
+//
+// One container, no Features: everything this project needs at development time is Node, git and
+// the k6 binary, and all three are in the image (.devcontainer/Dockerfile). Adding a Feature pulls
+// in a layer and a maintenance surface, so add one only when something actually needs it.
+{
+  "name": "Kaigara",
+  "build": {
+    "dockerfile": "Dockerfile"
+    // Override the pinned engine/runtime here if you need to, e.g.:
+    // "args": { "K6_VERSION": "2.1.0", "NODE_VERSION": "24" }
+  },
+
+  // `docker run --init`: a real init process reaps the k6 subprocesses the orchestrator spawns,
+  // so an aborted run does not leave a zombie behind.
+  "init": true,
+
+  // Both Node servers default to binding 127.0.0.1, which is right on a laptop and wrong in a
+  // container — it would make them unreachable from a published port. Inside the container's own
+  // network namespace, listening on every interface exposes nothing that the port mapping does
+  // not already. Vite reads no such variable; pass `-- --host` if you need it reachable the same
+  // way (VS Code's port forwarding does not need it).
+  "containerEnv": {
+    "HOST": "0.0.0.0"
+  },
+
+  // VS Code forwards these automatically once something listens on them. The `devcontainer` CLI
+  // does not — it has no forwarding agent — so if you work without VS Code, uncomment `appPort`
+  // below to publish them the plain Docker way instead.
+  "forwardPorts": [5173, 5174, 8081],
+  // "appPort": [5173, 5174, 8081],
+  "portsAttributes": {
+    "5173": { "label": "Frontend (Vite dev server)", "onAutoForward": "openBrowserOnce" },
+    "5174": { "label": "Backend (orchestrator)", "onAutoForward": "silent" },
+    "8081": { "label": "Stub AAS server", "onAutoForward": "silent" }
+  },
+
+  // The lockfile is not baked into the image on purpose, so the first start installs the
+  // workspaces. Later starts reuse what is already in the bind mount.
+  "postCreateCommand": "npm install",
+
+  "remoteUser": "node",
+
+  "customizations": {
+    "vscode": {
+      // The two the repo's own toolchain implies: oxlint is `npm run lint -w frontend`, and the
+      // frontend is Tailwind v4.
+      "extensions": [
+        "oxc.oxc-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  },
+}

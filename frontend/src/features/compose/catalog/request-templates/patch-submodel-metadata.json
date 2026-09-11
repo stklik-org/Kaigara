@@ -1,0 +1,40 @@
+{
+  "id": "patch-submodel-metadata",
+  "title": "Patch $metadata",
+  "operation": "update",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "PATCH submodel metadata without touching element values.",
+  "endpoint": {
+    "method": "PATCH",
+    "path": "/submodels/{smId}/$metadata",
+    "expect": [
+      204,
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "value",
+      "label": "New idShort",
+      "type": "value",
+      "bindsTo": "body.idShort",
+      "strategies": [
+        "fixed",
+        "random-string"
+      ],
+      "default": "random-string"
+    }
+  ],
+  "defaults": {
+    "weight": 5
+  },
+  "kind": "request"
+}

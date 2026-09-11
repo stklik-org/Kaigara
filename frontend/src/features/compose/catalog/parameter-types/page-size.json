@@ -1,0 +1,58 @@
+{
+  "id": "page-size",
+  "title": "Page size",
+  "appliesTo": [
+    "aas",
+    "submodel"
+  ],
+  "default": "fixed",
+  "description": "limit/cursor paging on collection reads.",
+  "strategies": [
+    {
+      "id": "fixed",
+      "label": "Fixed",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "title": "limit",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "paging": {
+            "type": "string",
+            "title": "Cursor",
+            "enum": [
+              "first page only",
+              "walk pages"
+            ],
+            "default": "first page only"
+          }
+        }
+      },
+      "sample": "limit=20"
+    },
+    {
+      "id": "range",
+      "label": "Range",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "integer",
+            "title": "Min",
+            "default": 10
+          },
+          "max": {
+            "type": "integer",
+            "title": "Max",
+            "default": 100
+          }
+        }
+      },
+      "sample": "limit=10…100"
+    }
+  ]
+}

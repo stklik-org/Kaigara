@@ -1,0 +1,54 @@
+{
+  "id": "create-aas-with-submodels",
+  "title": "Create AAS + Submodels",
+  "operation": "create",
+  "target": "both",
+  "execution": "authoring",
+  "kind": "composite",
+  "summary": "A shell, then N submodels referenced from it — one virtual-user iteration.",
+  "steps": [
+    {
+      "ref": "create-aas",
+      "capture": {
+        "aasId": "$.id"
+      }
+    },
+    {
+      "ref": "create-submodel",
+      "repeatWith": "submodelCount",
+      "bind": {
+        "parentAasId": "{{aasId}}"
+      },
+      "capture": {
+        "smId": "$.id"
+      }
+    },
+    {
+      "ref": "replace-aas",
+      "bind": {
+        "aasId": "{{aasId}}"
+      },
+      "note": "adds the submodel references to the shell"
+    }
+  ],
+  "parameters": [
+    {
+      "id": "submodelCount",
+      "label": "Submodels per shell",
+      "type": "count",
+      "bindsTo": "steps[1].repeat",
+      "default": "range"
+    },
+    {
+      "id": "payload",
+      "label": "Submodel payload",
+      "type": "payload-template",
+      "bindsTo": "steps[1].body",
+      "default": "idta-template"
+    }
+  ],
+  "defaults": {
+    "weight": 6
+  },
+  "notes": "Steps run in order inside one iteration; a failed step aborts the rest, so a PUT never targets an id that was not created."
+}

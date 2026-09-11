@@ -1,0 +1,81 @@
+{
+  "id": "attachment",
+  "title": "Attachment",
+  "appliesTo": [
+    "submodel"
+  ],
+  "default": "synthesised",
+  "description": "File/Blob bytes uploaded to …/{idShortPath}/attachment.",
+  "strategies": [
+    {
+      "id": "synthesised",
+      "label": "Synthesised",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "enum": [
+              "pdf",
+              "png",
+              "jpeg",
+              "txt",
+              "csv",
+              "bin"
+            ],
+            "default": "pdf"
+          },
+          "minBytes": {
+            "type": "integer",
+            "title": "Min bytes",
+            "default": 204800
+          },
+          "maxBytes": {
+            "type": "integer",
+            "title": "Max bytes",
+            "default": 5242880
+          },
+          "distribution": {
+            "type": "string",
+            "title": "Size distribution",
+            "enum": [
+              "uniform",
+              "lognormal",
+              "fixed"
+            ],
+            "default": "lognormal"
+          }
+        }
+      },
+      "sample": "PDF 0.2–5 MB, p50 1.1 MB"
+    },
+    {
+      "id": "from-folder",
+      "label": "Sample a folder",
+      "schema": {
+        "type": "object",
+        "required": [
+          "folder"
+        ],
+        "properties": {
+          "folder": {
+            "type": "string",
+            "title": "Folder on the load generator",
+            "default": "./corpus/datasheets"
+          }
+        }
+      },
+      "sample": "./corpus/datasheets/*"
+    },
+    {
+      "id": "none",
+      "label": "No attachment",
+      "schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "sample": "—"
+    }
+  ]
+}

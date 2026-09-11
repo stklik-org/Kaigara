@@ -1,0 +1,27 @@
+{
+  "id": "read-aas",
+  "title": "Read AAS",
+  "operation": "read",
+  "target": "aas",
+  "execution": "engine",
+  "summary": "GET one shell by identifier.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/shells/{aasId}",
+    "expect": [
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "aasId",
+      "label": "AAS identifier",
+      "type": "aas-identifier",
+      "bindsTo": "path.aasId"
+    }
+  ],
+  "defaults": {
+    "weight": 25
+  },
+  "kind": "request"
+}

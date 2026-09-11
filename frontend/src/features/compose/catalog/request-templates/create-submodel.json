@@ -1,0 +1,45 @@
+{
+  "id": "create-submodel",
+  "title": "Create Submodel",
+  "operation": "create",
+  "target": "submodel",
+  "execution": "engine",
+  "summary": "POST one submodel, optionally an instance of an IDTA template.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/submodels",
+    "expect": [
+      201
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "New identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "body.id",
+      "strategies": [
+        "fixed"
+      ],
+      "default": "fixed",
+      "config": {
+        "mode": "sequence"
+      }
+    },
+    {
+      "id": "payload",
+      "label": "Submodel payload",
+      "type": "payload-template",
+      "bindsTo": "body",
+      "default": "idta-template"
+    }
+  ],
+  "captures": {
+    "smId": "$.id"
+  },
+  "defaults": {
+    "weight": 10
+  },
+  "kind": "request"
+}

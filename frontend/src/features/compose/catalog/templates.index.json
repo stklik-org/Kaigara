@@ -1,0 +1,5549 @@
+[
+ {
+  "family": "Artificial Intelligence Dataset",
+  "idta": "02058",
+  "version": "1.0.1",
+  "idShort": "AIDataset",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDataset/1/0",
+  "elements": 50,
+  "paths": [
+   {
+    "path": "URIOfTheProduct",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Storage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.NumberLables",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.Labels.ExampleLabel.ClassName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.Labels.ExampleLabel.NumberOfSamples",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.SingleFiles.ExampleSingleFile.Name",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.SingleFiles.ExampleSingleFile.Labels.NumberLabels",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.SingleFiles.ExampleSingleFile.Labels.Label",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.SingleFiles.ExampleSingleFile.SingleFilePath",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.SingleFiles.ExampleSingleFile.AnnotationFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Labeled.Classification.SingleFiles.ExampleSingleFile.SingleFileDetails.ExampleSingleFileDetail",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.Balance",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Labeled.Classification.AnnotationFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Labeled.Regression.labeledescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Labeled.Regression.AnnotationFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Labeled.Regression.SingleFiles.ExampleAnnotation.AnnotationFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Labeled.Regression.SingleFiles.ExampleAnnotation.SingleFileDetails.ExampleDetails",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizeInformation.CompleteSize",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizeInformation.TrainSize",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizeInformation.ValSize",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizeInformation.TestSize",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizeInformation.SplitRatio",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MetaData.FileType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Artificial Intelligence Deployment",
+  "idta": "02059",
+  "version": "1.0.1",
+  "idShort": "AIDeployment",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIDeployment/1/0",
+  "elements": 38,
+  "paths": [
+   {
+    "path": "URIOfTheProduct",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Storage.Format",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Storage.DeployedModel",
+    "modelType": "File"
+   },
+   {
+    "path": "Input.ExampleInput",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Output.ExampleOutput",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareRequirements.ExampleFile",
+    "modelType": "File"
+   },
+   {
+    "path": "HardwareRequirements.ExampleHardware",
+    "modelType": "File"
+   },
+   {
+    "path": "PerformanceInformation.InferenceTime.Time",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "PerformanceInformation.InferenceTime.Hardware.CPU",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PerformanceInformation.InferenceTime.Hardware.GPU",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PerformanceInformation.InferenceTime.Hardware.TPU",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PerformanceInformation.InferenceTime.Hardware.RAM",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.Confidence",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.TimeIntervall",
+    "modelType": "Range",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.AverageConfidenceOverTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.RunTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.HardwareWorkload.GPUWorkload",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.HardwareWorkload.CPUWorkload",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.HardwareWorkload.TPUWorkload",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.HardwareWorkload.RAMWorkload",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.DriftMetrics.DataDrift",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.DriftMetrics.ConceptDrift",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "LiveMonitoring.DriftMetrics.PerformanceDrift",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Artificial Intelligence Model Nameplate",
+  "idta": "02060",
+  "version": "1.0.1",
+  "idShort": "AIModelNameplate",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/AIModelNameplate/1/0",
+  "elements": 44,
+  "paths": [
+   {
+    "path": "URIOfTheProduct",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Storage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "KindOfLearning",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Inputs.KindOfInput",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Inputs.DimensionN.Size",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Inputs.DimensionN.Information",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Inputs.Preprocessing",
+    "modelType": "File"
+   },
+   {
+    "path": "Outputs.DimensionN.Size",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Outputs.DimensionN.Result",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "TrainingResults.ExampleResult",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Plots.TrainingTesting.ExamplePlot",
+    "modelType": "File"
+   },
+   {
+    "path": "Plots.Structure.ExampleStructurePlot",
+    "modelType": "File"
+   },
+   {
+    "path": "Plots.GeneralPlots.ExamplePlot",
+    "modelType": "File"
+   },
+   {
+    "path": "Details.FileExtension",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Details.AIFramework",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Details.ProgramLanguage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Details.Requirements",
+    "modelType": "File"
+   },
+   {
+    "path": "AIDataset.TimeStamp",
+    "modelType": "Range",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "AITypeSpecificInformation.TransferLearning.Name",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AITypeSpecificInformation.TransferLearning.TimeStamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "AITypeSpecificInformation.TransferLearning.Weights",
+    "modelType": "File"
+   },
+   {
+    "path": "AITypeSpecificInformation.Hyperparameter.Example",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AITypeSpecificInformation.Type",
+    "modelType": "MultiLanguageProperty"
+   }
+  ]
+ },
+ {
+  "family": "Asset Interfaces Description",
+  "idta": "02017",
+  "version": "1.1",
+  "idShort": "AssetInterfacesDescription",
+  "semanticId": "https://admin-shell.io/idta/AssetInterfacesDescription/1/1/Submodel",
+  "elements": 784,
+  "paths": [
+   {
+    "path": "InterfaceTemplateForHTTP.title",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.created",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.modified",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.support",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.base",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.contentType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.nosec_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.auto_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.auto_sc.proxy",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.basic_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.basic_sc.name",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.basic_sc.in",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.basic_sc.proxy",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.combo_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.combo_sc.proxy",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.apikey_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.apikey_sc.name",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.apikey_sc.in",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.apikey_sc.proxy",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.psk_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.psk_sc.identity",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.psk_sc.proxy",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.digest_sc.scheme",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InterfaceTemplateForHTTP.EndpointMetadata.securityDefinitions.digest_sc.name",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Asset Interfaces Mapping Configuration",
+  "idta": "02027",
+  "version": "2.0",
+  "idShort": "AssetInterfacesMappingConfiguration",
+  "semanticId": "https://admin-shell.io/idta/AssetInterfacesMappingConfiguration/2/0/Submodel",
+  "elements": 13,
+  "paths": [
+   {
+    "path": "MappingConfigurations[0].DefaultPollingInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "MappingConfigurations[0].Transformation",
+    "modelType": "Blob"
+   },
+   {
+    "path": "MappingConfigurations[0].Sources[0].PollingInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "MappingConfigurations[0].Sources[0].SourceId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MappingConfigurations[0].Sinks[0].SinkId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Capability Description",
+  "idta": "02020",
+  "version": "1.0",
+  "idShort": "CapabilityDescription",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/CapabilityDescription/1/0",
+  "elements": 37,
+  "paths": [
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityComment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertyRange",
+    "modelType": "Range",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertyProperty",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertyMultiLanguageProperty",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertySubmodelList[0]",
+    "modelType": "Range",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertySubmodelList[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertySubmodelList[0]",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.PropertySet.PropertyContainer.PropertyComment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityRelations.ComposedOfSet.ComposedOfContainer.ComposedOfComment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityRelations.ConstraintSet.PropertyConstraintContainer.BasicConstraint",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityRelations.ConstraintSet.PropertyConstraintContainer.OCLConstraint",
+    "modelType": "File"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityRelations.ConstraintSet.PropertyConstraintContainer.ConstraintType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityRelations.ConstraintSet.PropertyConstraintContainer.PropertyConditionalType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CapabilitySet.CapabilityContainer.CapabilityRelations.ConstraintSet.TransitionConstraintContainer.TransitionConditionalType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Carbon Footprint",
+  "idta": "02023",
+  "version": "1.0",
+  "idShort": "CarbonFootprint",
+  "semanticId": "https://admin-shell.io/idta/CarbonFootprint/CarbonFootprint/1/0",
+  "elements": 27,
+  "paths": [
+   {
+    "path": "ProductCarbonFootprints[0].PcfCalculationMethods[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].PcfCO2eq",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].ReferenceImpactUnitForCalculation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].QuantityOfMeasureForCalculation",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].LifeCyclePhases[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].ExplanatoryStatement",
+    "modelType": "File"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].PublicationDate",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "ProductCarbonFootprints[0].ExpirationDate",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].PcfCalculationMethods[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].ProductOrSectorSpecificRule.PcfRuleOperator",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].ProductOrSectorSpecificRule.PcfRuleName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].ProductOrSectorSpecificRule.PcfRuleVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].ProductOrSectorSpecificRule.PcfRuleOnlineReference",
+    "modelType": "File"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].ExternalPcfApi.PcfApiEndpoint",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].ExternalPcfApi.PcfApiQuery",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductOrSectorSpecificCarbonFootprints[0].PcfInformation.ArbitraryContent",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Contact Information",
+  "idta": "02002",
+  "version": "1.0.1",
+  "idShort": "ContactInformations",
+  "semanticId": "https://admin-shell.io/zvei/nameplate/1/0/ContactInformations",
+  "elements": 57,
+  "paths": [
+   {
+    "path": "ContactInformation.RoleOfContactPerson",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.NationalCode",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Language",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.TimeZone",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.CityTown",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Company",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Department",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Phone.TelephoneNumber",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Phone.TypeOfTelephone",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.Phone.AvailableTime",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Fax.FaxNumber",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Fax.TypeOfFaxNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.Email.EmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.Email.PublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Email.TypeOfEmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.Email.TypeOfPublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.IPCommunication__00__.AddressOfAdditionalLink",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.IPCommunication__00__.TypeOfCommunication",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ContactInformation.IPCommunication__00__.AvailableTime",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Street",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.Zipcode",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.POBox",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.ZipCodeOfPOBox",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ContactInformation.StateCounty",
+    "modelType": "MultiLanguageProperty"
+   }
+  ]
+ },
+ {
+  "family": "Control Component Instance",
+  "idta": "02016",
+  "version": "2.0.1",
+  "idShort": "ControlComponentInstance",
+  "semanticId": "https://admin-shell.io/idta/ControlComponent/Instance/2/0",
+  "elements": 19,
+  "paths": [
+   {
+    "path": "Skills.Skill.Disabled",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Skills.Skill.Modes.Mode__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Skills.Skill.Parameters.Parameter.Direction",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Skills.Skill.Parameters.Parameter.Type",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Control Component Type",
+  "idta": "02015",
+  "version": "2.0.1",
+  "idShort": "ControlComponentType",
+  "semanticId": "https://admin-shell.io/idta/ControlComponent/Type/2/0",
+  "elements": 22,
+  "paths": [
+   {
+    "path": "Interfaces.Interface.InterfaceProfile",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Interfaces.Interface.InterfaceProfileSupplement",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Errors.Error.ErrorCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Skills.Skill.Disabled",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Skills.Skill.Modes.Mode__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Skills.Skill.Parameters.Parameter.Direction",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Skills.Skill.Parameters.Parameter.Type",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Control Configuration and Parametrization for NC and CNC Machines",
+  "idta": "02053",
+  "version": "1.0.1",
+  "idShort": "ControlConfig__00__",
+  "semanticId": "https://admin-shell.io/idta/ControlConfig/1/0",
+  "elements": 51,
+  "paths": [
+   {
+    "path": "ControllerType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "TimeUnit",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "LengthUnit",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "FieldbusType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CNCCycleTime",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "PLCCycleTime",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "FieldbusCycleTime",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "VelocityUnit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AccelerationUnit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "JerkUnit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ControlConfigData__00__.ControlConfigFileName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ControlConfigData__00__.ControlConfigFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Channels__00__.Channel__00__.ChannelIdentification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Channels__00__.Channel__00__.AxesReference__00__.AxisName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.AxisName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.AxisType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.SimulationAxis",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.SwLimitSwitchNeg",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.SwLimitSwitchPos",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.VelocityLimit",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.AccelerationLimit",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.JerkLimit",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.AxisConfigData__00__.AxisConfigFileName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Axes__00__.Axis__00__.AxisConfigData__00__.AxisConfigFile",
+    "modelType": "File"
+   }
+  ]
+ },
+ {
+  "family": "Creation and Classification of Materials",
+  "idta": "02034",
+  "version": "1.0.1",
+  "idShort": "BackendSpecificMaterialInformation",
+  "semanticId": "https://admin-shell.io/idta/BackendSpecificMaterialInformation/1/0",
+  "elements": 12,
+  "paths": [
+   {
+    "path": "MaterialSystemProperties.MaterialType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaterialSystemProperties.BaseUnitOfMeasure",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaterialSystemProperties.MaterialStatus",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaterialSystemProperties.Industry",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaterialSystemProperties.ProductName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaterialSystemProperties.MaterialNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaterialSystemProperties.Description",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaterialSystemProperties.Plant",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Data Model for Asset Location",
+  "idta": "02045",
+  "version": "1.0.1",
+  "idShort": "AssetLocation",
+  "semanticId": "https://admin-shell.io/idta/smt/assetlocation/1/0",
+  "elements": 80,
+  "paths": [
+   {
+    "path": "Addresses[0].AddressLine1",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].AddressLine2",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].AddressLine3",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].AddressOfAdditionalLink",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].AddressRemarks",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].NationalCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].Statecounty",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].Citytown",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].Street",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Addresses[0].ZipCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CoordinateSystems[0].CoordinateSystemName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CoordinateSystems[0].CoordinateSystemId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CoordinateSystems[0].CoordinateSystemType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CoordinateSystems[0].ElevationReference",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CoordinateSystems[0].SeaLevelOfBaseHeight",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "CoordinateSystems[0].GroundControlPoints[0].GeographicCoordinates.Longitude",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "CoordinateSystems[0].GroundControlPoints[0].GeographicCoordinates.Latitude",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "CoordinateSystems[0].GroundControlPoints[0].RelativeCoordinates.X",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "CoordinateSystems[0].GroundControlPoints[0].RelativeCoordinates.Y",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "VisitedAreas[0].AreaRegionCoordinates[0].X",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "VisitedAreas[0].AreaRegionCoordinates[0].Y",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "VisitedAreas[0].KindOfArea",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "VisitedAreas[0].AreaName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "VisitedAreas[0].AreaId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Data Retention Policies",
+  "idta": "02056",
+  "version": "1.0.1",
+  "idShort": "DataRetentionPolicies",
+  "semanticId": "https://admin-shell.io/idta/DataRetentionPolicies/1/0",
+  "elements": 28,
+  "paths": [
+   {
+    "path": "Policies.Policy.RetentionTime",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "Policies.Policy.Immutable",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Policies.Policy.CreatedBy",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Policies.Policy.CreationTime",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Policies.Policy.Issuer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Policies.Policy.Source.Identifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Policies.Policy.Source.Document",
+    "modelType": "File"
+   },
+   {
+    "path": "Policies.Policy.Source.Link",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "Policies.Policy.EffectiveFrom",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Policies.Policy.EffectiveUntil",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Policies.Policy.AuditLog[0].Timestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Policies.Policy.AuditLog[0].Identity",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Policies.Policy.AuditLog[0].Operation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Policies.Policy.AuditLog[0].Reason",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Policies.Policy.AuditLog[0].Signature",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "DEXPI",
+  "idta": "02012",
+  "version": "1.0",
+  "idShort": "DEXPI",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/DEXPI/1/0",
+  "elements": 289,
+  "paths": [
+   {
+    "path": "PlantMetadata.EnterpriseIdentificationCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.EnterpriseName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.IndustrialComplexIdentificationCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.IndustrialComplexName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.PlantSectionIdentificationCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.PlantSectionName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.ProcessPlantIdentificationCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.ProcessPlantName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.ProjectName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.ProjectNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.SiteIdentificationCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.SiteName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.SubProjectName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.SubProjectNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.ManufacturerName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.DateOfManufacture",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PlantMetadata.EndProductCASName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PlantMetadata.EndProductName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model01.ModelMetadata.ApprovalDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "Model01.ModelMetadata.ApprovalDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Model01.ModelMetadata.ArchiveNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model01.ModelMetadata.CheckerName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model01.ModelMetadata.CreationDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "Model01.ModelMetadata.CreatorName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Digital Battery Passport",
+  "idta": "02035",
+  "version": "7",
+  "idShort": "Circularity",
+  "semanticId": "urn:samm:io.admin-shell.idta.batterypass.circularity:1.0.0#Circularity",
+  "elements": 37,
+  "paths": [
+   {
+    "path": "DismantlingAndRemovalInformation[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SparePartSources[0].NameOfSupplier",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SparePartSources[0].AddressOfSupplier.NationalCode",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SparePartSources[0].AddressOfSupplier.PostalCode",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SparePartSources[0].AddressOfSupplier.Street",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SparePartSources[0].EmailAddressOfSupplier.EmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SparePartSources[0].EmailAddressOfSupplier.PublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SparePartSources[0].EmailAddressOfSupplier.TypeOfEmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SparePartSources[0].EmailAddressOfSupplier.TypeOfPublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SparePartSources[0].SupplierWebAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SparePartSources[0].Components[0].PartName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SparePartSources[0].Components[0].PartNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RecycledContentInformation[0].PreConsumerShare",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "RecycledContentInformation[0].RecycledMaterial",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RecycledContentInformation[0].PostConsumerShare",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "SafetyMeasures.SafetyInstructions[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SafetyMeasures.ExtinguishingAgents[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndOfLifeInformation.WastePrevention[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndOfLifeInformation.SeparateCollection[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndOfLifeInformation.InformationOnCollection[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RenewableContent",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   }
+  ]
+ },
+ {
+  "family": "Digital nameplate",
+  "idta": "02006",
+  "version": "3.0.1",
+  "idShort": "Nameplate",
+  "semanticId": "https://admin-shell.io/idta/nameplate/3/0/Nameplate",
+  "elements": 42,
+  "paths": [
+   {
+    "path": "URIOfTheProduct",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "ManufacturerName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ManufacturerProductDesignation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ManufacturerProductRoot",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ManufacturerProductFamily",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ManufacturerProductType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OrderCodeOfManufacturer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductArticleNumberOfManufacturer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SerialNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "YearOfConstruction",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DateOfManufacture",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "HardwareVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FirmwareVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CountryOfOrigin",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "UniqueFacilityIdentifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompanyLogo",
+    "modelType": "File"
+   },
+   {
+    "path": "Markings[0].MarkingName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Markings[0].DesignationOfCertificateOrApproval",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Markings[0].IssueDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "Markings[0].ExpiryDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "Markings[0].MarkingFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Markings[0].MarkingAdditionalText",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AssetSpecificProperties.ArbitraryProperty",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Digital Product Passport",
+  "idta": "02099",
+  "version": "1",
+  "idShort": "DppMetadata",
+  "semanticId": "https://admin-shell.io/idta/cds/dppMetadata/1",
+  "elements": 10,
+  "paths": [
+   {
+    "path": "digitalProductPassportId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "uniqueProductIdentifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "granularity",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "dppSchemaVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "dppStatus",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "lastUpdate",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "economicOperatorId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "facilityId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "contentSpecificationIds[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Digital Quality Documents",
+  "idta": "02065",
+  "version": "1",
+  "idShort": "DigitalQualityDocuments",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/DigitalQualityDocument/1/0",
+  "elements": 75,
+  "paths": [
+   {
+    "path": "DocumentIds[0].DocumentDomainId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentIds[0].DocumentIdentifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentIds[0].DocumentIsPrimary",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "DocumentClassifications[0].ClassId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentClassifications[0].ClassName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "DocumentClassifications[0].ClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].Language[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].Title",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "DocumentInstances[0].Description",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "DocumentInstances[0].StatusSetDate",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "DocumentInstances[0].StatusValue",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].OrganizationShortName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].OrganizationOfficialName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].DigitalFiles[0]",
+    "modelType": "File"
+   },
+   {
+    "path": "DocumentInstances[0].PreviewFile",
+    "modelType": "File"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.UniqueIdentifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.Identifications[0].IdentificationName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.Identifications[0].IdentificationIssuer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.Identifications[0].IdentificationValue",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.Identifications[0].ID",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.Identifications[0].RefID",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.Identifications[0].RefType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentInstances[0].AdministrativeData.CoreData.IssueDate",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   }
+  ]
+ },
+ {
+  "family": "Energy Flexibility Data Model",
+  "idta": "02076",
+  "version": "1.0",
+  "idShort": "EnergyFlexibilityDataModel",
+  "semanticId": null,
+  "elements": 268,
+  "paths": [
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.instanceId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.efdmVersion.versionNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.efdmVersion.schemaLink",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.origin.originId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.origin.timestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.modification.modificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.metadata.modification.timestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.flexibleLoadMeasures[0].flexibleLoadMeasureId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.flexibleLoadMeasures[0].status",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.flexibleLoadMeasures[0].flexibleLoadId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.flexibleLoadMeasures[0].reward",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.flexibleLoadMeasures[0].loadChangeProfiles[0].power",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "flexibleLoadMeasuresPackage.flexibleLoadMeasures[0].loadChangeProfiles[0].timestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.instanceId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.efdmVersion.versionNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.efdmVersion.schemaLink",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.origin.originId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.origin.timestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.modification.modificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.metadata.modification.timestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.utilizationContext.status",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "flexibilitySpace_operationalPotential.utilizationContext.modellingScope",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Factory Automation Data for Plant Planning",
+  "idta": "02075",
+  "version": "1.0",
+  "idShort": "FactoryAutomationDataForPlant",
+  "semanticId": "https://admin-shell.io/idta/cds/factoryAutomationDataForPlant/1",
+  "elements": 67,
+  "paths": [
+   {
+    "path": "AutomationMLData",
+    "modelType": "File"
+   },
+   {
+    "path": "AutomationMLVersion",
+    "modelType": "Property",
+    "valueType": "xs:positiveInteger"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].onOff",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].ArticleNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].NameOfSupplier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].name",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].description",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].medium",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].comment",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].plant",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].diameter",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].overallLength",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].NominalVoltage",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].nominalPowerConsumption",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].maximalPowerConsumption",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].powerNominal",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].powerMaximal",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].xframe",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].yframe",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].zframe",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].rxframe",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].ryframe",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "AutomationMLAttributeAndInterfaceList[0].rzframe",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   }
+  ]
+ },
+ {
+  "family": "Fire Protection on Railway Vehicles",
+  "idta": "02102",
+  "version": "1.0",
+  "idShort": "RailwayFireProtection",
+  "semanticId": "https://admin-shell.io/idta/cds/RailwayFireProtection/1",
+  "elements": 62,
+  "paths": [
+   {
+    "path": "ManufacturerInformation.ManufacturerName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ManufacturerInformation.ManufacturerProductDesignation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ManufacturerInformation.OrderCodeOfManufacturer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ManufacturerInformation.ProductArticleNumberOfManufacturer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.RequirementsSets[0].HazardLevel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.RequirementsSets[0].Requirement",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.RequirementsSets[0].HazardLevel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.RequirementsSets[0].Requirement",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].ReportFile",
+    "modelType": "File"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestProcedure",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestResult",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestReportNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestProcedure",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestResult",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].Tests[0].TestReportNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabAddress.AddressOfAdditionalLink",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabAddress.NationalCode",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabAddress.CityTown",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabAddress.Company",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabAddress.Phone.TelephoneNumber",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "FireProtectionCertificates.Reports[0].LabInformation.LabAddress.Email.EmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Functional Safety",
+  "idta": "02014",
+  "version": "1.0.1",
+  "idShort": "FunctionalSafety",
+  "semanticId": "https://admin-shell.io/idta/iec62683/1/0/FunctionalSafety",
+  "elements": 31,
+  "paths": [
+   {
+    "path": "NumberOfFunctionalSafetySetsOfCharacteristics",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.TypeOfVoltage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.RatedVoltage",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.MinimumRatedVoltage",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.MaximumRatedVoltage",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.RatedOperationalCurrent",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.TypeOfInterlockingDevice",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.OtherOperatingConditions",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.UsefulLifeInNumberOfOperations",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfFunctionalSafetyCharacteristics.UsefulLifeInTimeInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.FunctionalSafetyDeviceType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SafetyDeviceTypes.SafetySubsystem.SIL",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SafetyDeviceTypes.SafetySubsystem.PFH",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.SafetySubsystem.ProofTestInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.SafetySubsystem.PL",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SafetyDeviceTypes.SafetySubsystem.Category",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SafetyDeviceTypes.ElectronicElement.MTTFD",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "SafetyDeviceTypes.ElectronicElement.RDF",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "SafetyDeviceTypes.ElectronicElement.ProofTestInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.ElectromechanicalElement.B10D",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.ElectromechanicalElement.ProofTestInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.InherentlySafeSubsystem.SIL",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SafetyDeviceTypes.InherentlySafeSubsystem.ProofTestInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "SafetyDeviceTypes.InherentlySafeSubsystem.PL",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Handover Documentation",
+  "idta": "02004",
+  "version": "2.0.1",
+  "idShort": "HandoverDocumentation",
+  "semanticId": "0173-1#01-AHF578#003",
+  "elements": 38,
+  "paths": [
+   {
+    "path": "Documents[0].DocumentIds[0].DocumentDomainId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentIds[0].DocumentIdentifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentIds[0].DocumentIsPrimary",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Documents[0].DocumentClassifications[0].ClassId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentClassifications[0].ClassName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Documents[0].DocumentClassifications[0].ClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].Language[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].Title",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].Subtitle",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].Description",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].KeyWords",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].StatusSetDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].StatusValue",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].OrganizationShortName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].OrganizationOfficialName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].DigitalFiles[0]",
+    "modelType": "File"
+   },
+   {
+    "path": "Documents[0].DocumentVersions[0].PreviewFile",
+    "modelType": "File"
+   }
+  ]
+ },
+ {
+  "family": "Hierarchical Structures enabling Bills of Material",
+  "idta": "02011",
+  "version": "1.1.1",
+  "idShort": "IEC81346Structure",
+  "semanticId": null,
+  "elements": 19,
+  "paths": []
+ },
+ {
+  "family": "Inspection Documents of Steel Products",
+  "idta": "02032",
+  "version": "1.0.1",
+  "idShort": "InspectionDocumentsOfSteelProducts",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/InspectionDocumentsOfSteelProducts/1/0",
+  "elements": 129,
+  "paths": [
+   {
+    "path": "Manufacturer.CompanyName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Manufacturer.Street",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Manufacturer.ZIPCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Manufacturer.City",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Manufacturer.NationalCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Manufacturer.MailAddress__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.CompanyName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.CustomerRole",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.Street",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.ZIPCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.City",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.NationalCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Customer__00__.MailAddress__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OrderData.TypeOfInspectionDocument",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OrderData.OrderDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "OrderData.ManufacturerOrderNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OrderData.PurchaserOrderNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OrderData.DeliveryNoteNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductData.ManufacturerProductNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductData.PurchaserArticleNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductData.ProductDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ProductData.AdditionalProductRequirements",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ProductData.BatchNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductData.MaterialNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Intelligent Information  for Use",
+  "idta": "02063",
+  "version": "1.0.1",
+  "idShort": "IntelligentInformationforUse",
+  "semanticId": "https://admin-shell.io/idta/IntelligentInformationForUse/1/0",
+  "elements": 176,
+  "paths": [
+   {
+    "path": "ResourceIRI",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "FormatRestriction",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "IirdsVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.ResourceIRI",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.Title",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.DateOfCreation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.DateOfLastModification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.Language__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.Revision",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.Rights__00__",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "InformationUnitCollection.Document__00__.IsReplacementOf",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.ResourceIRI",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.Title",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.DateOfCreation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.DateOfLastModification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.Language__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.Revision",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.Rights__00__",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "InformationUnitCollection.Topic__00__.IsReplacementOf__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Fragment__00__.ResourceIRI",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "InformationUnitCollection.Fragment__00__.Title",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Fragment__00__.DateOfCreation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Fragment__00__.DateOfLastModification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationUnitCollection.Fragment__00__.Language__00__",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Maintenance Instructions",
+  "idta": "02018",
+  "version": "1.0",
+  "idShort": "MaintenanceInstructions",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/MaintenanceInstructions/1/0",
+  "elements": 127,
+  "paths": [
+   {
+    "path": "MaintenanceFreeAsset",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.MaintenanceID",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.NameOfMaintenance",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.SourceOfMaintenanceInstructions",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.IntervalSpecification.MaintenanceIntervalValue",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.IntervalSpecification.MaintenanceIntervalUnit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.AlarmValues.Alarm__00__.AlarmName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.AlarmValues.Alarm__00__.WarningLimitRelativeValue",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.AlarmValues.Alarm__00__.WarningLimitSeverity",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.FlowChartOfMaintenanceSteps",
+    "modelType": "File"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.RelatedStandardsLawsRegulations",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Company",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Department",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.RoleOfContactPerson",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Title",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.AcademicTitle",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.NameOfContact",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.FirstName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.MiddleNames",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Email.EmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Email.PublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Email.TypeOfEmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Email.TypeOfPublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "MaintenanceInstructionsForSpecificInterval__00__.BasicMaintenanceInformation.ContactForMaintenanceAuthorization.Phone.TelephoneNumber",
+    "modelType": "MultiLanguageProperty"
+   }
+  ]
+ },
+ {
+  "family": "Material Data for Plastic Waste",
+  "idta": "02080",
+  "version": "1.0",
+  "idShort": "MaterialDataForEN18065ClassificationOfPlastics",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/en18065materialdata/en18065MaterialData/1/0",
+  "elements": 82,
+  "paths": [
+   {
+    "path": "DataQuality.DataQualityLevel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ApplicationSpecificStandards[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.MainMaterialType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.TypeOfPackaging",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.ColorByVisualInspection",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.Form",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.TradeName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.RecycledContent",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "InformationCharacteristics.ChainOfCustody.AttributionModel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.ChainOfCustody.RelevantEuropeanOrInternationalNorm",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.RecyclingMethod",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.Source",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.TypesOfFillers[0].Filler",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.TypesOfFillers[0].FillerMassPercentage",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "InformationCharacteristics.LotNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.CertificateOfAnalysis.TypeOfInspectionCertificate",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.CertificateOfAnalysis.Documentation",
+    "modelType": "File"
+   },
+   {
+    "path": "InformationCharacteristics.ContentOfTheMainPlasticType",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "InformationCharacteristics.PercentConfidenceOfCertificateOfAnalysis",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "InformationCharacteristics.CoefficientOfVariationWRTCertificateOfAnalysis",
+    "modelType": "Property",
+    "valueType": "xs:decimal"
+   },
+   {
+    "path": "InformationCharacteristics.PresenceOfModifyingAdditives[0].ModifyingAdditiveName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.PresenceOfModifyingAdditives[0].ModifyingAdditiveCASNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.OriginalUseOfMaterial",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "InformationCharacteristics.RecyclingFeedstockConversionTechnology",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "MTP",
+  "idta": "02001",
+  "version": "1.0.1",
+  "idShort": "AssetIdentification",
+  "semanticId": null,
+  "elements": 1,
+  "paths": [
+   {
+    "path": "Manufacturer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "OPC UA Server Datasheet",
+  "idta": "02009",
+  "version": "1.0",
+  "idShort": "UAServerDataSheet",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/opcuaserverdatasheet/1/0",
+  "elements": 44,
+  "paths": [
+   {
+    "path": "Configuration.NodeSets[0]",
+    "modelType": "File"
+   },
+   {
+    "path": "Configuration.AllowAnonymousUser",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Configuration.SupportSecurityModeNone",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "Configuration.SupportSecurityModeSign",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "Configuration.SupportSecurityModeSignEncrypt",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "Configuration.SupportSecurityPolicyUris[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Configuration.SupportRedundancy",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Identification.ProductUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Identification.ManufacturerName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Identification.ProductName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Identification.SoftwareVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Identification.BuildNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Identification.BuildDate",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "EndpointDescriptions[0].EndpointUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.ApplicationUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.ProductUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.ApplicationName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.ApplicationType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.GatewayServerUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.DiscoveryProfileUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].Server.DiscoveryUrls[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].ServerCertificate",
+    "modelType": "Blob"
+   },
+   {
+    "path": "EndpointDescriptions[0].SecurityMode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "EndpointDescriptions[0].SecurityPolicyUri",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Plant Asset Management Specification Sheet",
+  "idta": "02019",
+  "version": "1.0.1",
+  "idShort": "PAMSpecificationSheet",
+  "semanticId": "0173-1#01-AGC973#003",
+  "elements": 80,
+  "paths": [
+   {
+    "path": "DocumentHeader.PAMSpecificationSheetIdentification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentHeader.AssetTypeClass",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DocumentHeader.AssetTypeIdentification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.FunctionalLocation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.TechnicalLocation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.Description",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.AssetSubtype",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.SpecificationSheetReference",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.SafetyMeasure",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.RedundantAssets",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.SILCategory",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.FailureProbability",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.FailureSeverity",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.CriticalityCategory",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.FurtherInformation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.FurtherInformationReference",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.GeneralTask",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompleteSystem.StatusCondition.StatusConditionName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompleteSystem.StatusCondition.MonitoringRequired",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompleteSystem.StatusCondition.Description",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompleteSystem.StatusCondition.MethodAbbreviation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompleteSystem.StatusCondition.NE107Status",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompleteSystem.StatusCondition.NE129AlarmCategory",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SubSystem.SubSystemName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Plastic and Rubber Moulds",
+  "idta": "02038",
+  "version": "1",
+  "idShort": "PlasticsAndRubberMouldsIdentification",
+  "semanticId": "https://admin-shell.io/idta/euromap/Moulds/Identification/1/0",
+  "elements": 64,
+  "paths": [
+   {
+    "path": "MonthOfConstruction",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "InitialOperationDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "InitialSamplingDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "InitialProductionDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "ManufacturerURI",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "AssetID",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ControllerName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ArticleID",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ArticleName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.RoleOfContactPerson",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.NationalCode",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Language",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.TimeZone",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.CityTown",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Company",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Department",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Phone.TelephoneNumber",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Phone.TypeOfTelephone",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.Phone.AvailableTime",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Fax.FaxNumber",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Fax.TypeOfFaxNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.Email.EmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Affiliation.Email.PublicKey",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Affiliation.Email.TypeOfEmailAddress",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Predictive Maintenance",
+  "idta": "02048",
+  "version": "1.0",
+  "idShort": "PredictiveMaintenance",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/PredictiveMaintenance/1/0",
+  "elements": 32,
+  "paths": [
+   {
+    "path": "RemainingUsefulLifePrediction.RemainingUsfulLifeDateTime",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ConfidenceInterval",
+    "modelType": "Range",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].ConditionName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].IsBoundaryConditionUsedInModel",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].BoundaryValueRange",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].BoundaryEngineeringUnit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].DriftInfoAIModel",
+    "modelType": "Range",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].MeanValue",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].Standarddeviation",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].Skewness",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListRULBoundaryConditions[0].BoundaryDescription",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.PredictionModelInformation.ModelType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.PredictionModelInformation.ModelDescription",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListPreAlerts[0].PreAlertMessage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.ListPreAlerts[0].PreAlertValue",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.AlertAfterExceedingRemainingUsableLife.AlertMessage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RemainingUsefulLifePrediction.AlertAfterExceedingRemainingUsableLife.MaintenanceRequired",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   }
+  ]
+ },
+ {
+  "family": "Process Parameters Instance",
+  "idta": "02031",
+  "version": "2",
+  "idShort": "ExecutedProcesses",
+  "semanticId": "https://admin-shell.io/idta/ExecutedProcesses/1/0",
+  "elements": 26,
+  "paths": [
+   {
+    "path": "Run__00__.RunResult",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Run__00__.Process__00__.PlannedProcessTime",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessStatus",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessResult",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.OperatorRole",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessStartTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessEndTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessStages.ProcessStage__00__.StageId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessStages.ProcessStage__00__.StartTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessStages.ProcessStage__00__.EndTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessStages.ProcessStage__00__.Result",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessErrors.ProcessError__00__.ErrorCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Run__00__.Process__00__.ProcessErrors.ProcessError__00__.ErrorDescription",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Process Parameters Type",
+  "idta": "02031",
+  "version": "1",
+  "idShort": "ProcessParameters",
+  "semanticId": "https://admin-shell-io/idta/SubmodelTemplate/ProcessParameters/1/0",
+  "elements": 11,
+  "paths": [
+   {
+    "path": "Processes.Process__00__.ProcessId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Processes.Process__00__.ProcessName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Processes.Process__00__.ProcessDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Processes.Process__00__.PlannedProcessTime",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   }
+  ]
+ },
+ {
+  "family": "Process Variables for Manufacturing Key Performance Indicators",
+  "idta": "02066",
+  "version": "1.0",
+  "idShort": "ProcessVariablesForManufacturingKPICalculation",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/ProcessVariablesForManufacturingKPICalculation/1/0",
+  "elements": 76,
+  "paths": [
+   {
+    "path": "ActualPersonnelWorkTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualPersonnelWorkTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualPersonnelWorkTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualUnitProcessingTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualUnitProcessingTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualUnitProcessingTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualUnitBusyTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualUnitBusyTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualUnitBusyTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualOrderExecutionTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualOrderExecutionTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualOrderExecutionTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualPersonnelAttendanceTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualPersonnelAttendanceTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualPersonnelAttendanceTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualProductionTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualProductionTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualProductionTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualQueuingTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualQueuingTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualQueuingTime.comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ActualUnitDownTime.key",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ActualUnitDownTime.currentValue",
+    "modelType": "Property",
+    "valueType": "xs:duration"
+   },
+   {
+    "path": "ActualUnitDownTime.comment",
+    "modelType": "MultiLanguageProperty"
+   }
+  ]
+ },
+ {
+  "family": "Product Change Notifications",
+  "idta": "02036",
+  "version": "1.0",
+  "idShort": "ProductChangeNotifications",
+  "semanticId": "0173-1#01-AHE582#003",
+  "elements": 88,
+  "paths": [
+   {
+    "path": "Records[0].Manufacturer.ManufacturerName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].ManufacturerChangeID",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].PcnType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].LifeCycleData[0].MilestoneClassification",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].LifeCycleData[0].DateOfValidity",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Records[0].ReasonsOfChange[0].ReasonClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ReasonsOfChange[0].VersionOfClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ReasonsOfChange[0].ReasonId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ItemCategories[0].ItemClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ItemCategories[0].VersionOfClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ItemCategories[0].ItemCategory",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].AffectedPartNumbers[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].PcnReasonComment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].PcnChangeInformation.ChangeTitle",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].PcnChangeInformation.ChangeDetail",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].AdditionalInformation[0]",
+    "modelType": "File"
+   },
+   {
+    "path": "Records[0].DateOfRecord",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Records[0].ItemOfChange.ManufacturerProductFamily",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].ItemOfChange.ManufacturerProductDesignation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].ItemOfChange.OrderCodeOfManufacturer",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Records[0].ItemOfChange.ProductClassifications[0].ClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ItemOfChange.ProductClassifications[0].VersionOfClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ItemOfChange.ProductClassifications[0].ProductClassId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Records[0].ItemOfChange.HardwareVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Production Calendar",
+  "idta": "02067",
+  "version": "1.0",
+  "idShort": "ProductionCalendar",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/ProductionCalendar/1/0",
+  "elements": 12,
+  "paths": [
+   {
+    "path": "calendar",
+    "modelType": "File"
+   },
+   {
+    "path": "specificationExtensionVariables[0].variableName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "specificationExtensionVariables[0].variableSpecification",
+    "modelType": "File"
+   },
+   {
+    "path": "specificationExtensionVariables[0].variableName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "specificationExtensionVariables[0].variableSpecification",
+    "modelType": "File"
+   },
+   {
+    "path": "specificationExtensionVariables[0].variableName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "specificationExtensionVariables[0].variableSpecification",
+    "modelType": "File"
+   }
+  ]
+ },
+ {
+  "family": "Provision of 3D Models",
+  "idta": "02026",
+  "version": "1.0.1",
+  "idShort": "Models3D",
+  "semanticId": "https://admin-shell.io/idta/Models3D/1/0",
+  "elements": 117,
+  "paths": [
+   {
+    "path": "Model3D[0].File.FileId[0].FileDomainId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileId[0].ValueId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileId[0].IsPrimary",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].Title",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].FileName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].FileVersionId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].StatusValue",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].SetDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].PreviewFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].DigitalFile",
+    "modelType": "File"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].ExternalUrl",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].FileIdentifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].HostOrganization.OrganizationName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].HostOrganization.OrganizationOfficialName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].Api[0].ApiVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].Api[0].ApiDocumentationUrl",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].ExternalFile[0].Api[0].ApiSpecificationUrl",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].FileFormat.FormatName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].FileFormat.FormatVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].FileFormat.FormatQualifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].SourceApplication.ApplicationName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].SourceApplication.ApplicationVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].SourceApplication.ApplicationQualifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Model3D[0].File.FileVersion[0].SourceApplication.Api[0].ApiVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Provision of Company Data",
+  "idta": "02068",
+  "version": "1.0",
+  "idShort": "CompanyData",
+  "semanticId": "https://admin-shell.io/idta/CompanyData/1/0/CompanyData",
+  "elements": 114,
+  "paths": [
+   {
+    "path": "CompanyIdentification.CompanyName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompanyIdentification.CompanyDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CompanyIdentification.HomepageURL",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CompanyIdentification.VATNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompanyIdentification.TaxNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompanyIdentification.DUNS",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompanyIdentification.CommercialRegisterNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "CompanyIdentification.FoundingYear",
+    "modelType": "Property",
+    "valueType": "xs:gYear"
+   },
+   {
+    "path": "CompanyIdentification.OrderCurrency",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CompanyIdentification.MainProductGroups[0]",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CompanyIdentification.Industries[0]",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "CompanyIdentification.CompanyLogo",
+    "modelType": "File"
+   },
+   {
+    "path": "BankAccounts.BankAccount__00__.AccountHolder",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "BankAccounts.BankAccount__00__.BankAccountType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "BankAccounts.BankAccount__00__.IBAN",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "BankAccounts.BankAccount__00__.BIC",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DigitalInterfaces.CompanySystems.ERPSystem.ERPName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DigitalInterfaces.CompanySystems.ERPSystem.ERPVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DigitalInterfaces.CompanySystems.EmailSystem.EmailSystemName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DigitalInterfaces.CompanySystems.CADTools[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DigitalInterfaces.DataExchange.EncryptedDataTransmission",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "DigitalInterfaces.DataExchange.OutgoingEInvoiceFormat",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "DigitalInterfaces.DataExchange.EDI",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "DigitalInterfaces.DataExchange.WebEDI",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   }
+  ]
+ },
+ {
+  "family": "Provision of Simulation Models",
+  "idta": "02005",
+  "version": "1.1",
+  "idShort": "SimulationModels",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/SimulationModels/1/1",
+  "elements": 76,
+  "paths": [
+   {
+    "path": "SimulationModel.Summary",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SimulationModel.SimPurpose.PosSimPurpose",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.SimPurpose.NegSimPurpose",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.TypeOfModel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.ScopeOfModel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.LicenseModel",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.EngineeringDomain",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.OperatingSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.ToolEnvironment",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.DependencyEnvironment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SimulationModel.Environment.VisualizationInformation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SimToolName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.DependencySimTool",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.Compiler",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.StepSizeControlNeeded",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.FixedStepSize",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.StiffSolverNeeded",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.SolverIncluded",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.TestedToolSolverAlgorithm.SolverAlgorithm",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.TestedToolSolverAlgorithm.ToolSolverFurtherDescription",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.Environment.SimulationTool.SolverAndTolerances.TestedToolSolverAlgorithm.Tolerance",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "SimulationModel.RefSimDocumentation",
+    "modelType": "File"
+   },
+   {
+    "path": "SimulationModel.ModelFile.ModelFileType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SimulationModel.ModelFile.ModelFileVersion.ModelVersionId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Purchase Order",
+  "idta": "02050",
+  "version": "1.0",
+  "idShort": "PurchaseOrder",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/PurchaseOrder/1/0",
+  "elements": 836,
+  "paths": [
+   {
+    "path": "PurchaseOrderInformation.DocumentType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.BuyerPurchaseRequestNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.SellerPurchaseRequestNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.AgentPurchaseRequestNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.BuyerQuotationNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.SellerQuotationNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.AgentQuotationNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.SellerPurchaseOrderNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.BuyerPurchaseOrderNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.AgentPurchaseOrderNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.DocumentCreationDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PurchaseOrderInformation.DocumentUpdateDateTime",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "PurchaseOrderInformation.ValidityStartDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PurchaseOrderInformation.ValidityEndDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PurchaseOrderInformation.OpenDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PurchaseOrderInformation.CloseDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PurchaseOrderInformation.LatestRegistrationDate",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.BindingPeriodEndDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "PurchaseOrderInformation.PurchaseRequestType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.PurchaseOrderType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.DocumentStatus",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.Language",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "PurchaseOrderInformation.Currency",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Quality Control for Machining",
+  "idta": "02049",
+  "version": "1.0",
+  "idShort": "QualityControlForMachining",
+  "semanticId": null,
+  "elements": 183,
+  "paths": [
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].LinearFeatureName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].DimensionDescription",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].MeasurementProcedure",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].InspectionRelevant",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].ToleranceNorm",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].NominalValue",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].UpperTolerance",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].LowerTolerance",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].OneSided",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].EngineeringUnit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].IDList3DModel[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].Reference2DList[0].Page",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.LinearFeaturesList[0].Reference2DList[0].Coordinate",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].AttributiveFeatureName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].AttibutiveFeatureDescription",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].MeasurementProcedure",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].ToleranceNorm",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].InspectionRelevant",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].IDList3DModel[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].Reference2DList[0].Page",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].Reference2DList[0].Coordinate",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].OKAttributesList[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.AttributiveFeaturesList[0].NOKAttributesList[0]",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "QualityFeatures.GeometricFeaturesList[0].GPS_FeatureName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Reliability",
+  "idta": "02013",
+  "version": "1.0.1",
+  "idShort": "Reliability",
+  "semanticId": "https://admin-shell.io/idta/iec62683/1/0/Reliability",
+  "elements": 15,
+  "paths": [
+   {
+    "path": "NumberOfReliabilitySets",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.TypeOfVoltage",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.RatedVoltage",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.MinimumRatedVoltage",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.MaximumRatedVoltage",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.RatedOperationalCurrent",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.TypeOfInterlockingDevice",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.OtherOperatingConditions",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.UsefulLifeInNumberOfOperations",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "OperatingConditionsOfReliabilityCharacteristics.UsefulLifeInTimeInterval",
+    "modelType": "Property",
+    "valueType": "xs:double"
+   },
+   {
+    "path": "ReliabilityCharacteristics.MTTF",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "ReliabilityCharacteristics.MTBF",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   },
+   {
+    "path": "ReliabilityCharacteristics.B10",
+    "modelType": "Property",
+    "valueType": "xs:int"
+   }
+  ]
+ },
+ {
+  "family": "sensor4.0",
+  "idta": "02029",
+  "version": "1",
+  "idShort": "MeasurementValue",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/measurementValue/1/0",
+  "elements": 16,
+  "paths": [
+   {
+    "path": "MeasuredValue.Value",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "MeasuredValue.Unit",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MeasuredValue.Kind",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MeasuredValuePreDefined.Distance",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "MeasurementTimestamp",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "Concept.Origin",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Concept.Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Concept.Identifier",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MeasurementQualifier.Quality",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "MeasurementQualifier.Range",
+    "modelType": "Range",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "MeasurementQualifier.Scale",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "MeasurementQualifier.Tag",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Service Request Notification",
+  "idta": "02010",
+  "version": "1.0.1",
+  "idShort": "ServiceRequestNotification",
+  "semanticId": "0173-1#01-AHX443#001",
+  "elements": 28,
+  "paths": [
+   {
+    "path": "NumberOfServiceRequestNotifications",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "ServiceRequestNotification.ReportedBy.CustomerNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.ReportedBy.NumberOfContacs",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.ServiceRequestNotificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.Status",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.Priority",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.ShortText",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ServiceRequestNotification.ServiceType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.DetailedInformation.LongText",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ServiceRequestNotification.DetailedInformation.StartOfFault",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "ServiceRequestNotification.DetailedInformation.ErrorCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.DetailedInformation.AttachedMedia.NumberOfMedias",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "ServiceRequestNotification.DetailedInformation.AttachedMedia.Media.DigitalFile",
+    "modelType": "File"
+   },
+   {
+    "path": "ServiceRequestNotification.DetailedInformation.AttachedMedia.Media.Comment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ServiceRequestNotification.OnsiteContact.PartnerNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ServiceRequestNotification.OnsiteContact.NumberOfContacts",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   }
+  ]
+ },
+ {
+  "family": "Sizing of Power Drive Trains",
+  "idta": "02021",
+  "version": "1.0.1",
+  "idShort": "PowerDriveTrainSizing",
+  "semanticId": "https://admin-shell.io/idta/PowerDriveTrainSizing/1/0",
+  "elements": 221,
+  "paths": [
+   {
+    "path": "SizingProjectInformation.ClientName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizingProjectInformation.SizingProjectName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizingProjectInformation.SizingProjectAxisReference",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizingProjectInformation.SizingProjectDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SizingProjectInformation.SizingProjectLink",
+    "modelType": "File"
+   },
+   {
+    "path": "SizingProjectInformation.SizingToolName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SizingProjectInformation.DateCreated",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "SizingProjectInformation.DateChanged",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   },
+   {
+    "path": "SizingProjectInformation.AmlDriveConfigVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.FrictionTorque",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.LeverArmAxialForce",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.AxialForce",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.LeverArmRadialForce",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.RadialForce",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MomentOfInertiaOfLoad",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.LoadTorque",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.Time",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.AngularPosition",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.AngularVelocity",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.AngularAcceleration",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.AngularJerk",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.FrictionTorque",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "ApplicationRequirements.MotionPattern.MotionPatternSections.RotativeSection.MetadataRotativeMotionFile.AxialForce",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   }
+  ]
+ },
+ {
+  "family": "Software Nameplate",
+  "idta": "02007",
+  "version": "1.0.1",
+  "idShort": "SoftwareNameplate",
+  "semanticId": "https://admin-shell.io/idta/SoftwareNameplate/1/0",
+  "elements": 91,
+  "paths": [
+   {
+    "path": "SoftwareNameplateType.URIOfTheProduct",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateType.ManufacturerName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.ManufacturerProductDesignation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.ManufacturerProductDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.ManufacturerProductFamily",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.ManufacturerProductType",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.SoftwareType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateType.Version",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateType.VersionName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.VersionInfo",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.ReleaseDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "SoftwareNameplateType.ReleaseNotes",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SoftwareNameplateType.ReleaseInformation",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateType.BuildDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "SoftwareNameplateType.InstallationURI",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   },
+   {
+    "path": "SoftwareNameplateType.InstallationFile",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateType.InstallerType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateType.InstallationChecksum",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateInstance.SerialNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateInstance.InventoryTag",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateInstance.InstanceName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateInstance.InstalledVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SoftwareNameplateInstance.InstallationDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   },
+   {
+    "path": "SoftwareNameplateInstance.InstallationPath",
+    "modelType": "Property",
+    "valueType": "xs:anyURI"
+   }
+  ]
+ },
+ {
+  "family": "Technical Data for Automated Guided Vehicles",
+  "idta": "02047",
+  "version": "1.0.1",
+  "idShort": "TechnicalDataAGV",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/technicaldataagv/1/0",
+  "elements": 99,
+  "paths": [
+   {
+    "path": "GeneralInformation.ManufacturerName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.CompanyLogo",
+    "modelType": "File"
+   },
+   {
+    "path": "GeneralInformation.ManufacturerProductDesignation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralInformation.ProductArticleNumberOfManufacturer",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.ManufacturerOrderCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.ProductImages[0].ImageFile",
+    "modelType": "File"
+   },
+   {
+    "path": "GeneralInformation.ProductImages[0].ImageNote",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SpecificDescriptions[0].DataSheet",
+    "modelType": "File"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.AgvKinematic",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.AgvClass",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.TravelDirection",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.TransportPrinciple",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.LocalizationType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.NavigationType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.SpecialApplications",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.SpecialCapabilities",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.ProtectionClassIP",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.SuitableForOutdoorUse",
+    "modelType": "Property",
+    "valueType": "xs:boolean"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.RequiredEnvironmentalConditions",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SpecificDescriptions[0].TypeAndApplicationInformation.SpecialQualificationDemand",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "SpecificDescriptions[0].TechnicalParameters.MaxLateralInclinationMaxLoad",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "SpecificDescriptions[0].TechnicalParameters.MaxLateralInclinationWithoutLoad",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "SpecificDescriptions[0].TechnicalParameters.MaxClimbingInclinationMaxLoad",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "SpecificDescriptions[0].TechnicalParameters.MaxClimbingInclinationWithoutLoad",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   }
+  ]
+ },
+ {
+  "family": "Technical_Data",
+  "idta": "02003",
+  "version": "2.0.1",
+  "idShort": "TechnicalData",
+  "semanticId": "0173-1#01-AHX837#002",
+  "elements": 69,
+  "paths": [
+   {
+    "path": "GeneralInformation.ManufacturerName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.CompanyLogo",
+    "modelType": "File"
+   },
+   {
+    "path": "GeneralInformation.ManufacturerProductDesignation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralInformation.ManufacturerArticleNumber",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.ManufacturerOrderCode",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralInformation.ProductImages[0].ImageFile",
+    "modelType": "File"
+   },
+   {
+    "path": "GeneralInformation.ProductImages[0].ImageNote",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ProductClassifications[0].ClassificationSystem",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductClassifications[0].ClassificationSystemVersion",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductClassifications[0].ClassificationSystemUrl",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductClassifications[0].ProductClassId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductClassifications[0].ProductClassCodedName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ProductClassifications[0].ProductClassName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].Section.ArbitraryProperty",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].Section.ArbitraryMLP",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].Section.ArbitraryRange",
+    "modelType": "Range",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].ArbitrarySMC.ArbitraryProperty",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].ArbitrarySMC.ArbitraryMLP",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].ArbitrarySMC.ArbitraryRange",
+    "modelType": "Range",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].ArbitraryProperty",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].ArbitraryMLP",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "TechnicalPropertyAreas[0].ArbitraryRange",
+    "modelType": "Range",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "FurtherInformation.TextStatement",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "FurtherInformation.ValidDate",
+    "modelType": "Property",
+    "valueType": "xs:date"
+   }
+  ]
+ },
+ {
+  "family": "Time Series Data",
+  "idta": "02008",
+  "version": "1.1.1",
+  "idShort": "TimeSeries",
+  "semanticId": "https://admin-shell.io/idta/TimeSeries/1/1",
+  "elements": 63,
+  "paths": [
+   {
+    "path": "Metadata.Name",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Metadata.Description",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Metadata.Record.Time",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Metadata.Record.sampleAccelerationX",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Metadata.Record.sampleAccelerationY",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Metadata.Record.sampleAccelerationZ",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Segments.ExternalSegment.Name",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Segments.ExternalSegment.Description",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Segments.ExternalSegment.RecordCount",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Segments.ExternalSegment.StartTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.ExternalSegment.EndTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.ExternalSegment.Duration",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.ExternalSegment.SamplingInterval",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Segments.ExternalSegment.SamplingRate",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Segments.ExternalSegment.State",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.ExternalSegment.LastUpdate",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.ExternalSegment.File",
+    "modelType": "File"
+   },
+   {
+    "path": "Segments.ExternalSegment.Blob",
+    "modelType": "Blob"
+   },
+   {
+    "path": "Segments.LinkedSegment.Name",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Segments.LinkedSegment.Description",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "Segments.LinkedSegment.RecordCount",
+    "modelType": "Property",
+    "valueType": "xs:long"
+   },
+   {
+    "path": "Segments.LinkedSegment.StartTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.LinkedSegment.EndTime",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "Segments.LinkedSegment.Duration",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   }
+  ]
+ },
+ {
+  "family": "Wireless Communication",
+  "idta": "02022",
+  "version": "1.0.1",
+  "idShort": "WirelessCommunication",
+  "semanticId": "https://admin-shell.io/idta/SubmodelTemplate/WirelessCommunication/1/0",
+  "elements": 90,
+  "paths": [
+   {
+    "path": "WirelessCommunicationFunction.CommunicationCycle",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessCommunicationFunction.TechnologyStandard",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessCommunicationFunction.MediumAccess.MediumAccessType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessCommunicationFunction.MediumAccess.SlotConfiguration.NumberOfDownlinkSlots",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessCommunicationFunction.MediumAccess.SlotConfiguration.NumberOfUplinkSlots",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessCommunicationFunction.MediumAccess.SlotConfiguration.NumberOfSharedSlots",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessCommunicationFunction.SecurityMechanism",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WirelessNetworkRole",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RadioFrequency.FrequencyBand.BandIDList",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RadioFrequency.FrequencyBand.BandIDCurrent",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RadioFrequency.FrequencyBand.CenterFrequecy",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "RadioFrequency.FrequencyBand.Bandwidth",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RadioFrequency.RadioFrequencyChannel.ChannelNumbering",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "RadioFrequency.RadioFrequencyChannel.UsedChannelCentreFrequency",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "RadioFrequency.RadioFrequencyChannel.UsedChannelBandwidth",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ReceptionQualityIndicator.ParameterType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ReceptionQualityIndicator.Range",
+    "modelType": "Range",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "ReceptionQualityIndicator.SpecifiedValue",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "ReceptionQualityIndicator.ReferenceValue",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "ReceptionQualityIndicator.CurrentValue",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "OutputPower.ParameterType",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "OutputPower.Range",
+    "modelType": "Range",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "OutputPower.SpecifiedValue",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   },
+   {
+    "path": "OutputPower.ReferenceValue",
+    "modelType": "Property",
+    "valueType": "xs:float"
+   }
+  ]
+ },
+ {
+  "family": "Worskstation Worker Matching Data",
+  "idta": "02046",
+  "version": "1.0.1",
+  "idShort": "WorkstationWorkerMatchingData",
+  "semanticId": "https://admin-shell.io/idta/sm/workstationworkermatchingdata",
+  "elements": 85,
+  "paths": [
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.WorkstationName",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.WorkstationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.OrgName",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.TypeOfWorkstation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.WorkerAssistanceInformation",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.RequiredPersonalSafetyEquipment",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.NecessaryPersonalTools",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.PersonalDataProcessing",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.LocationDescription",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.WorkstationInformation.Directions",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralQualificationDemand[0].QualificationClassificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralQualificationDemand[0].QualificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralQualificationDemand[0].ExceptionRules",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralSkillDemand[0].SkillClassificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralSkillDemand[0].SkillLevelClassificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralSkillDemand[0].SkillLevelId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralSkillDemand[0].SkillId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "GeneralWorkstationData.GeneralSkillDemand[0].ExceptionRules",
+    "modelType": "MultiLanguageProperty"
+   },
+   {
+    "path": "ErgonomicWorkstationProfile.MaxLiftingWeight",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "ErgonomicWorkstationProfile.MinWorkerHeight",
+    "modelType": "Property",
+    "valueType": "xs:integer"
+   },
+   {
+    "path": "ErgonomicWorkstationProfile.AllowedPersonalLimitations[0].LimitationClassificationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "ErgonomicWorkstationProfile.AllowedPersonalLimitations[0].PersonalLimitationId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WorkstationConfigurationRecords[0].WorkerId",
+    "modelType": "Property",
+    "valueType": "xs:string"
+   },
+   {
+    "path": "WorkstationConfigurationRecords[0].AccessStart",
+    "modelType": "Property",
+    "valueType": "xs:dateTime"
+   }
+  ]
+ }
+]

@@ -1,0 +1,34 @@
+{
+  "id": "create-submodel-element",
+  "title": "Add Submodel Element",
+  "operation": "create",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "POST a single element into an existing submodel.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/submodels/{smId}/submodel-elements",
+    "expect": [
+      201
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId"
+    },
+    {
+      "id": "value",
+      "label": "Element value",
+      "type": "value",
+      "bindsTo": "body.value"
+    }
+  ],
+  "defaults": {
+    "weight": 8
+  },
+  "kind": "request"
+}

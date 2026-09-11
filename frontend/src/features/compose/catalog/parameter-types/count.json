@@ -1,0 +1,60 @@
+{
+  "id": "count",
+  "title": "Count",
+  "appliesTo": [
+    "aas",
+    "submodel"
+  ],
+  "default": "fixed",
+  "description": "How many children a composite step creates.",
+  "strategies": [
+    {
+      "id": "fixed",
+      "label": "Fixed",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer",
+            "title": "Count",
+            "default": 3,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "sample": "3"
+    },
+    {
+      "id": "range",
+      "label": "Range",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "integer",
+            "title": "Min",
+            "default": 1,
+            "minimum": 0
+          },
+          "max": {
+            "type": "integer",
+            "title": "Max",
+            "default": 6,
+            "minimum": 1
+          },
+          "distribution": {
+            "type": "string",
+            "title": "Distribution",
+            "enum": [
+              "uniform",
+              "zipf"
+            ],
+            "default": "uniform"
+          }
+        }
+      },
+      "sample": "1–6"
+    }
+  ]
+}

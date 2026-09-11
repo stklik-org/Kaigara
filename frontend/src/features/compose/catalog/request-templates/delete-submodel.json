@@ -1,0 +1,35 @@
+{
+  "id": "delete-submodel",
+  "title": "Delete Submodel",
+  "operation": "delete",
+  "target": "submodel",
+  "execution": "engine",
+  "summary": "DELETE one submodel.",
+  "endpoint": {
+    "method": "DELETE",
+    "path": "/submodels/{smId}",
+    "expect": [
+      204,
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId",
+      "strategies": [
+        "created-in-scenario",
+        "from-server",
+        "fixed",
+        "non-existing"
+      ]
+    }
+  ],
+  "defaults": {
+    "weight": 5
+  },
+  "consumesPool": true,
+  "kind": "request"
+}

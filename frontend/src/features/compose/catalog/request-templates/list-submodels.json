@@ -1,0 +1,30 @@
+{
+  "id": "list-submodels",
+  "title": "List submodels (paged)",
+  "operation": "read",
+  "target": "submodel",
+  "execution": "engine",
+  "summary": "GET the submodel collection with limit/cursor paging.",
+  "endpoint": {
+    "method": "GET",
+    "path": "/submodels",
+    "expect": [
+      200
+    ],
+    "query": {
+      "limit": "{pageSize}"
+    }
+  },
+  "parameters": [
+    {
+      "id": "pageSize",
+      "label": "Page size",
+      "type": "page-size",
+      "bindsTo": "query.limit"
+    }
+  ],
+  "defaults": {
+    "weight": 10
+  },
+  "kind": "request"
+}

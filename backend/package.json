@@ -2,23 +2,30 @@
   "name": "@kaigara/backend",
   "version": "0.0.0",
   "private": true,
-  "description": "Kaigara orchestrator backend. Only the connection reachability probe is implemented so far \u2014 see backend/README.md and proposal section 5.1/5.3.",
+  "description": "Kaigara orchestrator backend: connection probe, folder-backed scenario library, and timeline execution (compile to an engine-neutral plan, run via the k6 adapter). See backend/README.md and proposal section 5.1/5.3.",
   "type": "module",
   "main": "src/server.ts",
   "scripts": {
+    "predev": "node ../scripts/ports.mjs 5174 backend",
     "dev": "node --watch src/server.ts",
+    "prestart": "node ../scripts/ports.mjs 5174 backend",
     "start": "node src/server.ts",
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
+    "prestub-aas": "node ../scripts/ports.mjs 8081 stub-aas",
     "stub-aas": "node src/devtools/stubAasServer.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.0",
+    "@fastify/static": "^10.1.3",
+    "@fastify/swagger": "^9.8.1",
+    "@fastify/swagger-ui": "^6.1.1",
     "@kaigara/shared-types": "*",
     "fastify": "^5.12.1"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",
+    "openapi-types": "^12.1.3",
     "tsx": "^4.19.0",
     "typescript": "~6.0.2"
   }

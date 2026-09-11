@@ -14,7 +14,8 @@
  *    `{id}` placeholder.
  *  - `query` is a collection read, not a filter. IDTA-01002 v3 splits "get all with paging" from
  *    the separate Query API; the tool's "query" operation maps to the paged collection GET, which
- *    is the search-shaped operation every conformant repository implements.
+ *    is the search-shaped operation every conformant repository implements. `read`, added
+ *    alongside it, is the by-identifier GET — the two answer different questions about a server.
  */
 
 import type { RequestOperation, RequestTargetEntity } from "@kaigara/shared-types";
@@ -35,8 +36,10 @@ export interface AasOperationDescriptor {
   expectStatus: number[];
 }
 
-/** Collection path per entity — the two repository interfaces Kaigara targets. */
-const COLLECTION_PATH: Record<RequestTargetEntity, string> = {
+/** Collection path per entity — the two repository interfaces Kaigara targets. Exported so the k6
+ *  adapter's compile-time identifier harvest (`resolveIdentifiers.ts`) pages the same collections
+ *  this table already says every other request addresses. */
+export const COLLECTION_PATH: Record<RequestTargetEntity, string> = {
   shell: "/shells",
   submodel: "/submodels",
 };
@@ -59,6 +62,20 @@ export function describeOperation(operation: RequestOperation, target: RequestTa
         pathTemplate: collection,
         query: { limit: String(COLLECTION_PAGE_LIMIT) },
         idSource: "none",
+        consumesId: false,
+        sendsBody: false,
+        expectStatus: [200],
+      };
+
+    case "read":
+      // Read-by-identifier — the counterpart to `query`'s collection GET. Both are reads; this one
+      // measures single-entity lookup rather than paging and serialising a result set, which is a
+      // different cost on every server tested so far.
+      return {
+        method: "GET",
+        pathTemplate: `${collection}/{id}`,
+        query: {},
+        idSource: "pool",
         consumesId: false,
         sendsBody: false,
         expectStatus: [200],

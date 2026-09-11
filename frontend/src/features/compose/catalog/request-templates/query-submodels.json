@@ -1,0 +1,35 @@
+{
+  "id": "query-submodels",
+  "title": "Query submodels",
+  "operation": "query",
+  "target": "submodel",
+  "execution": "authoring",
+  "summary": "POST /submodels/$query with an IDTA-01002 $condition.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/submodels/$query",
+    "expect": [
+      200
+    ],
+    "body": true
+  },
+  "parameters": [
+    {
+      "id": "condition",
+      "label": "Condition",
+      "type": "query-condition",
+      "bindsTo": "body.$condition"
+    },
+    {
+      "id": "pageSize",
+      "label": "Page size",
+      "type": "page-size",
+      "bindsTo": "body.limit"
+    }
+  ],
+  "defaults": {
+    "weight": 12
+  },
+  "notes": "Not every server implements the Query API. Set a fallback, or the run reports 501s as failures.",
+  "kind": "request"
+}

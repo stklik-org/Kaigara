@@ -1,5 +1,5 @@
 @startuml Kaigara-Metamodel
-title Kaigara Scenario Metamodel\nScenario -> LoadTimeline -> Track -> Load -> LoadShape / RequestComposition
+title Kaigara Scenario Metamodel\nScenario -> LoadTimeline -> Track -> Load -> LoadShape / RequestComposition -> RequestGenerator
 skinparam classAttributeIconSize 0
 skinparam wrapWidth 200
 hide empty members
@@ -8,10 +8,17 @@ package "Scenario" {
   class Scenario {
     id: string
     name: string
+    description: string [0..1]
     connectionId: string [0..1]
     +toJSON(): ScenarioData
     +{static} fromJSON(data): Scenario
   }
+  note right of Scenario
+    `description` is one line saying what the scenario
+    measures -- it lives in the document, not a side
+    table, so a file dropped into the library folder
+    describes itself on its own card.
+  end note
 
   interface ScenarioPhases {
     preparation: PhaseStep[]
@@ -31,7 +38,9 @@ package "Scenario" {
     Preparation / Preconditions / Postconditions / Cleanup
     stay plain ordered lists of opaque steps for now --
     not (yet) part of the polymorphic metamodel below.
-    No Compose screen surfaces them yet either.
+    No Compose screen surfaces them, and the backend
+    reports them `skipped` rather than `done`: only the
+    `method` phase actually executes.
   end note
 }
 
@@ -57,6 +66,12 @@ package "Method timeline" {
   note bottom of Track
     Organizational only -- a Track is not tied to one
     LoadShapeKind. Each Load carries its own shape.
+
+    `color` is literal hex and part of the **document**,
+    so a scenario looks the same wherever it is opened.
+    Handed out by `assignTrackColors` from
+    TRACK_COLOR_PALETTE (trackPalette.ts), never
+    re-derived per render.
   end note
 
   class Load {
@@ -67,6 +82,11 @@ package "Method timeline" {
     +{static} fromJSON(data): Load
     +with(patch): Load
   }
+  note bottom of Load
+    One scheduled occurrence: a rate curve (LoadShape)
+    paired with what it sends (RequestComposition).
+    Instantaneous shapes carry durationSeconds = 0.
+  end note
 }
 
 package "Load shape (polymorphic rate curve)" {
@@ -78,6 +98,19 @@ package "Load shape (polymorphic rate curve)" {
     +{abstract} toJSON(): LoadShapeData
     +{static} fromJSON(data): LoadShape
   }
+  note top of LoadShape
+    `rateAt()` is the **single** definition of a shape's
+    request rate: the Compose overlay chart and the
+    backend's plan compiler both sample it, which is why
+    neither has a per-kind switch and why the preview and
+    the actual run cannot disagree.
+
+    INSTANTANEOUS_WINDOW_SECONDS (= 6) is the nominal
+    window Spike/Individual are spread over -- shared for
+    the same reason.
+
+    Narrow with `instanceof`, not `kind === "..."`.
+  end note
 
   class RampShape {
     kind = "ramp"
@@ -144,6 +177,12 @@ package "Request composition" {
     +{static} fromJSON(data): RequestSpec
     +{static} createDefault(): RequestSpec
   }
+  note bottom of RequestSpec
+    `weight` is a relative share against the sibling
+    specs of the same Load -- it need not sum to 100.
+    The plan compiler folds it into a cumulative
+    distribution the engine draws from once per request.
+  end note
 
   enum RequestOperation {
     create
@@ -156,6 +195,60 @@ package "Request composition" {
     shell
     submodel
   }
+}
+
+package "Request payload generation (polymorphic)" {
+  abstract class RequestGenerator {
+    {abstract} kind: RequestGeneratorKind
+    {abstract} label: string
+    +{abstract} toJSON(): RequestGeneratorData
+    +{static} fromJSON(data): RequestGenerator
+  }
+  note top of RequestGenerator
+    Mirrors the LoadShape pattern (kind discriminant +
+    concrete subclasses) so the Request Composition panel
+    switches generator fields the same way the Load Shape
+    panel switches shape fields.
+
+    Neither this nor LoadShape has a `.with()`; patch them
+    through `patchShape` / `patchGenerator`
+    (compose/timeline/modelFactories.ts), which round-trip
+    via toJSON/fromJSON. Never object-spread an instance --
+    that drops the prototype.
+  end note
+
+  class RandomizedGenerator {
+    kind = "randomized"
+    sizeBytes: number
+    +{static} createDefault(): RandomizedGenerator
+  }
+  class ExactGenerator {
+    kind = "exact"
+    value: string
+    +{static} createDefault(): ExactGenerator
+  }
+  class MutateGenerator {
+    kind = "mutate"
+    baseValue: string
+    mutationRatePercent: number
+    +{static} createDefault(): MutateGenerator
+  }
+
+  RequestGenerator <|-- RandomizedGenerator
+  RequestGenerator <|-- ExactGenerator
+  RequestGenerator <|-- MutateGenerator
+
+  note bottom of RandomizedGenerator
+    Builds real IDTA-01001-shaped entities padded to
+    `sizeBytes` through a legitimate field -- a server
+    that validates input must be able to accept them.
+  end note
+  note bottom of ExactGenerator
+    Sent **verbatim**, including an id that may not match
+    the URL: the negative-testing escape hatch (proposal
+    section 9.1). Repairing it would remove the only way
+    to author such a case.
+  end note
 }
 
 class ServerConnection <<(C,#cccccc) external>> {
@@ -181,7 +274,24 @@ Load "1" *-- "1" RequestComposition : requests
 RequestComposition "1" *-- "*" RequestSpec : requests
 RequestSpec --> RequestOperation : operation
 RequestSpec --> RequestTargetEntity : target
+RequestSpec "1" *-- "1" RequestGenerator : generator
 
 Scenario ..> ServerConnection : connectionId (reference)
+
+legend bottom
+  All of the above lives in **packages/shared-types/src**, imported
+  unchanged by the frontend and the backend.
+  ==
+  Reading an untrusted document goes through **parseScenarioDocument**
+  (scenarioDocument.ts) or **parseLoadTimeline** (loadTimelineValidation.ts),
+  never `fromJSON` directly -- the constructors only guard the polymorphic
+  `kind` discriminants.
+  ==
+  Adding a field means touching four places, in order:
+  the class + its toJSON/fromJSON -> loadTimelineSchema.ts (then
+  `npm run schema:emit`) -> loadTimelineValidation.ts -> backend/src/timeline/.
+  A field missing from the schema is worse than one missing everywhere:
+  `additionalProperties: false` makes the editor flag a document the app wrote.
+endlegend
 
 @enduml

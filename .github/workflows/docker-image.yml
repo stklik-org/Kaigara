@@ -1,0 +1,127 @@
+# Builds the Kaigara image from the repository's Dockerfile and publishes it to the GitHub Container
+# Registry, so running the tool is a `docker pull` rather than a checkout and a build. README.md,
+# "Running Kaigara", is the user-facing side of this file.
+#
+#   push to main      → :latest, :main, :sha-<short>
+#   tag v1.2.3        → :1.2.3, :1.2, :sha-<short>
+#   pull request      → built for both platforms and smoke-tested, never pushed
+#   manual dispatch   → like a push of the chosen branch (`latest` only for main)
+#
+# Two platforms because this is a load generator: an arm64 laptop running an amd64 image under
+# emulation would be measuring its emulation layer as much as the server under test.
+#
+# To publish somewhere other than GHCR — a self-hosted registry, say — set the repository variable
+# IMAGE_NAME to the full image name, registry host included and tag left off
+# (`registry.example.org/aas/kaigara`, `docker.io/<user>/kaigara`), and the secrets
+# REGISTRY_USERNAME and REGISTRY_PASSWORD. Nothing else changes.
+
+name: Docker image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+# A newer commit on the same ref supersedes the image being built for an older one.
+concurrency:
+  group: docker-image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      # Image references must be lower-case, and a GitHub owner name need not be. The registry host
+      # is the part before the first slash, which is what the login below needs.
+      - name: Resolve image name
+        id: image
+        env:
+          IMAGE: ${{ vars.IMAGE_NAME || format('ghcr.io/{0}/kaigara', github.repository_owner) }}
+        run: |
+          echo "name=${IMAGE,,}" >> "$GITHUB_OUTPUT"
+          echo "registry=${IMAGE%%/*}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+
+      # Test before push: the runner's own platform is built first and loaded into its Docker, and
+      # has to come up, serve the UI, reach a server and finish a real k6 run before anything is
+      # published. The multi-platform build below then reuses every layer of this one.
+      - name: Build for the smoke test
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: kaigara:smoke-test
+          cache-from: type=gha
+
+      - name: Smoke test
+        run: node scripts/smoke-test-image.mjs kaigara:smoke-test
+
+      - name: Log in to ${{ steps.image.outputs.registry }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ steps.image.outputs.registry }}
+          username: ${{ secrets.REGISTRY_USERNAME || github.actor }}
+          password: ${{ secrets.REGISTRY_PASSWORD || secrets.GITHUB_TOKEN }}
+
+      # `latest` follows main rather than the newest release tag: there are no releases yet, and
+      # the point of the image is that trying the current state of the tool is one command.
+      - name: Tags and labels
+        id: meta
+        uses: docker/metadata-action@v6
+        # A multi-platform image is an index over per-platform manifests, and GHCR reads the
+        # description and the source repository from the index — so annotate both levels.
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+          labels: |
+            org.opencontainers.image.title=Kaigara
+            org.opencontainers.image.description=Standards-based benchmarking tool for Asset Administration Shell (AAS) servers
+
+      - name: Build for amd64 and arm64${{ github.event_name != 'pull_request' && ', and push' || '' }}
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          cache-from: type=gha
+          # A cache that fails to save must not fail a build that succeeded.
+          cache-to: type=gha,mode=max,ignore-error=true
+
+      - name: Summary
+        if: github.event_name != 'pull_request'
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+          IMAGE: ${{ steps.image.outputs.name }}
+        run: |
+          {
+            echo "### Published"
+            echo
+            echo '```'
+            echo "$TAGS"
+            echo '```'
+            echo
+            echo "Run it with \`docker run --rm -p 5174:5174 $IMAGE:sha-${GITHUB_SHA::7}\` and open <http://localhost:5174>."
+          } >> "$GITHUB_STEP_SUMMARY"
