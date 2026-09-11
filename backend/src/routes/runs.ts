@@ -106,7 +106,7 @@ const runRequestProperties = {
   engineId: { type: "string", enum: ["k6"], description: "Names an adapter. Only k6 is implemented (ADR 0001)." },
   dryRun: {
     type: "boolean",
-    description: "Validate and compile, create the run, and stop there — status `compiled`, not a single request sent. The generated script is still readable from `/artifacts/script.js`.",
+    description: "Validate and compile, create the run, and stop there — status `compiled`, not a single request sent. The generated scripts are still readable from `/artifacts/main.js` and the files it lists.",
   },
 } as const;
 
@@ -168,7 +168,7 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
       tags: ["runs"],
       summary: "Compile a timeline without running it",
       description:
-        "Returns the execution plan (one k6 executor per load) and the generated engine script, so the translation from timeline to IDTA-01002 calls is inspectable before anything is sent. Creates no run — but does contact the target if the plan addresses an existing entity: identifiers are resolved (paged in, or pre-generated for creates) at compile time rather than by the script itself, so this preview and the run it precedes see the same target state. An explicit `idPool.source: \"server\"` request whose entity harvests to nothing fails the compile with 400.",
+        "Returns the k6 plan and every generated file — `main.js` plus one small script per request type of each load — so the translation from timeline to IDTA-01002 calls is inspectable before anything is sent. Creates no run, but does contact the target if the plan addresses an existing entity: identifiers are resolved (paged in, or minted for creates) at compile time rather than by the scripts themselves, so this preview and the run it precedes see the same target state. An explicit `idPool.source: \"server\"` request whose entity harvests to nothing fails the compile with 400. Target header *values* are redacted from the plan — the scripts read them from the `KAIGARA_HEADERS` environment variable at run time.",
       body: {
         type: "object",
         required: ["timeline", "target"],
@@ -177,11 +177,21 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
       },
       response: {
         200: {
-          description: "The plan, the script, and any non-blocking warnings found in the timeline.",
+          description: "The plan, the generated files, and any non-blocking warnings found in the timeline.",
           type: "object",
           properties: {
             plan: { type: "object", additionalProperties: true },
-            script: { type: "string", description: "The generated engine script, verbatim." },
+            files: {
+              type: "array",
+              description: "`main.js` first, then one standalone script per request type, in the order k6 starts them.",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string", examples: ["main.js", "01-create-shell.js"] },
+                  content: { type: "string", description: "The file, verbatim." },
+                },
+              },
+            },
             warnings: { type: "array", items: { $ref: "#/components/schemas/ValidationIssue" } },
           },
         },
@@ -191,8 +201,8 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
     }),
     async (request, reply) => {
       try {
-        const { plan, script, warnings } = await runs.compileOnly(request.body);
-        return { plan, script, warnings };
+        const { plan, files, warnings } = await runs.compileOnly(request.body);
+        return { plan, files, warnings };
       } catch (error) {
         return reply.code(statusForError(error)).send(errorBody(error));
       }
@@ -407,20 +417,20 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
     },
   );
 
-  /** The generated script (or plan) for a run, so the user can read exactly what was executed. */
+  /** A generated file (or the plan) for a run, so the user can read exactly what was executed. */
   app.get<{ Params: { id: string; name: string } }>(
     "/api/runs/:id/artifacts/:name",
     documented({
       tags: ["runs"],
       summary: "Read a generated artifact",
       description:
-        "`script.js` — the exact engine script that was executed — or `plan.json`, the k6 execution plan it was rendered from. Names come from the run's `artifacts` list.",
+        "`main.js` — the entry point k6 was handed — one of the per-request scripts it schedules (e.g. `01-create-shell.js`), or `plan.json`, the k6 plan they were rendered from. Names come from the run's `artifacts` list.",
       params: {
         type: "object",
         required: ["id", "name"],
         properties: {
           id: { type: "string" },
-          name: { type: "string", description: "`script.js` or `plan.json`.", examples: ["script.js"] },
+          name: { type: "string", description: "`main.js`, one of the numbered scripts, or `plan.json`.", examples: ["main.js"] },
         },
       },
       // No response schema: the body is the artifact's own text, sent with its own content type.

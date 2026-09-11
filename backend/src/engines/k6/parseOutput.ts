@@ -4,15 +4,15 @@
  * k6 emits one JSON object per line, of two kinds: `Metric` (a declaration, once per metric) and
  * `Point` (an observation). Only points matter here, and only three metrics of them:
  *
- *  - `http_req_duration` — one point per completed request, carrying the tags the generated script
- *    attached (`load`, `track`, `op`, `target`) plus k6's own `status` and `expected_response`.
+ *  - `http_req_duration` — one point per completed request, carrying the tags the generated scripts
+ *    attach (`load`, `track`, `op`, `target`, `script`) plus k6's own `status` and `expected_response`.
  *    This single metric yields both the request count and the latency, so parsing it alone avoids
  *    walking the output twice.
  *  - `dropped_iterations` — requests k6 wanted to start but could not, because its worker pool was
  *    saturated. Surfaced prominently: it means the measurement was limited by the load generator
  *    rather than by the server under test.
- *  - `kaigara_skipped_no_id` — the generated script's own counter for update/delete operations
- *    that had no identifier to address.
+ *  - `kaigara_skipped_no_id` — the generated scripts' own counter for iterations that had no
+ *    identifier left to address.
  *
  * The volume is substantial (one line per request per metric), which is exactly why the proposal
  * (section 7.2) calls for aggregating server-side rather than forwarding raw events to the
@@ -20,9 +20,6 @@
  */
 
 import type { RequestSample } from "../adapter.ts";
-
-/** Must match `SETUP_TAG` in the generated script (see compileScript.ts). */
-const SETUP_TAG = "__kaigara_setup";
 
 export interface ParsedBatch {
   samples: RequestSample[];
@@ -116,11 +113,11 @@ export class K6OutputParser {
 
     const tags = data.tags ?? {};
 
-    // Requests the generated script issues on Kaigara's own behalf — seeding its identifier pool
-    // in setup() — carry the setup tag, and anything with no `load` tag at all belongs to no
-    // planned load. Neither is part of the workload under measurement, and counting them would
-    // put the tool's own overhead into the numbers it reports (proposal section 2.3).
-    if (tags.load === undefined || tags.load === SETUP_TAG) return null;
+    // Anything with no `load` tag belongs to no planned load — the generated scripts tag every
+    // request they issue, and they issue nothing else (they discover no server state of their own,
+    // ADR 0003). Counting an untagged request would put the tool's own overhead into the numbers it
+    // reports (proposal section 2.3).
+    if (tags.load === undefined) return null;
 
     const timestamp = data.time ? Date.parse(data.time) : Number.NaN;
     const offsetMs = Number.isFinite(timestamp) ? Math.max(0, timestamp - this.startEpochMs) : 0;
@@ -133,8 +130,8 @@ export class K6OutputParser {
       durationMs: data.value ?? 0,
       // Transport failures carry status "0"; parseInt on a missing tag would give NaN, so default.
       status: Number.parseInt(tags.status ?? "0", 10) || 0,
-      // `expected_response` is bound to the plan's own expected statuses by the generated script
-      // (see compileScript.ts), so it is authoritative rather than k6's default 2xx/3xx notion.
+      // `expected_response` is bound to each script's own EXPECTED_STATUS (scriptTemplates.ts),
+      // so it is authoritative rather than k6's default 2xx/3xx notion.
       failed: tags.expected_response !== "true",
     };
   }

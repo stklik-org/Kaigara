@@ -37,7 +37,7 @@ export interface AasOperationDescriptor {
 }
 
 /** Collection path per entity — the two repository interfaces Kaigara targets. Exported so the k6
- *  adapter's compile-time identifier harvest (`resolveIdentifiers.ts`) pages the same collections
+ *  adapter's compile-time identifier harvest (`harvestIdentifiers.ts`) pages the same collections
  *  this table already says every other request addresses. */
 export const COLLECTION_PATH: Record<RequestTargetEntity, string> = {
   shell: "/shells",

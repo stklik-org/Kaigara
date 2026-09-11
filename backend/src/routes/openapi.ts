@@ -42,7 +42,7 @@ export async function registerOpenApi(app: FastifyInstance): Promise<void> {
             "3. `POST /api/runs/scenario` with `{ \"scenarioId\": \"shape-showcase\", \"target\": { … } }`, or with",
             "   your own document under `scenario`. Add `\"dryRun\": true` to compile and inspect the plan",
             "   without sending a single request.",
-            "4. `GET /api/runs/{id}` to follow it, `GET /api/runs/{id}/artifacts/script.js` to read exactly",
+            "4. `GET /api/runs/{id}` to follow it, `GET /api/runs/{id}/artifacts/main.js` to read exactly",
             "   what was executed.",
             "",
             "Runs are held in memory and do not survive a restart.",

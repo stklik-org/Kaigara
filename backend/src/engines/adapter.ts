@@ -113,7 +113,7 @@ export interface EngineRunContext {
  *  executed on their behalf — the translation from timeline to requests should be inspectable,
  *  not a black box. */
 export interface CompiledArtifact {
-  /** Short name, e.g. "script.js". */
+  /** Short name, e.g. "main.js". */
   name: string;
   absolutePath: string;
   /** MIME-ish hint for rendering, e.g. "application/javascript". */

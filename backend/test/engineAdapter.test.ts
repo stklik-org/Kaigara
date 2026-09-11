@@ -57,7 +57,7 @@ function spec(id: string, operation: RequestSpec["operation"]): RequestSpec {
   return new RequestSpec({ id, operation, target: "shell", weight: 1, generator: new RandomizedGenerator({ sizeBytes: 64 }) });
 }
 
-/** Keeps `resolveIdentifiers`'s compile-time harvest off the network for the duration of a test. */
+/** Keeps the compile-time identifier harvest off the network for the duration of a test. */
 function withEmptyHarvest(): () => void {
   const original = globalThis.fetch;
   globalThis.fetch = (async () =>
@@ -99,11 +99,23 @@ test("K6Adapter.compile() works straight from the timeline and returns a thin su
     assert.equal(compiled.summary.loads[0].startSeconds, 5);
     assert.equal(compiled.summary.loads[0].requestCount, 2);
 
-    // Both artifacts are written, and plan.json is the adapter's own k6 form.
-    assert.deepEqual(compiled.artifacts.map((a) => a.name).sort(), ["plan.json", "script.js"]);
+    // main.js, one script per request type, and the plan are all written to the work dir k6 runs in.
+    assert.deepEqual(compiled.artifacts.map((a) => a.name), [
+      "main.js",
+      "01-query-shell.js",
+      "02-create-shell.js",
+      "plan.json",
+    ]);
+    for (const artifact of compiled.artifacts) {
+      assert.ok((await readFile(artifact.absolutePath, "utf8")).length > 0, `${artifact.name} is empty`);
+    }
+    const main = await readFile(join(workDir, "main.js"), "utf8");
+    assert.match(main, /import \* as s01 from "\.\/01-query-shell\.js";/, "main.js imports the scripts it schedules");
+
     const planJson = JSON.parse(await readFile(join(workDir, "plan.json"), "utf8"));
     assert.equal(planJson.loads[0].executor.executor, "constant-arrival-rate");
     assert.equal(planJson.loads[0].key, compiled.summary.loads[0].key, "summary keys tag the same loads as the plan");
+    assert.equal(planJson.loads[0].scripts.length, 2, "one script per request type");
   } finally {
     restore();
     await rm(scratch, { recursive: true, force: true });

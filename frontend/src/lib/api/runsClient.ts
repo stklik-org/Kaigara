@@ -52,6 +52,12 @@ function toRequest({ timeline, connection, scenarioName, dryRun }: StartRunOptio
   };
 }
 
+/** One file of a compiled run: `main.js`, or one of the numbered scripts it schedules. */
+export interface GeneratedScriptFile {
+  name: string;
+  content: string;
+}
+
 export interface RunsClient {
   /** Serializes `timeline` and asks the backend to execute it. Resolves once the run has been
    *  accepted and started — not when it finishes. */
@@ -61,8 +67,9 @@ export interface RunsClient {
   /** Live stream of that same view. Returns an unsubscribe function. */
   subscribeDetail(runId: string, onUpdate: (view: RunView) => void): () => void;
   stop(runId: string): Promise<RunView>;
-  /** Compiles without executing, returning the generated engine script for inspection. */
-  compile(options: StartRunOptions): Promise<{ script: string; warnings: ValidationIssue[] }>;
+  /** Compiles without executing, returning every generated engine file for inspection: `main.js`
+   *  first, then one small script per request type of each load. */
+  compile(options: StartRunOptions): Promise<{ files: GeneratedScriptFile[]; warnings: ValidationIssue[] }>;
   /** Expands the timeline into a bucketed, time-ordered schedule of the requests the engine will
    *  issue — the Run screen's "Concrete plan" debug view. Runs nothing. */
   concretePlan(options: StartRunOptions): Promise<ConcretePlan>;
@@ -113,8 +120,8 @@ export function createRunsClient(baseUrl = ""): RunsClient {
 
     async compile(options) {
       const response = await postJson(url(`${RUNS_ENDPOINT}/compile`), toRequest({ ...options, dryRun: true }));
-      const body = await read<{ script: string; warnings?: ValidationIssue[] }>(response);
-      return { script: body.script, warnings: body.warnings ?? [] };
+      const body = await read<{ files?: GeneratedScriptFile[]; warnings?: ValidationIssue[] }>(response);
+      return { files: body.files ?? [], warnings: body.warnings ?? [] };
     },
 
     async concretePlan(options) {

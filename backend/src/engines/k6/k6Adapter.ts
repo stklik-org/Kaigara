@@ -4,8 +4,8 @@
  * k6 is run **as an external subprocess**, exactly as a person would from a terminal, and is never
  * linked into this process. That is a licensing constraint, not a style preference: k6 is AGPL-3.0
  * and the network-copyleft clause is triggered by linking, not by invoking a CLI (proposal
- * sections 3.1 and 12). Nothing here imports k6 code; it writes a script, spawns a binary, and
- * reads the binary's output.
+ * sections 3.1 and 12). Nothing here imports k6 code; it writes scripts, spawns a binary,
+ * and reads the binary's output.
  *
  * Per ADR 0004, `compile()` takes the authored timeline straight from `EngineRunContext` and owns
  * the whole translation to k6 itself: `compileTimeline()` splits it into one small script per
@@ -270,11 +270,18 @@ export class K6Adapter implements EngineAdapter {
       }
     };
 
-    const timer = setInterval(() => {
-      void drain().catch((error) => {
+    // Drains are queued behind one another rather than fired concurrently: each one advances
+    // `offset` only after it has read, so two overlapping reads — the interval's and the final one
+    // on close — would read the same bytes twice and report every one of those requests twice.
+    let queue: Promise<void> = Promise.resolve();
+    const drainOnce = (): Promise<void> => {
+      queue = queue.then(drain).catch((error) => {
         handlers.onLog({ stream: "stderr", message: `metrics tail failed: ${(error as Error).message}` });
       });
-    }, TAIL_INTERVAL_MS);
+      return queue;
+    };
+
+    const timer = setInterval(() => void drainOnce(), TAIL_INTERVAL_MS);
 
     child.stdout?.on("data", (chunk) => {
       for (const line of String(chunk).split("\n")) {
@@ -296,12 +303,9 @@ export class K6Adapter implements EngineAdapter {
       clearInterval(timer);
 
       void (async () => {
-        // One last drain: the interval may have missed everything written since its last tick.
-        try {
-          await drain();
-        } catch {
-          /* the exit result matters more than the final few samples */
-        }
+        // One last drain: the interval may have missed everything written since its last tick. It
+        // queues behind any drain still in flight, so nothing is read — and counted — twice.
+        await drainOnce();
         const tail = parser.flush();
         droppedIterations += tail.droppedIterations;
         skippedNoId += tail.skippedNoId;

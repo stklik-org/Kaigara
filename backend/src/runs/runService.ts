@@ -8,7 +8,7 @@
  * back a `CompiledRunSummary` thin enough to project a `RunView` from, nothing more; what happens
  * between "timeline" and "summary" is entirely the adapter's business. The two inspection-only
  * endpoints below (`compileOnly`, `concretePlan`) are the deliberate exception: they import k6's
- * own `compileTimeline`/`compileK6Script`/`resolveIdentifiers`/`buildConcretePlan` directly, the
+ * own `compileTimeline`/`planTimeline`/`buildConcretePlan` directly, the
  * same way they already did before this change, because there is no adapter method for "compile
  * and show me" and inventing one for two debug-only callers would be speculative engine-adapter
  * surface ADR 0001 warns against.
@@ -40,10 +40,8 @@ import {
 } from "@kaigara/shared-types";
 
 import { buildConcretePlan } from "../engines/k6/concretePlan.ts";
-import { compileTimeline } from "../engines/k6/compileTimeline.ts";
-import { compileK6Script } from "../engines/k6/compileScript.ts";
-import type { K6Plan } from "../engines/k6/k6Plan.ts";
-import { resolveIdentifiers } from "../engines/k6/resolveIdentifiers.ts";
+import { compileTimeline, planTimeline, type GeneratedFile } from "../engines/k6/compileTimeline.ts";
+import { redactPlan, type K6Plan } from "../engines/k6/k6Plan.ts";
 import type {
   CompiledArtifact,
   CompiledRunSummary,
@@ -118,24 +116,23 @@ export class RunService {
   }
 
   /**
-   * Validates and compiles a timeline without executing it, returning the generated engine script.
+   * Validates and compiles a timeline without executing it, returning the generated engine files.
    *
    * This exists so the translation from timeline to HTTP requests is inspectable rather than
-   * implicit: the user can see exactly which IDTA-01002 calls their composition produces before
-   * pointing it at a server. Inspection-only, so it goes straight to k6's own compile functions
-   * rather than through the `EngineAdapter` seam — see the module doc.
+   * implicit: the user can see exactly which IDTA-01002 calls their composition produces, and
+   * against which identifiers, before pointing it at a server. It runs the *whole* compile a real
+   * run does — including the identifier harvest — so the files handed back are byte for byte the
+   * ones `POST /api/runs` would execute, not a preview that quietly differs. Inspection-only, so
+   * it goes straight to k6's own compiler rather than through the `EngineAdapter` seam (module doc).
    */
-  async compileOnly(request: CreateRunRequest): Promise<{ plan: K6Plan; script: string; warnings: ValidationIssue[] }> {
-    const { plan, warnings } = compileTimeline(request.timeline, {
+  async compileOnly(request: CreateRunRequest): Promise<{ plan: K6Plan; files: GeneratedFile[]; warnings: ValidationIssue[] }> {
+    const { plan, files, warnings } = await compileTimeline(request.timeline, {
       scenarioName: request.scenarioName,
       target: this.resolveTarget(request.target),
     });
-    // Same compile-time identifier resolution a real run does (resolveIdentifiers.ts), so the
-    // script this hands back is exactly the one `POST /api/runs` would execute — not a preview
-    // that quietly differs because it skipped the harvest.
-    const resolvedIds = await resolveIdentifiers(plan);
-    const script = compileK6Script(plan, resolvedIds, { summaryPath: "<run directory>/summary.json" });
-    return { plan, script, warnings };
+    // Header values never leave the process: they reach k6 through its environment, and this
+    // response goes back over the wire.
+    return { plan: redactPlan(plan), files, warnings };
   }
 
   /**
@@ -143,7 +140,8 @@ export class RunService {
    * debug view renders. Compiles but executes nothing — the same validation path as `compileOnly`.
    */
   concretePlan(request: CreateRunRequest): ConcretePlan {
-    const { plan, warnings } = compileTimeline(request.timeline, {
+    // Only the schedule is needed here, so this half of the compile never contacts the target.
+    const { plan, warnings } = planTimeline(request.timeline, {
       scenarioName: request.scenarioName,
       target: this.resolveTarget(request.target),
     });
@@ -419,4 +417,4 @@ export class EngineUnavailableError extends Error {}
 export class InvalidTargetError extends Error {}
 export { TimelineValidationError };
 export { EmptyPlanError } from "../engines/k6/k6Adapter.ts";
-export { EmptyServerCorpusError } from "../engines/k6/resolveIdentifiers.ts";
+export { EmptyServerCorpusError } from "../engines/k6/harvestIdentifiers.ts";

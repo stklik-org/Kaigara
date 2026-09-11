@@ -437,7 +437,11 @@ export function planTimeline(input: LoadTimelineData | LoadTimeline, options: Co
 
   const plannedLoads: PlannedLoad[] = loads.map(({ drafts, ...load }) => ({
     ...load,
-    scripts: drafts.map(({ order: _order, ...draft }) => ({ ...(numbered.get(draft) as { key: string; file: string }), ...draft })),
+    scripts: drafts.map((draft) => {
+      const { order, ...script } = draft;
+      void order;
+      return { ...(numbered.get(draft) as { key: string; file: string }), ...script };
+    }),
   }));
 
   const plan: K6Plan = {

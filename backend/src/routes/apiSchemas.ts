@@ -165,7 +165,7 @@ const runView: JsonSchema = {
     },
     artifacts: {
       type: "array",
-      description: "Readable via `GET /api/runs/{id}/artifacts/{name}` — normally `script.js` and `plan.json`.",
+      description: "Readable via `GET /api/runs/{id}/artifacts/{name}` — `main.js`, the numbered scripts it schedules, and `plan.json`.",
       items: {
         type: "object",
         properties: { name: { type: "string" }, description: { type: "string" }, contentType: { type: "string" } },

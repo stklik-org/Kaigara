@@ -1,0 +1,143 @@
+{
+  "id": "minimal-crud",
+  "name": "Minimal CRUD lifecycle",
+  "description": "Create an AAS and a submodel, then read, update, read and delete them — one step every 10 seconds.",
+  "phases": {
+    "preparation": [],
+    "preconditions": [],
+    "method": {
+      "totalDurationSeconds": 50,
+      "tracks": [
+        {
+          "id": "lifecycle",
+          "label": "AAS lifecycle",
+          "color": "#2977d6",
+          "loads": [
+            {
+              "id": "create",
+              "startSeconds": 0,
+              "durationSeconds": 0,
+              "shape": { "kind": "individual", "requestCount": 2 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "create-shell",
+                    "operation": "create",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 512 }
+                  },
+                  {
+                    "id": "create-submodel",
+                    "operation": "create",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 512 }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "read-after-create",
+              "startSeconds": 10,
+              "durationSeconds": 0,
+              "shape": { "kind": "individual", "requestCount": 2 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "read-shell-1",
+                    "operation": "read",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                  },
+                  {
+                    "id": "read-submodel-1",
+                    "operation": "read",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "update",
+              "startSeconds": 20,
+              "durationSeconds": 0,
+              "shape": { "kind": "individual", "requestCount": 2 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "update-shell",
+                    "operation": "update",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 512 }
+                  },
+                  {
+                    "id": "update-submodel",
+                    "operation": "update",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 512 }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "read-after-update",
+              "startSeconds": 30,
+              "durationSeconds": 0,
+              "shape": { "kind": "individual", "requestCount": 2 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "read-shell-2",
+                    "operation": "read",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                  },
+                  {
+                    "id": "read-submodel-2",
+                    "operation": "read",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "delete",
+              "startSeconds": 40,
+              "durationSeconds": 0,
+              "shape": { "kind": "individual", "requestCount": 2 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "delete-submodel",
+                    "operation": "delete",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                  },
+                  {
+                    "id": "delete-shell",
+                    "operation": "delete",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "postconditions": [],
+    "cleanup": []
+  }
+}

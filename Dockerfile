@@ -83,6 +83,13 @@ COPY packages/shared-types/ packages/shared-types/
 COPY backend/ backend/
 COPY --from=build /app/frontend/dist frontend/dist
 
+# Fail the build, rather than ship an image that dies on first start, when the runtime image is
+# incomplete — a stale import left by a refactor, a source file .dockerignore happens to exclude.
+# Loading the entry module resolves the backend's whole import graph without binding a port
+# (server.ts listens only when it is the main module), and it runs for every target platform,
+# including the ones no smoke test can start on the machine that builds them.
+RUN node -e "import('./backend/src/server.ts')"
+
 # The run archive (backend/src/engines/k6/runArchive.ts): every generated script, plan and exact
 # `k6 run` command line, kept so a benchmark can be reproduced by hand later. Its default,
 # <cwd>/k6-logs, would land in the root-owned /app — and since the archive swallows its own write

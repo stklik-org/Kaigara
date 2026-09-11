@@ -115,9 +115,14 @@ test("the documented example compiles to a plan that would issue requests", asyn
   await app.close();
 
   assert.equal(response.statusCode, 200, response.body);
-  const { plan, script } = response.json();
+  const { plan, files } = response.json();
   assert.ok(plan.loads.length > 0, "example should compile to at least one load");
-  assert.ok(script.includes("http"), "expected a generated engine script");
+  assert.equal(files[0].name, "main.js", "the entry point comes first");
+  assert.ok(files.length > 1, "expected at least one script beside main.js");
+  assert.ok(
+    files.every((file: { content: string }) => file.content.includes("http")),
+    "expected generated engine scripts",
+  );
 });
 
 /** The concrete-plan endpoint projects the compiled plan into one entry per load (engine

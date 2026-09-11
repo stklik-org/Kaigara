@@ -18,9 +18,10 @@ of sync.
 conformance probe. A scenario library, which is a folder of documents on disk.
 Composing a load timeline, in a visual track editor and in its JSON — two renderings
 of one document, not an editor plus an export. And executing that timeline: it is
-validated, compiled into a k6 execution plan (one k6 executor per load shape),
-rendered into a k6 script, run as an external subprocess, and streamed back as
-aggregated live metrics. The
+validated and compiled into a set of small, readable k6 scripts — one per request type
+of each load, at its share of that load's rate, each carrying the literal identifiers
+it addresses and runnable on its own — scheduled by a thin `main.js`, run as an
+external subprocess, and streamed back as aggregated live metrics. The
 backend's whole surface is browsable and executable at `/swagger`, so a benchmark can be
 driven without the frontend at all.
 
@@ -152,10 +153,16 @@ docker build -t kaigara:local .
 node scripts/smoke-test-image.mjs kaigara:local
 ```
 
-It starts the image beside the stub, and fails unless the UI is served, the stub is reachable
-through the connection probe, a real k6 run (`minimal-crud`) completes, its run archive is written,
-and `docker stop` is honoured promptly. Everything it starts is removed again, and it binds a random
-port, so it can run next to a development stack.
+It starts the image beside the stub, and fails unless the UI is served, the orchestrator finds k6
+and its scenario library, the stub is reachable through the connection probe, a real k6 run gets
+requests to it, the run archive is written, and `docker stop` is honoured promptly. It takes a few
+seconds: the run is stopped as soon as its first requests land, rather than played out to the end,
+so the length of the scenario it picks does not matter. Everything it starts is removed again, and
+it binds a random port, so it can run next to a development stack.
+
+A broken import is caught earlier still: the build itself loads the backend's entry module
+(`RUN node -e "import('./backend/src/server.ts')"`), so a refactor that leaves a stale import fails
+the build, on every platform, instead of producing an image that dies on first start.
 
 ### How the image gets published
 
@@ -324,13 +331,14 @@ That interface now exists — the backend hands an adapter the authored timeline
 adapter compiles it itself, and nothing about plans, scripts, VUs or subprocesses
 crosses back over that boundary into the results (ADR 0004). The k6 adapter's
 compiled form is expressed in k6's own executor vocabulary (ADR 0002), so each
-authored load shape maps straight to one k6 executor; a second engine would bring
-its own compiler. **k6** is the one adapter implemented, and deliberately
+authored load shape maps straight to one k6 executor — scaled by request weight into
+one small script per request type, which is what the adapter actually emits
+(ADR 0005); a second engine would bring its own compiler. **k6** is the one adapter implemented, and deliberately
 the only one: further adapters are future work, not scheduled. It runs as an external
 subprocess and is never linked in-process, which is a licensing boundary as much as
 an architectural one (k6 is AGPL-3.0, and the network-copyleft clause is triggered by
 linking, not by invoking a CLI). The decisions and their consequences are recorded in
-ADRs 0001–0004 under `docs/adr/`.
+ADRs 0001–0005 under `docs/adr/`.
 
 ## Repository layout
 

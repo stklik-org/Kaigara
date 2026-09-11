@@ -1,0 +1,66 @@
+{
+  "id": "purge-repository",
+  "name": "Purge repository (delete every shell and submodel)",
+  "description": "Best-effort teardown: harvest every identifier already on the target, then issue DELETE against the shell and submodel repositories at a sustained rate until the corpus is gone. Use it to reset a server between benchmark runs, not as a correctness check.",
+  "phases": {
+    "preparation": [],
+    "preconditions": [],
+    "method": {
+      "totalDurationSeconds": 120,
+      "tracks": [
+        {
+          "id": "delete-submodels",
+          "label": "Delete submodels",
+          "color": "#eb6733",
+          "loads": [
+            {
+              "id": "purge-submodels",
+              "startSeconds": 0,
+              "durationSeconds": 120,
+              "shape": { "kind": "constant", "ratePerSec": 200 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "delete-submodel",
+                    "operation": "delete",
+                    "target": "submodel",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 },
+                    "idPool": { "source": "server", "maxIds": 100000 }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "delete-shells",
+          "label": "Delete shells",
+          "color": "#e34b4a",
+          "loads": [
+            {
+              "id": "purge-shells",
+              "startSeconds": 0,
+              "durationSeconds": 120,
+              "shape": { "kind": "constant", "ratePerSec": 200 },
+              "requests": {
+                "requests": [
+                  {
+                    "id": "delete-shell",
+                    "operation": "delete",
+                    "target": "shell",
+                    "weight": 1,
+                    "generator": { "kind": "randomized", "sizeBytes": 0 },
+                    "idPool": { "source": "server", "maxIds": 100000 }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "postconditions": [],
+    "cleanup": []
+  }
+}

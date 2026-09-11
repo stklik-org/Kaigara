@@ -51,13 +51,12 @@ test("a transport failure with no status becomes status 0 rather than NaN", () =
   assert.equal(samples[0].failed, true);
 });
 
-test("the tool's own setup requests are excluded from the measurement", () => {
+test("requests belonging to no planned load are excluded from the measurement", () => {
   const parser = new K6OutputParser(START);
   const { samples } = parser.push(
     [
-      // Pool seeding issued by the generated script's setup() on Kaigara's behalf.
-      point("http_req_duration", 5, { load: "__kaigara_setup", status: "200", expected_response: "true" }),
-      // A point with no load tag belongs to no planned load.
+      // A point with no load tag belongs to no planned load: the generated scripts tag every
+      // request they issue, so an untagged one is not part of the workload under measurement.
       point("http_req_duration", 5, { status: "200", expected_response: "true" }),
       point("http_req_duration", 5, REQUEST_TAGS),
     ].join("\n") + "\n",

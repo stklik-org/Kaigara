@@ -22,7 +22,9 @@ app would reject fails the build instead of the Load screen.
 | File | What it is |
 |---|---|
 | `shape-showcase.json` | Every load shape on one 10-minute timeline. The walkthrough scenario. |
+| `minimal-crud.json` | One AAS + submodel through create → read → update → read → delete, 10 s apart. |
 | `persistence-latency.json` | Inject one shell, then poll for it every 1 ms. |
+| `purge-repository.json` | Best-effort teardown: DELETE every shell and submodel already on the target. |
 | `component-manufacturer.json` | StressForge profile — the baseline workload. |
 | `public-website.json` | StressForge profile — read-dominant. |
 | `process-integrator.json` | StressForge profile — write-heavy, extra-large submodels. |
@@ -42,6 +44,44 @@ Two things about it are worth knowing before reading its numbers:
   the metamodel's `query` operation means today (see `src/timeline/aasOperations.ts`). So the poll
   measures when the write becomes visible to a *collection read*, not a `GET /shells/{id}`. A
   read-by-id operation would be the sharper instrument and does not exist yet.
+
+### `minimal-crud`
+
+One `AAS lifecycle` track, 50 s, five `individual` loads 10 s apart: `create` (a shell and a
+submodel), `read`, `update`, `read`, `delete` (submodel then shell) — two requests per step, one
+per entity. The smallest thing that exercises every operation in the metamodel end to end.
+
+`read`/`update`/`delete` address an identifier, so — like every other scenario here — they draw
+one from whatever is already on the target (harvested by the backend before the script is even
+generated, ADR 0003), not from the entities this run just created: each VU's own confirmed-created
+pool is local to that VU and does not cross between scenarios. It is a CRUD-shaped *workload*, not
+a transactional check that the same entity survives the round trip.
+
+### `purge-repository`
+
+Two tracks, both a `constant` 200 req/s load for 120 s: one `DELETE /submodels/{id}`, one
+`DELETE /shells/{id}`, each with `idPool.source: "server"` and a large `maxIds`, so the pre-load
+harvest pages the *entire* shell and submodel collections before the deletes start. An empty
+harvest aborts the run (there is no skip option), so if the target has shells but no submodels —
+or the reverse — drop the track for the empty side before running, or run it twice.
+
+It is **best-effort, not a guaranteed wipe**, for two reasons rooted in how the engine issues
+requests today:
+
+- **Server-harvested identifiers are not consumed.** Each iteration picks a *random* id from the
+  harvested pool and never removes it (`takeId` in `src/engines/k6/compileScript.ts` only splices
+  the per-VU created pool, not the seeded one). So coverage is a coupon-collector process:
+  `rate × duration` has to exceed roughly `N·ln(N)` for a corpus of `N` entities before every id
+  has probably been hit at least once. 200 req/s for 120 s is 24 000 attempts per repository —
+  comfortable up to a few thousand entities; raise the rate or the duration for a larger target.
+- **Re-draws of an already-deleted id return 404**, which is outside the delete's expected
+  `[204, 200]`, so the run's *failed* count climbs steadily as coverage approaches complete. That
+  is expected here and is not a server fault — read it as progress, not regression.
+
+A truly idempotent "enumerate and delete until the collection is empty" is a different operation
+than a rate-driven load, and would need an engine feature (consume server-sourced ids, or a
+dedicated drain mode). Until then, re-run the scenario if a `GET /shells?limit=1` still returns
+anything.
 
 ## The StressForge profiles
 

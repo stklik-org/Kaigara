@@ -10,7 +10,7 @@
     {
       "id": "created-in-scenario",
       "label": "Created in scenario",
-      "hint": "Drawn at random from the shells this run has created so far — the id exists because this scenario just POSTed it.",
+      "hint": "The shells this run creates earlier in the timeline, addressed in order — the compiler works out which ones exist by the time this load starts, so the id is one the scenario really did POST. Falls back to what is already on the target if this load starts before any create has finished.",
       "schema": {
         "type": "object",
         "properties": {}
