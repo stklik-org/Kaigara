@@ -37,8 +37,8 @@ Thumbs.db
 .idea/
 *.swp
 
-docs/
 basyx-setup/
+basyx-setup-update/
 sink/
 AAS-Benchmarking-Tool-Proposal.md
 

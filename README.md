@@ -57,6 +57,9 @@ generated filename, which is not the one committed here).
 
 ## Running Kaigara
 
+New to the tool? [**The walkthrough**](docs/walkthrough.md) tours the five screens — Connect, Load,
+Compose, Run, Analyze — with screenshots and what to look at on each one.
+
 To use the tool rather than work on it you need Docker and nothing else. Every push to `main`
 publishes a ready-made image to the GitHub Container Registry — the orchestrator, the k6 engine and
 the built UI in one:
@@ -320,25 +323,11 @@ root `Dockerfile` — see [Running Kaigara](#running-kaigara).
 
 ## Direction: pluggable by design
 
-The architecture treats the load-generation engine as a swappable component behind a
-stable interface, rather than something the rest of the tool depends on directly.
-Recipes, results and the UI are engine-agnostic; a given engine is just an adapter
-that knows how to turn a scenario's benchmark phase into something runnable, and how
-to report results back in a common shape. The intent is that the tool can outlive any
-single engine choice and grow further adapters later without touching its core.
-
-That interface now exists — the backend hands an adapter the authored timeline, the
-adapter compiles it itself, and nothing about plans, scripts, VUs or subprocesses
-crosses back over that boundary into the results (ADR 0004). The k6 adapter's
-compiled form is expressed in k6's own executor vocabulary (ADR 0002), so each
-authored load shape maps straight to one k6 executor — scaled by request weight into
-one small script per request type, which is what the adapter actually emits
-(ADR 0005); a second engine would bring its own compiler. **k6** is the one adapter implemented, and deliberately
-the only one: further adapters are future work, not scheduled. It runs as an external
-subprocess and is never linked in-process, which is a licensing boundary as much as
-an architectural one (k6 is AGPL-3.0, and the network-copyleft clause is triggered by
-linking, not by invoking a CLI). The decisions and their consequences are recorded in
-ADRs 0001–0005 under `docs/adr/`.
+The load-generation engine sits behind a stable `EngineAdapter` interface rather than being
+something the rest of the tool depends on directly, so recipes, results and the UI stay
+engine-agnostic. **k6** is the only adapter implemented, and deliberately so — it runs as an
+external subprocess, never linked in-process (a licensing boundary: k6 is AGPL-3.0). Full rationale
+lives in the project proposal.
 
 ## Repository layout
 
@@ -347,6 +336,7 @@ frontend/                 React + TypeScript + Vite — the five screens
 backend/                  Fastify orchestrator: probe, scenario library, timeline execution
   scenarios/                the shipped demo scenarios, as data
 packages/shared-types/    the metamodel, its validator and generated JSON Schema
+docs/                     user-facing documentation — start at docs/walkthrough.md
 scripts/                  the dev-stack launcher, the port guard, and the image smoke test
 Dockerfile                the deployment image; docker-compose.yml runs it from a checkout
 .github/workflows/        CI that builds, smoke-tests and publishes that image
@@ -357,15 +347,14 @@ architecture.puml / .png  the system diagram linked above
 `packages/shared-types/` is the point worth knowing about: the frontend and the backend
 import the *same* metamodel, validator and wire contract, so the document the Compose
 screen's Code view shows is byte-identical to the one the orchestrator validates and
-executes. There is no separate export format to keep in sync — that is the design, not
-a convenience.
+executes. There is no separate export format to keep in sync.
 
-`frontend/`, `backend/` and `backend/scenarios/` each carry their own README describing
-what is real, what is stubbed, and why. Read those before changing anything inside them.
+`frontend/`, `backend/` and `backend/scenarios/` each carry their own README describing where
+things live and how the pieces fit together. Read those before changing anything inside them.
 
-The proposal document, the `docs/adr/` decision records and the read-only `stress-forge/`
-reference checkout live alongside these in a working checkout but are not committed to
-this repository — see `.gitignore`.
+The proposal document, architecture decision records and the read-only `stress-forge/` reference
+checkout live alongside these in a working checkout but are not committed to this repository —
+see `.gitignore`.
 
 ## Guiding principles
 

@@ -1,8 +1,7 @@
 # Kaigara backend
 
-A thin TypeScript/Fastify orchestrator, per `AAS-Benchmarking-Tool-Proposal.md` §5.1/§5.3. Three
-slices are real — the connection probe, the scenario library and timeline execution — and the rest
-is still the shape it will grow into.
+A thin TypeScript/Fastify orchestrator. Three slices are real — the connection probe, the scenario
+library and timeline execution — and the rest is still the shape it will grow into.
 
 ## Running it
 
@@ -63,7 +62,7 @@ the target, so check where it points before running it. See `backend/scenarios/R
 each scenario is and, for the StressForge three, exactly which parts of the original profile
 survived the translation.
 
-Recipes are data, not code (§4.2), so the library is a **directory**: adding a scenario is copying
+Recipes are data, not code, so the library is a **directory**: adding a scenario is copying
 a file in, and there is no write endpoint. Files are read through `parseScenarioDocument` from
 `@kaigara/shared-types` — the same reader the Load screen's drop zone uses — so a file the library
 serves is exactly a file a user could have dropped in by hand. A file that fails to parse is
@@ -94,34 +93,32 @@ view shows — and executes it against a target AAS server.
 (`GET /api/health` answers `{ ok, service }`, and is the one endpoint that touches nothing else.)
 
 The pipeline, in order. `RunService.create()` resolves the target and hands the adapter the
-**authored timeline** — per ADR 0004 there is no intermediate plan built outside the adapter:
+**authored timeline** — there is no intermediate plan built outside the adapter:
 
 1. **Compile, inside the adapter** (`K6Adapter.compile()`, all under `src/engines/k6/`):
    - *Validate* (`compileTimeline.ts`, via `@kaigara/shared-types`'s `collectLoadTimelineIssues`) —
      the same validator the Compose Code view uses. Errors reject the request with 422 and a
-     per-path issue list; warnings ride along on the run so the user can see why it may not do
-     what they expected.
-   - *Split* (`compileTimeline.ts`) — each `LoadShape` maps one to one to a k6 executor
-     (ADR 0002): `constant`/`spike` → `constant-arrival-rate`, `ramp` → a one-stage
-     `ramping-arrival-rate`, `individual` → `shared-iterations`; only `sine`/`bell` are sampled
-     through their own `rateAt()` into a multi-stage ramp, because k6 has no curved executor. That
-     executor is then **scaled by each request type's weight share** into one script per
-     (load × request type) (ADR 0005): a 70/30 read/create load at 100 req/s becomes a 70 req/s
-     read script and a 30 req/s create script, and an `individual` load's literal count is split by
-     largest remainder so the parts add back up exactly. Each `RequestSpec` becomes a concrete
-     IDTA-01002 call (`src/timeline/aasOperations.ts`). The result is a `K6Plan`, which never
-     leaves `engines/k6/`.
-   - *Design the request pools* (`compileTimeline.ts` + `harvestIdentifiers.ts`, ADR 0003/0005) —
-     harvest the target once per entity, then walk the scripts in schedule order deciding the
-     literal identifiers each addresses: a create mints its own, a delete claims what it removes,
-     and a read/update cycles over what is alive for its whole window.
+     per-path issue list; warnings ride along on the run.
+   - *Split* (`compileTimeline.ts`) — each `LoadShape` maps one to one to a k6 executor:
+     `constant`/`spike` → `constant-arrival-rate`, `ramp` → a one-stage `ramping-arrival-rate`,
+     `individual` → `shared-iterations`; `sine`/`bell` are sampled through their own `rateAt()` into
+     a multi-stage ramp, since k6 has no curved executor. That executor is then **scaled by each
+     request type's weight share** into one script per (load × request type): a 70/30 read/create
+     load at 100 req/s becomes a 70 req/s read script and a 30 req/s create script, and an
+     `individual` load's literal count is split by largest remainder so the parts add back up
+     exactly. Each `RequestSpec` becomes a concrete IDTA-01002 call
+     (`src/timeline/aasOperations.ts`). The result is a `K6Plan`, which never leaves `engines/k6/`.
+   - *Design the request pools* (`compileTimeline.ts` + `harvestIdentifiers.ts`) — harvest the
+     target once per entity, then walk the scripts in schedule order deciding the literal
+     identifiers each addresses: a create mints its own, a delete claims what it removes, and a
+     read/update cycles over what is alive for its whole window.
    - *Render* (`scriptTemplates.ts`) — one small standalone file per script, plus the thin
      `main.js` that schedules them all in one k6 process.
    - Return a `CompiledRun`: the artifacts, the warnings, and a thin `CompiledRunSummary`
      (scenario name, duration, expected requests, one key/label per load) — all `RunService` needs.
 2. **Run it** (`K6Adapter.start()`) — see below.
 3. **Aggregate** (`src/runs/metricsAggregator.ts`) — per-second buckets and a bounded latency
-   reservoir, so raw per-request events never reach the browser (proposal §7.2).
+   reservoir, so raw per-request events never reach the browser.
 
 A compile that throws never becomes a run: `RunService` inserts the run record only after
 `compile()` succeeds, and removes the work directory if it does not.
@@ -137,7 +134,7 @@ Runs are held **in memory**: they do not survive a restart. Their generated inpu
 output do hit the disk — each run gets a directory under `<os tmpdir>/kaigara-runs/<run id>/`
 holding `main.js`, the numbered scripts, `plan.json`, the engine's NDJSON metric stream and its
 summary — which is what
-`GET /api/runs/:id/artifacts/:name` serves. SQLite-backed history (proposal §10) is the next step,
+`GET /api/runs/:id/artifacts/:name` serves. SQLite-backed history is the next step,
 and `RunService` is the only place that changes.
 
 That tmp directory is swept by the OS, so the k6 adapter also keeps a **persistent archive** under
@@ -151,67 +148,54 @@ starts when. See `src/engines/k6/runArchive.ts`; it never fails a benchmark if t
 
 ## Engine adapters — Option C, k6 first
 
-Per ADR 0001, the "compile → run → parse" step sits behind the `EngineAdapter` interface in
-`src/engines/adapter.ts`. Per ADR 0004 an adapter is handed the authored timeline (plus the
-resolved target) and compiles it itself, returning a `CompiledRun` and later emitting
-`RequestSample`s; nothing about plans, scripts, VUs or subprocesses crosses that boundary. A second
-engine would bring its own compiler — what it shares with k6 is the timeline metamodel, the
-IDTA-01002 endpoint table (`src/timeline/aasOperations.ts`) and the weight arithmetic
-(`src/timeline/requestShares.ts`), not k6's execution model. The engine-agnostic
-`RunState`/`RunAnalysis` are unchanged. Only the **k6** adapter is implemented — do not build
-others speculatively.
+The "compile → run → parse" step sits behind the `EngineAdapter` interface in
+`src/engines/adapter.ts`. An adapter is handed the authored timeline (plus the resolved target) and
+compiles it itself, returning a `CompiledRun` and later emitting `RequestSample`s; nothing about
+plans, scripts, VUs or subprocesses crosses that boundary. A second engine would bring its own
+compiler — what it shares with k6 is the timeline metamodel, the IDTA-01002 endpoint table
+(`src/timeline/aasOperations.ts`) and the weight arithmetic (`src/timeline/requestShares.ts`), not
+k6's execution model. The engine-agnostic `RunState`/`RunAnalysis` are unchanged. Only the **k6**
+adapter is implemented.
 
 `POST /api/runs/compile` and `POST /api/runs/concrete-plan` are inspection-only, so `RunService`
-calls k6's `compileTimeline()`/`planTimeline()`/`buildConcretePlan()` directly for them rather than
-growing the adapter interface a "compile and show me" method for two debug callers. `plan.json` is
-the k6 adapter's own compiled form. (`planTimeline()` is the synchronous half — validate, split,
-schedule — so the concrete-plan view contacts the target not at all.)
+calls k6's `compileTimeline()`/`planTimeline()`/`buildConcretePlan()` directly rather than through
+the adapter interface. `plan.json` is the k6 adapter's own compiled form. (`planTimeline()` is the
+synchronous half — validate, split, schedule — so the concrete-plan view contacts the target not
+at all.)
 
-How the k6 adapter works, and why:
+How the k6 adapter works:
 
-- **k6 runs as an external subprocess, never linked.** That is a licensing constraint: k6 is
-  AGPL-3.0 and the network-copyleft clause is triggered by linking, not by invoking a CLI
-  (proposal §3.1/§12). No file in this package imports k6.
-- **The generated scripts are small and literal (ADR 0005).** `src/engines/k6/scriptTemplates.ts`
-  renders one file per request type — constants, an `EXECUTOR`, a `const IDS = [...]` list, a
-  `requestFor(i)` generator and a `run()` — modelled on the hand-written `sink/k6-tmp/03-delete-aas.js`.
-  Each is runnable on its own (`k6 run k6_<track>_<load>_<request-spec>.js`), because k6 ignores an imported module's
-  `options` and default export. `main.js` imports them all and schedules each as one k6 scenario at
-  its load's `startTime`. That matters because `POST /api/runs/compile` hands these files to the
-  user: the translation from timeline to IDTA-01002 calls should be readable, and a script that
-  names the identifiers it addresses is readable in a way an interpreter loop is not.
+- k6 runs as an external subprocess, never linked in-process. No file in this package imports k6.
+- `src/engines/k6/scriptTemplates.ts` renders one small standalone file per request type —
+  constants, an `EXECUTOR`, a `const IDS = [...]` list, a `requestFor(i)` generator and a `run()`.
+  Each is runnable on its own (`k6 run k6_<track>_<load>_<request-spec>.js`), because k6 ignores an
+  imported module's `options` and default export. `main.js` imports them all and schedules each as
+  one k6 scenario at its load's `startTime`.
 - `requestFor(i)` is indexed by `exec.scenario.iterationInTest`, k6's *global* iteration number for
   the scenario — not a per-VU generator, which would restart per VU and let two VUs create the same
   identifier.
 - Executor selection happens in `src/engines/k6/compileTimeline.ts`, one k6 executor per authored
-  shape (see the table in ADR 0002), scaled per request type. A `Constant 100 req/s for 60s` load
-  with one request type is a single `constant-arrival-rate` scenario, not a sampled curve. A share
-  that is not a whole number of requests per second is expressed per minute (`rate: 200,
-  timeUnit: "1m"`), so a third of 10 req/s stays exact.
-- **Target headers never enter a generated file.** They reach k6 through the `KAIGARA_HEADERS`
-  environment variable, and `plan.json` is redacted wherever it is written or returned — the files
-  are archived to disk and served over the API, so a bearer token in them would be a leak.
+  shape, scaled per request type. A `Constant 100 req/s for 60s` load with one request type is a
+  single `constant-arrival-rate` scenario, not a sampled curve. A share that is not a whole number
+  of requests per second is expressed per minute (`rate: 200, timeUnit: "1m"`).
+- Target headers never enter a generated file: they reach k6 through the `KAIGARA_HEADERS`
+  environment variable, and `plan.json` is redacted wherever it is written or returned.
 - Results come from `--out json`, written to a file and tailed incrementally.
-- **Identifiers are resolved by the backend, and assigned per script (ADR 0003/0005).**
-  `update`/`delete` need an id that exists on the server, and `create` needs one that does not yet.
-  Both used to be a k6 `setup()` HTTP harvest and a runtime `Date.now()`-based id; now
+- **Identifiers are resolved by the backend, and assigned per script.** `update`/`delete` need an id
+  that exists on the server, and `create` needs one that does not yet.
   `src/engines/k6/harvestIdentifiers.ts` pages the target **before anything is written**, and
-  `compileTimeline.ts` decides which identifiers each script gets. The walk is timeline-aware and
-  deliberately conservative: a create's output is addressable only by scripts that start after its
-  executor window closes, a delete claims what it removes so nothing later addresses it, and a
-  read/update cycles over what is alive for its whole window. A script therefore never discovers
-  anything at run time — it reads its own `IDS` array. Iterations with nothing left to address are
-  counted (`kaigara_skipped_no_id`) and reported rather than silently dropped, and the *compile*
-  warns about them up front ("will start ~40 deletes, but only 5 shells are known to exist"); an
-  explicit `idPool.source: "server"` request whose entity harvests to nothing fails the compile
-  (400), before a script is even generated.
-- **Dropped iterations are surfaced prominently.** A non-zero `dropped_iterations` means k6's
-  worker pool was saturated — the *tool* was the bottleneck, not the server — which invalidates
-  the measurement. VU sizing is an estimate (`rate × assumed latency`), because the real latency
-  is the thing being measured.
-- The scripts issue no requests of their own beyond the authored ones (there is no `setup()` any
-  more), so Kaigara's bookkeeping cannot land in the numbers it reports. Anything arriving without
-  a `load` tag is excluded by the parser regardless.
+  `compileTimeline.ts` decides which identifiers each script gets, walking the timeline in schedule
+  order: a create's output is addressable only by scripts that start after its executor window
+  closes, a delete claims what it removes so nothing later addresses it, and a read/update cycles
+  over what is alive for its whole window. A script never discovers anything at run time — it reads
+  its own `IDS` array. Iterations with nothing left to address are counted
+  (`kaigara_skipped_no_id`) and reported rather than silently dropped, and the compile warns about
+  them up front; an explicit `idPool.source: "server"` request whose entity harvests to nothing
+  fails the compile (400).
+- A non-zero `dropped_iterations` in the summary means k6's own worker pool was saturated — the
+  tool was the bottleneck, not the server. VU sizing is an estimate (`rate × assumed latency`).
+- The scripts issue no requests beyond the authored ones (there is no `setup()`), and anything
+  arriving without a `load` tag is excluded by the parser.
 
 ### Payload generation
 
@@ -220,7 +204,7 @@ How the k6 adapter works, and why:
 a legitimate field — a server that validates its input must be able to accept them, or the
 benchmark would only measure the rejection path. `Mutate` rewrites a share of the leaves of a base
 payload. `Exact` is sent **verbatim**, including an id that may not match the URL: it is the
-negative-testing escape hatch the proposal (§9.1) asks for, so repairing it would remove the only
+negative-testing escape hatch, so repairing it would remove the only
 way to author such a case.
 
 ## Serving the UI
@@ -279,9 +263,9 @@ worse than no example, because the first thing a new user does is press Execute.
   the others report status `skipped` rather than `done`, so a clean run is never mistaken for
   "correctness checks passed".
 - Saving a scenario back to the library (it is read-only — a scenario is stored by writing a file
-  into the folder) and run history (proposal §10), connection ownership (still `localStorage` in
-  the frontend), correctness checking via `aas-test-engines`/ajv (§8), and resource-usage
-  correlation (§7.3).
+  into the folder) and run history, connection ownership (still `localStorage` in
+  the frontend), correctness checking via `aas-test-engines`/ajv, and resource-usage
+  correlation.
 - Access control on the orchestrator itself. There is no authentication, CORS accepts any origin,
   and anyone who can reach the port can make it run k6 against any URL. It binds `127.0.0.1` by
   default, but the Docker image binds `0.0.0.0`, so don't publish that port anywhere untrusted.

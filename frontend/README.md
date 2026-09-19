@@ -1,10 +1,8 @@
 # Kaigara frontend
 
-The React 19 / TypeScript / Vite app: the Connect → Load → Compose → Run → Analyze screens,
-implemented from the lofi wireframes under
-`../docs/Benchmark UI prototype/design_handoff_aas_benchmarking_ui/`. Those wireframes encode
-intentional layout decisions, so check them before changing UI structure. Styling is Tailwind v4,
-state is Zustand, routing is React Router. The Compose screen is built on
+The React 19 / TypeScript / Vite app: the Connect → Load → Compose → Run → Analyze screens. See
+[`../docs/walkthrough.md`](../docs/walkthrough.md) for what each screen does, with screenshots.
+Styling is Tailwind v4, state is Zustand, routing is React Router. The Compose screen is built on
 `@xzdarcy/react-timeline-editor` (the track canvas) and Monaco (the Code view).
 
 ## Running it
