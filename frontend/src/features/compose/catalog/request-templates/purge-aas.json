@@ -1,0 +1,34 @@
+{
+  "id": "purge-aas",
+  "title": "Purge — Delete AAS",
+  "operation": "delete",
+  "target": "aas",
+  "execution": "engine",
+  "summary": "DELETE every shell already on the target — a bulk teardown, not one addressed delete.",
+  "endpoint": {
+    "method": "DELETE",
+    "path": "/shells/{aasId}",
+    "expect": [
+      204,
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "aasId",
+      "label": "AAS identifier",
+      "type": "aas-identifier",
+      "bindsTo": "path.aasId",
+      "strategies": [
+        "from-server"
+      ],
+      "default": "from-server",
+      "config": {
+        "maxIds": 100000
+      }
+    }
+  ],
+  "consumesPool": true,
+  "notes": "A preparatory step, not a benchmark — it resets the target rather than measuring anything, so its numbers do not belong next to a real run's. Give its Load a high, short-lived rate (a Spike, or a brief Constant well above the corpus size) so it finishes before the rest of the timeline starts; see backend/scenarios/purge-repository.json for the shape this mirrors.",
+  "kind": "request"
+}

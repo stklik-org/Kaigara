@@ -27,9 +27,6 @@
       ]
     }
   ],
-  "defaults": {
-    "weight": 5
-  },
   "consumesPool": true,
   "kind": "request"
 }

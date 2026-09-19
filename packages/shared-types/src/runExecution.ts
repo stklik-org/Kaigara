@@ -9,6 +9,7 @@
  * boundary is `engineId`, which names an adapter rather than describing one.
  */
 
+import type { OAuth2ClientCredentials } from "./connection.ts";
 import type { EngineId } from "./engine.ts";
 import type { LoadTimelineData } from "./loadTimeline.ts";
 import type { ValidationIssue } from "./loadTimelineValidation.ts";
@@ -21,8 +22,11 @@ export interface RunTarget {
   /** API root of the AAS server, e.g. "http://localhost:8081/api/v3". */
   baseUrl: string;
   timeoutSeconds?: number;
-  /** Applied to every generated request; where authentication will go once it exists. */
+  /** Applied to every generated request. */
   headers?: Record<string, string>;
+  /** When set, `RunService` exchanges these for a bearer token before compiling and merges it
+   *  into `headers` as `Authorization` — see `OAuth2ClientCredentials`. */
+  oauth2?: OAuth2ClientCredentials;
 }
 
 export interface StartRunRequest {
@@ -129,7 +133,73 @@ export interface RunRequestTotals {
   durationMsSum: number;
 }
 
-/** Server-side aggregates. Raw per-request events never cross this boundary (proposal §7.2). */
+/** One raw per-request event — the shape both `RunMetrics.recentSamples` (the live tail) and
+ *  `GET /api/runs/:id/requests` (the complete log, fetched once a run is done) carry. Mirrors the
+ *  engine-neutral shape `backend/src/engines/adapter.ts`'s `RequestSample` already uses
+ *  internally. */
+export interface RunRequestSample {
+  /** Milliseconds since the run started. */
+  offsetMs: number;
+  /** The compiled load this request belongs to — matches a `RunPlanLoadSummary.key`. */
+  loadKey: string;
+  operation: string;
+  target: string;
+  durationMs: number;
+  /** HTTP status, or 0 when the request never completed (timeout, connection refused). */
+  status: number;
+  failed: boolean;
+  /** Pass to `GET /api/runs/:id/exchanges/:exchangeId` for this row's captured request and
+   *  response — see `RunExchange`. `undefined` for a sample the engine never captured one for
+   *  (an archive from before this existed, or an adapter that does not capture exchanges). */
+  exchangeId?: string;
+  /** Whether this row's captured request/response body was cut at `EXCHANGE_CAPTURE_CAP` rather
+   *  than kept whole — read cheaply from `exchanges.log`'s own index (`exchangeLog.ts`), never by
+   *  loading the body. Both `undefined` when `exchangeId` is `undefined` (nothing was captured for
+   *  this request), or when the exchange line has not been indexed yet. */
+  requestTruncated?: boolean;
+  responseTruncated?: boolean;
+}
+
+/** `GET /api/runs/:id/exchanges/:exchangeId` — the "open this row" popup's whole content: the
+ *  literal request and response for one captured exchange, read back from the run's log folder on
+ *  demand rather than carried by every sample. How much of each body was kept follows the
+ *  timeline's `capture` setting (`ExchangeCaptureData`); `*Truncated` says whether this one was
+ *  cut, and `*Bytes` is the real UTF-8 size of the body as sent or received, cut or not. */
+export interface RunExchange {
+  id: string;
+  method: string;
+  url: string;
+  requestBody: string;
+  requestTruncated: boolean;
+  requestBytes: number;
+  status: number;
+  responseBody: string;
+  responseTruncated: boolean;
+  responseBytes: number;
+}
+
+/** `GET /api/runs/:id/requests?loadId=` — the complete per-request log for one Load, not the live
+ *  `recentSamples` tail. Deliberately not part of `RunView`/the SSE stream: serializing every
+ *  request on a 1-second timer would grow with run length exactly the way `proposal §7.2` warned
+ *  about. It is also deliberately scoped to one `loadId` rather than the whole run: a finished run
+ *  can carry hundreds of thousands of samples across every Load, and the Run screen only ever
+ *  renders one Load's log at a time (`RequestResponseView`) — omitting `loadId` returns an empty
+ *  `samples` array (`truncated`/`live` still reflect the whole run), so the client never pays for
+ *  data no panel is showing. */
+export interface RunRequestLog {
+  samples: RunRequestSample[];
+  /** True if `FULL_LOG_SAFETY_CAP` (`metricsAggregator.ts`) was reached and the oldest requests
+   *  were dropped to stay within it — practically never, for a run of any ordinary size. */
+  truncated: boolean;
+  /** True while the run has not reached a terminal status yet — this is "so far", not the whole
+   *  run. The Run screen only fetches this endpoint once `live` would be false. */
+  live: boolean;
+}
+
+/** Server-side aggregates. `recentSamples` is the one raw-event field re-published on every live
+ *  tick — bounded so its cost never grows with run length (see `metricsAggregator.ts`'s own doc
+ *  comment); the complete log lives at `GET /api/runs/:id/requests` instead. Everything else here
+ *  stays a rolling aggregate. */
 export interface RunMetrics {
   requests: number;
   failed: number;
@@ -140,6 +210,11 @@ export interface RunMetrics {
   byOperation: Record<string, RunRequestTotals>;
   byStatus: Record<string, number>;
   activeLoadKeys: string[];
+  /** The most recent requests, oldest first, capped server-side — the Run screen's *live* log.
+   *  Not the complete run: a sustained high-throughput run will have long since dropped its
+   *  earliest ones out of this window even though the aggregates above still count them. Fetch
+   *  `GET /api/runs/:id/requests` (`RunRequestLog`) for the complete record. */
+  recentSamples: RunRequestSample[];
 }
 
 /** The engine's own end-of-run totals, kept alongside `RunMetrics` rather than merged into it. */
@@ -164,6 +239,48 @@ export interface RunArtifactRef {
   name: string;
   description: string;
   contentType: string;
+}
+
+/** `GET /api/runs/archive` / `GET /api/runs/archive/:id` — "open previous execution", reading the
+ *  k6 adapter's own on-disk archive (`backend/src/engines/k6/runArchive.ts`) rather than
+ *  `RunService`'s in-memory state, so it survives a backend restart the way `GET /api/runs` does
+ *  not. Deliberately its own small surface, not `RunView` reused: an archived run has no live
+ *  state, no engine handle, nothing to subscribe to — only what was written to disk. */
+export interface RunArchiveManifest {
+  runId: string;
+  scenarioName: string;
+  targetBaseUrl: string;
+  engineId: EngineId;
+  /** ISO-8601. */
+  calledAt: string;
+  /** Absent for a run that only ever compiled and never actually started. */
+  startEpochMs?: number;
+  /** A `RunLifecycleStatus`'s terminal value, once the run has one. */
+  status?: string;
+  endedAt?: string;
+  requests?: number;
+  failed?: number;
+}
+
+/** One row of `GET /api/runs/archive`. */
+export interface RunArchiveEntry extends RunArchiveManifest {
+  /** Opaque — pass verbatim to `GET /api/runs/archive/:id`. */
+  id: string;
+}
+
+/** `GET /api/runs/archive/:id`'s body. `timeline`/`plan` are `null` when their file is missing —
+ *  an archive from before this existed, or a run that never got past compiling. `plan` is read
+ *  from the archived (redacted) `plan.json` — it is what lets the request log's `loadKey`s resolve
+ *  to human labels the same way a live `RunView.plan` does. `requestLog` is always `null` here: an
+ *  archived run's log is fetched the same lazy, per-`loadId` way a live one's is, from
+ *  `GET /api/runs/{manifest.runId}/requests?loadId=` (which works for an archived run too, reading
+ *  `metrics.ndjson` from disk instead of the in-memory aggregator) — reopening a run must not by
+ *  itself re-parse and transfer its entire log. */
+export interface RunArchiveDetail {
+  manifest: RunArchiveManifest;
+  timeline: LoadTimelineData | null;
+  plan: RunPlanSummary | null;
+  requestLog: { samples: RunRequestSample[]; truncated: boolean } | null;
 }
 
 /** Everything known about one run. Fetched from `GET /api/runs/:id` and pushed over the SSE

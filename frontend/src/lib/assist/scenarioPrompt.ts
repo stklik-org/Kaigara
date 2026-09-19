@@ -173,8 +173,8 @@ LOAD SHAPES — pick the one that matches the words used
 - "constant"    { "kind": "constant", "ratePerSec": R } — hold a steady rate for the load's duration. Use for "R requests per second for M minutes". durationSeconds MUST be > 0.
 - "ramp"        { "kind": "ramp", "direction": "up"|"down", "fromRatePerSec": A, "toRatePerSec": B } — linear change over the duration. Use for "ramp up", "ramp down", "increase to". durationSeconds MUST be > 0.
 - "spike"       { "kind": "spike", "magnitudeRatePerSec": R } — one instantaneous burst at startSeconds. Use for "spike", "sudden surge". durationSeconds MUST be 0.
-- "sine"        { "kind": "sine", "peakRatePerSec": R } — one smooth hump (0 -> peak -> 0) across the duration. Use for "wave", "daily/weekly curve", "oscillating". durationSeconds MUST be > 0.
-- "bell"        { "kind": "bell", "peakRatePerSec": R } — a narrower one-off hump across the duration. Use for "one peak event". durationSeconds MUST be > 0.
+- "sine"        { "kind": "sine", "baseRatePerSec": B, "amplitudeRatePerSec": A, "direction": "rise"|"fall" } — one full oscillation around base B across the duration: "rise" goes base -> base+A -> base -> base-A -> base, "fall" the mirror image. Use for "wave", "daily/weekly curve", "oscillating". durationSeconds MUST be > 0.
+- "bell"        { "kind": "bell", "peakRatePerSec": R } — one smooth hump (0 -> peak -> 0) across the duration, for a single one-off event. Use for "one peak event". durationSeconds MUST be > 0.
 
 REQUESTS — what a load sends
 Each RequestSpec: { "id", "operation", "target", "weight", "generator", and optionally "idPool" }.
@@ -189,7 +189,7 @@ Each RequestSpec: { "id", "operation", "target", "weight", "generator", and opti
   - { "kind": "randomized", "sizeBytes": N } — synthetic body of about N bytes. Default for create/update when no payload is described. Use sizeBytes 0 for read/query/delete (they send no body).
   - { "kind": "exact", "value": "<a string containing JSON>" } — a fixed body.
   - { "kind": "mutate", "baseValue": "<a string containing JSON>", "mutationRatePercent": 0..100 } — vary a share of a base body per request.
-- idPool: for read/update/delete against data this run did NOT create, add { "source": "server" }. Omit it (it defaults to "created") when the same load, or an earlier load on the timeline, created those entities. create and query never use idPool.
+- idPool: for read/update/delete against data this run did NOT create, add { "source": "server" }. Omit it (it defaults to "created") when the same load, or an earlier load on the timeline, created those entities. create and query never use idPool. On a "server" source, "onEmpty" ("warn", the default, or "fail") says what happens if the target's corpus for that entity is empty: "warn" skips the request and the run continues; "fail" refuses to compile. Only set it to "fail" if the request is deliberately meant to fail loudly on an empty target — leave it out otherwise.
 
 CONVERSION GUIDELINES
 - Convert every time expression to seconds: "a minute" = 60, "10 minutes" = 600, "half an hour" = 1800, "an 8-hour run" = 28800.

@@ -4,6 +4,8 @@
   "operation": "query",
   "target": "submodel",
   "execution": "authoring",
+  "addDisabled": true,
+  "addDisabledReason": "The IDTA Query API ($query) is authoring-only — the engine has no executor for it yet.",
   "summary": "The most common real query: every submodel of one template.",
   "endpoint": {
     "method": "POST",
@@ -25,8 +27,5 @@
       "default": "by-semantic-id"
     }
   ],
-  "defaults": {
-    "weight": 10
-  },
   "kind": "request"
 }

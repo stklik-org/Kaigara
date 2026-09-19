@@ -54,13 +54,18 @@ export class TimelineValidationError extends Error {
 
 const REQUEST_OPERATIONS = ["create", "read", "update", "delete", "query"] as const;
 const ID_POOL_SOURCES = ["created", "server"] as const;
-/** Operations that address a single entity by identifier, and therefore have an id pool at all.
- *  A create mints its own identifier and a query pages a collection; neither draws from a pool. */
-const ID_ADDRESSING_OPERATIONS: readonly string[] = ["read", "update", "delete"];
+const ID_POOL_ON_EMPTY = ["warn", "fail"] as const;
+/** Operations an id pool means something for. Usually "addresses a single entity by identifier"
+ *  (read/update/delete); `create` is the one exception, where an id pool means "duplicate an
+ *  existing identifier on purpose" rather than "address one" (see `RequestIdPoolData`'s own doc
+ *  comment) — still a pool, just not addressing. A query pages a whole collection and never draws
+ *  from one at all. */
+const ID_ADDRESSING_OPERATIONS: readonly string[] = ["read", "update", "delete", "create"];
 const REQUEST_TARGETS = ["shell", "submodel"] as const;
 const GENERATOR_KINDS = ["randomized", "exact", "mutate"] as const;
 const SHAPE_KINDS = ["ramp", "constant", "spike", "sine", "bell", "individual"] as const;
 const RAMP_DIRECTIONS = ["up", "down"] as const;
+const SINE_DIRECTIONS = ["rise", "fall"] as const;
 
 /** Shapes whose `rateAt()` is a real sustained rate over the Load's duration, as opposed to the
  *  instantaneous ones (spike/individual) that the data model pins to `durationSeconds: 0`. */
@@ -168,8 +173,12 @@ function validateGenerator(c: IssueCollector, value: unknown, path: string): voi
 
   switch (kind) {
     case "randomized":
-      rejectUnknownKeys(c, obj, path, ["kind", "sizeBytes"]);
+      rejectUnknownKeys(c, obj, path, ["kind", "sizeBytes", "sizeBytesPool"]);
       readNumber(c, obj.sizeBytes, join(path, "sizeBytes"), { min: 0 });
+      if (obj.sizeBytesPool !== undefined) {
+        const pool = readArray(c, obj.sizeBytesPool, join(path, "sizeBytesPool"), "sizes");
+        pool?.forEach((entry, i) => readNumber(c, entry, join(path, `sizeBytesPool[${i}]`), { min: 0 }));
+      }
       break;
     case "exact": {
       rejectUnknownKeys(c, obj, path, ["kind", "value"]);
@@ -251,9 +260,10 @@ function validateIdPool(c: IssueCollector, request: Record<string, unknown>, pat
   const idPool = readObject(c, request.idPool, idPoolPath, "an id pool");
   if (!idPool) return;
 
-  rejectUnknownKeys(c, idPool, idPoolPath, ["source", "maxIds"]);
+  rejectUnknownKeys(c, idPool, idPoolPath, ["source", "maxIds", "onEmpty"]);
   const source = readEnum(c, idPool.source, join(idPoolPath, "source"), ID_POOL_SOURCES);
   if (idPool.maxIds !== undefined) readNumber(c, idPool.maxIds, join(idPoolPath, "maxIds"), { min: 1 });
+  if (idPool.onEmpty !== undefined) readEnum(c, idPool.onEmpty, join(idPoolPath, "onEmpty"), ID_POOL_ON_EMPTY);
 
   const operation = typeof request.operation === "string" ? request.operation : undefined;
   if (source && operation && !ID_ADDRESSING_OPERATIONS.includes(operation)) {
@@ -261,6 +271,72 @@ function validateIdPool(c: IssueCollector, request: Record<string, unknown>, pat
       idPoolPath,
       `"${operation}" does not address an entity by identifier, so its id pool is never consulted`,
     );
+  }
+  if (idPool.onEmpty !== undefined && source !== "server") {
+    c.warn(join(idPoolPath, "onEmpty"), 'only "server"-sourced pools can be empty, so this is never consulted');
+  }
+}
+
+/**
+ * Checks `references` — real identifiers a `create`'s body should embed, drawn from another
+ * entity this run created earlier (e.g. an AAS's own `submodels` list).
+ *
+ * The engine renders exactly one combination today (see compileTimeline.ts/scriptTemplates.ts):
+ * `operation: "create"`, `target: "shell"`, `references.target: "submodel"`, and a `randomized`
+ * generator. Anything else validates — the shape is generic on purpose — but is never consulted,
+ * which is a warning for the same reason an id pool on a `create` is: a setting nothing acts on.
+ */
+function validateReferences(c: IssueCollector, request: Record<string, unknown>, path: string): void {
+  if (request.references === undefined) return;
+
+  const referencesPath = join(path, "references");
+  const references = readObject(c, request.references, referencesPath, "a reference");
+  if (!references) return;
+
+  rejectUnknownKeys(c, references, referencesPath, ["target", "count"]);
+  const target = readEnum(c, references.target, join(referencesPath, "target"), REQUEST_TARGETS);
+  if (references.count !== undefined) readNumber(c, references.count, join(referencesPath, "count"), { min: 1 });
+
+  const operation = typeof request.operation === "string" ? request.operation : undefined;
+  const requestTarget = typeof request.target === "string" ? request.target : undefined;
+  const generatorKind =
+    request.generator && typeof request.generator === "object" && "kind" in request.generator
+      ? (request.generator as { kind: unknown }).kind
+      : undefined;
+  const supported = operation === "create" && requestTarget === "shell" && target === "submodel" && generatorKind === "randomized";
+  if (!supported) {
+    c.warn(
+      referencesPath,
+      'only consulted for a "create" against "shell" referencing "submodel" with a randomized generator — this combination is never rendered',
+    );
+  }
+}
+
+/**
+ * Checks `mintId` — the identifier format a `create`'s own new instance should follow, in place of
+ * the engine's opaque default. Only meaningful for `create` (a read/update/delete addresses an
+ * existing identifier via `idPool`, not this), and `format` has to actually place the counter
+ * somewhere or every iteration would mint the same identifier twice.
+ */
+function validateMintId(c: IssueCollector, request: Record<string, unknown>, path: string): void {
+  if (request.mintId === undefined) return;
+
+  const mintIdPath = join(path, "mintId");
+  const mintId = readObject(c, request.mintId, mintIdPath, "a mint id");
+  if (!mintId) return;
+
+  rejectUnknownKeys(c, mintId, mintIdPath, ["format"]);
+  const format = readString(c, mintId.format, join(mintIdPath, "format"), { nonEmpty: true });
+  // A warning, not an error: the document still means something (every iteration mints the exact
+  // same identifier), just almost certainly not what the author meant — the same "well-formed but
+  // wrong" case every other warning here is.
+  if (format !== undefined && format.split("<Num>").length - 1 !== 1) {
+    c.warn(join(mintIdPath, "format"), 'without the placeholder "<Num>" exactly once, every iteration mints the same identifier');
+  }
+
+  const operation = typeof request.operation === "string" ? request.operation : undefined;
+  if (operation !== "create") {
+    c.warn(mintIdPath, `only a "create" mints a new identifier, so this is never consulted by "${operation}"`);
   }
 }
 
@@ -293,6 +369,8 @@ function validateRequestComposition(c: IssueCollector, value: unknown, path: str
       "templateId",
       "bindings",
       "idPool",
+      "references",
+      "mintId",
     ]);
 
     const id = readString(c, request.id, join(requestPath, "id"), { nonEmpty: true });
@@ -310,6 +388,8 @@ function validateRequestComposition(c: IssueCollector, value: unknown, path: str
     validateGenerator(c, request.generator, join(requestPath, "generator"));
     validateBindings(c, request, requestPath);
     validateIdPool(c, request, requestPath);
+    validateReferences(c, request, requestPath);
+    validateMintId(c, request, requestPath);
   });
 
   if (requests.length > 0 && totalWeight === 0) {
@@ -355,6 +435,11 @@ function validateShape(c: IssueCollector, value: unknown, path: string): string 
       readNumber(c, obj.magnitudeRatePerSec, join(path, "magnitudeRatePerSec"), { min: 0 });
       break;
     case "sine":
+      rejectUnknownKeys(c, obj, path, ["kind", "baseRatePerSec", "amplitudeRatePerSec", "direction"]);
+      readEnum(c, obj.direction, join(path, "direction"), SINE_DIRECTIONS);
+      readNumber(c, obj.baseRatePerSec, join(path, "baseRatePerSec"), { min: 0 });
+      readNumber(c, obj.amplitudeRatePerSec, join(path, "amplitudeRatePerSec"), { min: 0 });
+      break;
     case "bell":
       rejectUnknownKeys(c, obj, path, ["kind", "peakRatePerSec"]);
       readNumber(c, obj.peakRatePerSec, join(path, "peakRatePerSec"), { min: 0 });
@@ -458,9 +543,20 @@ export function collectLoadTimelineIssues(input: unknown): ValidationIssue[] {
 
   const root = readObject(c, input, "", "a LoadTimeline");
   if (!root) return c.issues;
-  rejectUnknownKeys(c, root, "", ["totalDurationSeconds", "tracks"]);
+  rejectUnknownKeys(c, root, "", ["totalDurationSeconds", "tracks", "capture"]);
 
   const totalDurationSeconds = readNumber(c, root.totalDurationSeconds, "totalDurationSeconds", { min: 0 });
+
+  if (root.capture !== undefined) {
+    const capture = readObject(c, root.capture, "capture", "an exchange capture setting");
+    if (capture) {
+      rejectUnknownKeys(c, capture, "capture", ["mode", "storeAllErrors"]);
+      readEnum(c, capture.mode, "capture/mode", ["capped", "capped-sampled", "complete"] as const);
+      if (capture.storeAllErrors !== undefined && typeof capture.storeAllErrors !== "boolean") {
+        c.error("capture/storeAllErrors", `expected true or false, got ${JSON.stringify(capture.storeAllErrors)}`);
+      }
+    }
+  }
 
   const tracks = readArray(c, root.tracks, "tracks", "tracks");
   if (tracks) {

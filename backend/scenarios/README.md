@@ -10,6 +10,17 @@ Every track carries its own `color` (a hex from the shared palette in `@kaigara/
 without colours gets them assigned when it is loaded — but then they only exist in that person's
 session, which is why the shipped files carry theirs.
 
+Every request is a pick from a card in the Compose screen's request catalogue — `templateId` and
+`bindings`, exactly what `toRequestSpec()` writes when that card is added — so each one opens in
+the parameter dialog like anything authored there. `backend/test/scenarioLibrary.test.ts` rejects
+a request with no card, or with a card the catalogue will not let anyone add. That is why nothing
+here updates: every update card is add-disabled for now.
+
+Creates mint their identifiers from a per-scenario "Sequence" format (`AAS-crud-<Num>`,
+`SM-website-<Num>`, …). That is deterministic, so re-running a scenario that does not delete what
+it creates, against the same server, collides with the previous run's identifiers — run
+`purge-repository` in between.
+
 Point the library somewhere else with `KAIGARA_SCENARIOS_DIR` (absolute, or relative to the
 process working directory). A file that fails to parse or validate is still *listed*, with its
 issues, rather than silently missing — see `src/scenarios/library.ts`.
@@ -22,7 +33,7 @@ app would reject fails the build instead of the Load screen.
 | File | What it is |
 |---|---|
 | `shape-showcase.json` | Every load shape on one 10-minute timeline. The walkthrough scenario. |
-| `minimal-crud.json` | One AAS + submodel through create → read → update → read → delete, 10 s apart. |
+| `minimal-crud.json` | One AAS + submodel through create → read → delete, 10 s apart. |
 | `persistence-latency.json` | Inject one shell, then poll for it every 1 ms. |
 | `purge-repository.json` | Best-effort teardown: DELETE every shell and submodel already on the target. |
 | `component-manufacturer.json` | StressForge profile — the baseline workload. |
@@ -37,33 +48,30 @@ The question it answers is how long after the write the shell becomes visible to
 
 Two things about it are worth knowing before reading its numbers:
 
-- The injected shell is an `exact` payload, not a randomized one. That is the point: its
-  identifier is fixed in the document, so it is known before the run rather than invented per
-  request.
-- `query` compiles to the **paged collection GET** (`GET /shells?limit=20`), because that is what
-  the metamodel's `query` operation means today (see `src/timeline/aasOperations.ts`). So the poll
-  measures when the write becomes visible to a *collection read*, not a `GET /shells/{id}`. A
-  read-by-id operation would be the sharper instrument and does not exist yet.
+- The injected shell is a "Create AAS" pick with a "Sequence" identifier. Being the only request
+  of its kind, it always mints `https://kaigara.example/ids/aas/persistence-probe-0`, so its
+  identifier is known before the run rather than invented per request.
+- The poll is "List shells (paged)", the **paged collection GET** (`GET /shells?limit=20`). So it
+  measures when the write becomes visible to a *collection read*, not a `GET /shells/{id}`.
 
 ### `minimal-crud`
 
-One `AAS lifecycle` track, 50 s, five `individual` loads 10 s apart: `create` (a shell and a
-submodel), `read`, `update`, `read`, `delete` (submodel then shell) — two requests per step, one
-per entity. The smallest thing that exercises every operation in the metamodel end to end.
+One `AAS lifecycle` track, 30 s, three `individual` loads 10 s apart: `create` (a shell and a
+submodel), `read`, `delete` (submodel then shell) — two requests per step, one per entity. It used
+to have an update step (and a second read after it); every update card in the catalogue is
+add-disabled for now, so it has none until one can be added again.
 
-`read`/`update`/`delete` address an identifier, so — like every other scenario here — they draw
-one from whatever is already on the target (harvested by the backend before the script is even
-generated, ADR 0003), not from the entities this run just created: each VU's own confirmed-created
-pool is local to that VU and does not cross between scenarios. It is a CRUD-shaped *workload*, not
-a transactional check that the same entity survives the round trip.
+`read` and `delete` keep the catalogue's default identifier source, "Created in scenario", so they
+address the very shell and submodel the `create` step minted (`AAS-crud-0`, `SM-crud-0`) — the
+compiler works that out before the run, so nothing is discovered at run time.
 
 ### `purge-repository`
 
 Two tracks, both a `constant` 200 req/s load for 120 s: one `DELETE /submodels/{id}`, one
 `DELETE /shells/{id}`, each with `idPool.source: "server"` and a large `maxIds`, so the pre-load
-harvest pages the *entire* shell and submodel collections before the deletes start. An empty
-harvest aborts the run (there is no skip option), so if the target has shells but no submodels —
-or the reverse — drop the track for the empty side before running, or run it twice.
+harvest pages the *entire* shell and submodel collections before the deletes start. Both are the
+catalogue's "Purge — Delete AAS/Submodel" cards, whose `onEmpty: "warn"` means an empty side is
+skipped with a warning rather than failing the run.
 
 It is **best-effort, not a guaranteed wipe**, for two reasons rooted in how the engine issues
 requests today:
@@ -117,11 +125,14 @@ the profile's character.
 
 ### Composition (approximate — deliberately)
 
-Each profile's `ReadWeight`/`WriteWeight` become request weights on the track. Shell writes are
-`create` (StressForge POSTs a fresh shell); submodel writes split evenly between `create` and
-`update`, because `SubmodelScenario` picks POST or PUT 50/50.
+Each profile's `ReadWeight`/`WriteWeight` become request weights on the track: reads are "List
+shells/submodels (paged)", writes are "Create AAS"/"Create Submodel" with a size-targeted payload.
 
-Three things do not survive the translation, and should not be read as if they had:
+Four things do not survive the translation, and should not be read as if they had:
+
+- **Submodel updates.** `SubmodelScenario` picks POST or PUT 50/50, but the catalogue's update
+  cards are add-disabled, so the PUT half's weight goes to the POST. The read:write proportion is
+  kept; the kind of write is not.
 
 - **Submodel-element operations.** The metamodel targets `shell` and `submodel`; there is no
   element-level target, so the `submodel-elements` track carries submodel-level requests at the

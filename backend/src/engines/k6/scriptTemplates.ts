@@ -7,7 +7,8 @@
  * hand:
  *   1. constants — `BASE_URL`, headers, metric tags, and the literal identifier list `IDS`;
  *   2. `EXECUTOR` / `options` — when and how fast, so the file also runs on its own;
- *   3. `bodyFor(id)` — create/update only: the payload for one identifier;
+ *   3. `bodyFor(id)` — create/update only: the payload for one identifier (`bodyFor(id, i)` when
+ *      the create also embeds real references to another entity — see RANDOM_SHELL_WITH_REFERENCES);
  *   4. `requestFor(i)` — the generator: request number `i` of this script. `i` is k6's global
  *      iteration number for the scenario, so every VU draws a different one and a create never
  *      mints the same identifier twice — which a per-VU `function*` generator could not promise;
@@ -23,6 +24,7 @@
  * k6 process. The generated files are archived to disk and served back over the API.
  */
 
+import { EXCHANGE_CAPTURE_CAP } from "@kaigara/shared-types";
 import { COLLECTION_PATH } from "../../timeline/aasOperations.ts";
 import {
   describeExecutor,
@@ -38,6 +40,20 @@ import {
  *  instead of a plain array each VU parses its own copy of. A purge of 100 000 entities must not
  *  multiply its identifier list by the VU count. */
 export const SHARED_ARRAY_THRESHOLD = 1000;
+
+/** Starts every captured request/response line: `KAIGARA_EXCHANGE <exchange id> <json>`. k6 writes
+ *  these through `--console-output` straight into the run's log folder (see `K6Adapter.start()`),
+ *  so the orchestrator never streams them; `runArchive.ts` indexes the file only when the Run
+ *  screen's popup asks for one. The id sits outside the JSON so that index never parses a body. */
+export const EXCHANGE_LOG_PREFIX = "KAIGARA_EXCHANGE ";
+
+/** `capped-sampled`: each request type keeps about this many of its successful exchanges complete,
+ *  spread evenly over its iterations. */
+const SAMPLED_SUCCESSES_PER_REQUEST_TYPE = 100;
+/** `capped-sampled`: errors are kept complete ahead of successes, from a budget of their own — per
+ *  VU, since k6 VUs share no state: this many per second, in bursts of up to `ERROR_BURST`. */
+const ERRORS_PER_SECOND_PER_VU = 5;
+const ERROR_BURST = 20;
 
 /** Environment variable the scripts read target headers from (a JSON object). */
 export const HEADERS_ENV = "KAIGARA_HEADERS";
@@ -199,7 +215,16 @@ function executorBlock(script: PlannedScript): string {
   ].join("\n");
 }
 
+// Drawn fresh on every call rather than once at module scope, so a pool of more than one size
+// (one entry per selected "IDTA template" family, say) genuinely varies request to request instead
+// of picking one family for the whole script's run. A one-entry pool — the ordinary case — always
+// returns that entry, so this never has to special-case "no real pool" separately.
+const PICK_SIZE_BYTES = String.raw`function pickSizeBytes() {
+  return SIZE_BYTES_POOL[Math.floor(Math.random() * SIZE_BYTES_POOL.length)];
+}`;
+
 const RANDOM_SHELL = String.raw`function bodyFor(id) {
+  const SIZE_BYTES = pickSizeBytes();
   const shell = {
     modelType: "AssetAdministrationShell",
     id: id,
@@ -211,7 +236,25 @@ const RANDOM_SHELL = String.raw`function bodyFor(id) {
   return JSON.stringify(shell);
 }`;
 
+// Same shell, plus a real `submodels` reference list — one group of already-created submodel
+// identifiers per iteration, so `shell.submodels` names entities that genuinely exist on the
+// target rather than a synthetic placeholder. See RequestReferenceData in requestComposition.ts.
+const RANDOM_SHELL_WITH_REFERENCES = String.raw`function bodyFor(id, i) {
+  const SIZE_BYTES = pickSizeBytes();
+  const shell = {
+    modelType: "AssetAdministrationShell",
+    id: id,
+    idShort: "shell_" + id.replace(/[^a-zA-Z0-9]/g, "_").slice(-48),
+    assetInformation: { assetKind: "Instance", globalAssetId: id.replace("/shell/", "/asset/") },
+    submodels: REFERENCE_IDS[i].map((smId) => ({ type: "ModelReference", keys: [{ type: "Submodel", value: smId }] })),
+  };
+  const padding = SIZE_BYTES - JSON.stringify(shell).length;
+  if (padding > 0) shell.description = [{ language: "en", text: "x".repeat(padding) }];
+  return JSON.stringify(shell);
+}`;
+
 const RANDOM_SUBMODEL = String.raw`function bodyFor(id) {
+  const SIZE_BYTES = pickSizeBytes();
   const submodel = {
     modelType: "Submodel",
     id: id,
@@ -266,14 +309,33 @@ function bodyBlock(script: PlannedScript): string | null {
         "// which is what makes Exact the way to author a deliberately invalid or conflicting request.",
         `const BODY = ${JSON.stringify(body.value)};`,
       ].join("\n");
-    case "randomized":
-      return [
-        `// The payload for one identifier: a minimal IDTA-01001 ${script.target}, padded to ~${body.sizeBytes} bytes. A real`,
-        "// entity rather than an opaque blob, so a server that validates its input measures acceptance.",
-        `const SIZE_BYTES = ${body.sizeBytes};`,
-        "",
-        script.target === "shell" ? RANDOM_SHELL : RANDOM_SUBMODEL,
-      ].join("\n");
+    case "randomized": {
+      const sizeDescription =
+        body.sizeBytesPool.length > 1
+          ? `one of ${body.sizeBytesPool.length} sizes (${body.sizeBytesPool.join(", ")} bytes), chosen at random per request`
+          : `padded to ~${body.sizeBytes} bytes`;
+      return script.referencedIds.length > 0
+        ? [
+            `// The payload for one identifier: a minimal IDTA-01001 ${script.target}, ${sizeDescription}, plus`,
+            `// real references to ${script.references?.target}s this run created earlier — one group per iteration, in`,
+            "// iteration order (see RequestReferenceData in requestComposition.ts).",
+            `const SIZE_BYTES_POOL = ${toJs(body.sizeBytesPool)};`,
+            `const REFERENCE_IDS = ${toJs(script.referencedIds)};`,
+            "",
+            PICK_SIZE_BYTES,
+            "",
+            RANDOM_SHELL_WITH_REFERENCES,
+          ].join("\n")
+        : [
+            `// The payload for one identifier: a minimal IDTA-01001 ${script.target}, ${sizeDescription}. A real`,
+            "// entity rather than an opaque blob, so a server that validates its input measures acceptance.",
+            `const SIZE_BYTES_POOL = ${toJs(body.sizeBytesPool)};`,
+            "",
+            PICK_SIZE_BYTES,
+            "",
+            script.target === "shell" ? RANDOM_SHELL : RANDOM_SUBMODEL,
+          ].join("\n");
+    }
     case "mutate":
       return [
         `// The payload for one identifier: this authored base, ~${body.mutationRatePercent}% of its values rewritten per request.`,
@@ -289,7 +351,8 @@ function bodyBlock(script: PlannedScript): string | null {
  *  address for that iteration. One shape per identifier use. */
 function generatorBlock(script: PlannedScript): string {
   const url = urlExpression(script);
-  const body = script.body.kind === "none" ? "null" : script.body.kind === "exact" ? "BODY" : "bodyFor(id)";
+  const body =
+    script.body.kind === "none" ? "null" : script.body.kind === "exact" ? "BODY" : script.referencedIds.length > 0 ? "bodyFor(id, i)" : "bodyFor(id)";
   const send = `return { method: ${JSON.stringify(script.method)}, url: ${url}, body: ${body} };`;
   const doc = "// The generator: request number i of this script, i = k6's iteration number for this scenario across";
 
@@ -331,7 +394,75 @@ function generatorBlock(script: PlannedScript): string {
   }
 }
 
-function runBlock(script: PlannedScript): string {
+/** `keepComplete(i, status)`: whether this exchange's bodies are logged in full rather than cut at
+ *  CAPTURE_CAP — the timeline's `capture` setting, specialised per script at compile time. "Error"
+ *  means any status outside 2xx, expected or not. */
+function keepCompleteFunction(script: PlannedScript, plan: K6Plan): string {
+  const { mode, storeAllErrors } = plan.capture;
+  const isError = "status < 200 || status >= 300";
+  if (mode === "complete") {
+    return ["// Capture: every exchange complete.", "function keepComplete() {", "  return true;", "}"].join("\n");
+  }
+  if (mode === "capped") {
+    return storeAllErrors
+      ? ["// Capture: bodies cut at CAPTURE_CAP, except errors, which are always complete.", "function keepComplete(i, status) {", `  return ${isError};`, "}"].join("\n")
+      : ["// Capture: every exchange, bodies cut at CAPTURE_CAP.", "function keepComplete() {", "  return false;", "}"].join("\n");
+  }
+  const every = Math.max(1, Math.ceil(script.expectedRequests / SAMPLED_SUCCESSES_PER_REQUEST_TYPE));
+  return [
+    "// Capture: bodies cut at CAPTURE_CAP, except a sample kept complete.",
+    storeAllErrors
+      ? "//   errors:    every one."
+      : `//   errors:    first in line — up to ${ERRORS_PER_SECOND_PER_VU}/s per VU, in bursts of up to ${ERROR_BURST}.`,
+    `//   successes: ${every === 1 ? "every iteration" : `1 in ${every} iterations`} (about ${SAMPLED_SUCCESSES_PER_REQUEST_TYPE} over this request type's run).`,
+    `const SAMPLE_EVERY = ${every};`,
+    ...(storeAllErrors
+      ? []
+      : [
+          `let errorBudget = ${ERROR_BURST};`,
+          "let errorBudgetAt = Date.now();",
+        ]),
+    "function keepComplete(i, status) {",
+    "  if (status >= 200 && status < 300) return i % SAMPLE_EVERY === 0;",
+    ...(storeAllErrors
+      ? ["  return true;"]
+      : [
+          "  const now = Date.now();",
+          `  errorBudget = Math.min(${ERROR_BURST}, errorBudget + ((now - errorBudgetAt) / 1000) * ${ERRORS_PER_SECOND_PER_VU});`,
+          "  errorBudgetAt = now;",
+          "  if (errorBudget < 1) return false;",
+          "  errorBudget -= 1;",
+          "  return true;",
+        ]),
+    "}",
+  ].join("\n");
+}
+
+/** `captured(body, complete)`: the body as it is logged, whether it was cut, and its real UTF-8
+ *  size — measured before any cut, so a capped exchange still reports how big the payload was. */
+const CAPTURED_BODY = String.raw`const CAPTURE_CAP = ${EXCHANGE_CAPTURE_CAP};
+const NON_ASCII = /[^\x00-\x7f]/;
+function utf8Bytes(text) {
+  if (!NON_ASCII.test(text)) return text.length;
+  let bytes = 0;
+  for (let k = 0; k < text.length; k++) {
+    const c = text.charCodeAt(k);
+    if (c < 0x80) bytes += 1;
+    else if (c < 0x800) bytes += 2;
+    else if (c >= 0xd800 && c <= 0xdbff) { bytes += 4; k++; }
+    else bytes += 3;
+  }
+  return bytes;
+}
+function captured(body, complete) {
+  if (typeof body !== "string") return { text: "", truncated: false, bytes: 0 };
+  const bytes = utf8Bytes(body);
+  return !complete && body.length > CAPTURE_CAP
+    ? { text: body.slice(0, CAPTURE_CAP), truncated: true, bytes }
+    : { text: body, truncated: false, bytes };
+}`;
+
+function runBlock(script: PlannedScript, plan: K6Plan): string {
   const checkName = `${script.operation} ${script.target}: status ${script.expectStatus.join(" or ")}`;
   const lines: string[] = [];
   if (script.identifiers.use !== "none") {
@@ -342,13 +473,48 @@ function runBlock(script: PlannedScript): string {
       "",
     );
   }
-  lines.push("export function run() {", "  const request = requestFor(execution.scenario.iterationInTest);");
+  lines.push(
+    keepCompleteFunction(script, plan),
+    "",
+    CAPTURED_BODY,
+    "",
+    "export function run() {",
+    "  const i = execution.scenario.iterationInTest;",
+    "  const request = requestFor(i);",
+  );
   if (script.identifiers.use !== "none") {
     lines.push("  if (request === null) {", "    skipped.add(1, TAGS);", "    return;", "  }");
   }
   lines.push(
+    // `i` rides along as metric *metadata*, not a tag: it is unique per request, and k6 keeps one
+    // time series in memory per distinct tag set for the whole run, so as a tag it would grow k6's
+    // memory with every request. Metadata reaches the JSON output all the same, which is where it
+    // turns a row in the Run screen's request log back into its exchange.
+    "  execution.vu.metrics.metadata.i = String(i);",
     "  const response = http.request(request.method, request.url, request.body, PARAMS);",
     `  check(response, { ${JSON.stringify(checkName)}: (r) => EXPECTED_STATUS.includes(r.status) }, TAGS);`,
+    "  delete execution.vu.metrics.metadata.i;",
+    "",
+    "  // The Run screen's request/response popup reads this back from the run's log folder.",
+    "  const complete = keepComplete(i, response.status);",
+    "  const sent = captured(request.body, complete);",
+    "  const received = captured(response.body, complete);",
+    // Small scalar fields first, body strings last: `ExchangeLogIndex` reads only the first
+    // `HEADER_BYTES` of each line to index it, and the request log's truncation badge needs
+    // `requestTruncated`/`responseTruncated` from that same cheap read — putting them ahead of
+    // `requestBody`/`responseBody` (which can each run to `CAPTURE_CAP` bytes) keeps them inside
+    // that header window regardless of how large the bodies are.
+    `  console.log(${JSON.stringify(EXCHANGE_LOG_PREFIX)} + TAGS.script + ":" + i + " " + JSON.stringify({`,
+    "    requestTruncated: sent.truncated,",
+    "    responseTruncated: received.truncated,",
+    "    requestBytes: sent.bytes,",
+    "    responseBytes: received.bytes,",
+    "    status: response.status,",
+    "    method: request.method,",
+    "    url: request.url,",
+    "    requestBody: sent.text,",
+    "    responseBody: received.text,",
+    "  }));",
     "}",
     "",
     "export default run;",
@@ -366,7 +532,7 @@ export function renderScript(script: PlannedScript, load: PlannedLoad, plan: K6P
     executorBlock(script),
     bodyBlock(script),
     generatorBlock(script),
-    runBlock(script),
+    runBlock(script, plan),
   ];
   return `${sections.filter((section) => section !== null).join("\n\n")}\n`;
 }

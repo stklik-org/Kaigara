@@ -36,7 +36,12 @@ export interface SpikeShapeData {
 
 export interface SineShapeData {
   kind: "sine";
-  peakRatePerSec: number;
+  baseRatePerSec: number;
+  amplitudeRatePerSec: number;
+  /** "rise" traces base -> base+amplitude -> base -> base-amplitude -> base over the Load's
+   *  duration; "fall" traces the mirror image, base -> base-amplitude -> base -> base+amplitude ->
+   *  base. */
+  direction: "rise" | "fall";
 }
 
 export interface BellShapeData {
@@ -183,35 +188,43 @@ export class SpikeShape extends LoadShape {
   }
 }
 
-/** A single half-sine hump across the Load's own duration — periodicity comes from placing
- *  several Sine Loads spaced out on the same Track, not from oscillating within one Load. */
+/** A full oscillation across the Load's own duration, around a `baseRatePerSec` floor: `direction:
+ *  "rise"` traces base -> base+amplitude -> base -> base-amplitude -> base, `"fall"` the mirror
+ *  image. Negative excursions are clamped to 0 — a k6 arrival-rate executor cannot run a negative
+ *  rate, so an amplitude larger than the base flattens the trough rather than going negative. */
 export class SineShape extends LoadShape {
   readonly kind = "sine" as const;
   readonly instantaneous = false;
   readonly label = "Sine";
-  peakRatePerSec: number;
+  baseRatePerSec: number;
+  amplitudeRatePerSec: number;
+  direction: "rise" | "fall";
 
   constructor(data: Omit<SineShapeData, "kind">) {
     super();
-    this.peakRatePerSec = data.peakRatePerSec;
+    this.baseRatePerSec = data.baseRatePerSec;
+    this.amplitudeRatePerSec = data.amplitudeRatePerSec;
+    this.direction = data.direction;
   }
 
   rateAt(elapsedSeconds: number, durationSeconds: number): number {
     const frac = clampFraction(elapsedSeconds, durationSeconds);
-    return this.peakRatePerSec * Math.sin(Math.PI * frac);
+    const sign = this.direction === "rise" ? 1 : -1;
+    return Math.max(0, this.baseRatePerSec + sign * this.amplitudeRatePerSec * Math.sin(2 * Math.PI * frac));
   }
 
   toJSON(): SineShapeData {
-    return { kind: "sine", peakRatePerSec: this.peakRatePerSec };
+    return { kind: "sine", baseRatePerSec: this.baseRatePerSec, amplitudeRatePerSec: this.amplitudeRatePerSec, direction: this.direction };
   }
 
-  static createDefault(): SineShape {
-    return new SineShape({ peakRatePerSec: 300 });
+  static createDefault(direction: "rise" | "fall" = "rise"): SineShape {
+    return new SineShape({ baseRatePerSec: 100, amplitudeRatePerSec: 50, direction });
   }
 }
 
-/** A narrower Gaussian hump than Sine — for a single one-time peak event rather than a shape
- *  meant to recur. */
+/** A single half-sine hump across the Load's own duration (0 -> peak -> 0) — for a one-time peak
+ *  event rather than a shape meant to recur; periodicity for a recurring wave instead comes from
+ *  placing several Sine Loads spaced out on the same Track, or use Sine's own oscillation. */
 export class BellShape extends LoadShape {
   readonly kind = "bell" as const;
   readonly instantaneous = false;
@@ -225,8 +238,7 @@ export class BellShape extends LoadShape {
 
   rateAt(elapsedSeconds: number, durationSeconds: number): number {
     const frac = clampFraction(elapsedSeconds, durationSeconds);
-    const sigma = 0.15;
-    return this.peakRatePerSec * Math.exp(-((frac - 0.5) ** 2) / (2 * sigma * sigma));
+    return this.peakRatePerSec * Math.sin(Math.PI * frac);
   }
 
   toJSON(): BellShapeData {

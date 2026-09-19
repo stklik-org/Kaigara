@@ -22,6 +22,7 @@ import {
   type LoadTimelineData,
 } from "@kaigara/shared-types";
 import type { EngineRegistry } from "../engines/adapter.ts";
+import type { K6RunArchive } from "../engines/k6/runArchive.ts";
 import { ScenarioNotFoundError, readScenario } from "../scenarios/library.ts";
 import {
   EmptyPlanError,
@@ -112,8 +113,11 @@ const runRequestProperties = {
 
 const runViewResponse = (description: string) => ({ description, $ref: "#/components/schemas/RunView" });
 
-export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService; engines: EngineRegistry }): void {
-  const { runs, engines } = deps;
+export function registerRunRoutes(
+  app: FastifyInstance,
+  deps: { runs: RunService; engines: EngineRegistry; archive: K6RunArchive },
+): void {
+  const { runs, engines, archive } = deps;
 
   /** Which engines this build can actually run, and their versions. */
   app.get(
@@ -187,7 +191,7 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
               items: {
                 type: "object",
                 properties: {
-                  name: { type: "string", examples: ["main.js", "01-create-shell.js"] },
+                  name: { type: "string", examples: ["main.js", "k6_writes_steady_create_submodel.js"] },
                   content: { type: "string", description: "The file, verbatim." },
                 },
               },
@@ -240,7 +244,7 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
     }),
     async (request, reply) => {
       try {
-        return runs.concretePlan(request.body);
+        return await runs.concretePlan(request.body);
       } catch (error) {
         return reply.code(statusForError(error)).send(errorBody(error));
       }
@@ -370,7 +374,8 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
     documented({
       tags: ["runs"],
       summary: "List runs, newest first",
-      description: "Runs are held in memory: this is empty after a restart. SQLite-backed history is the next step (proposal §10).",
+      description:
+        "Runs are held in memory: this is empty after a restart. SQLite-backed history is the next step (proposal §10) — until then, `GET /api/runs/archive` covers reopening a run from an earlier backend process, via the k6 adapter's own on-disk archive rather than a database.",
       response: {
         200: {
           description: "Every run this process still holds.",
@@ -380,6 +385,107 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
       },
     }),
     async () => ({ runs: runs.list() }),
+  );
+
+  const archiveEntrySchema = {
+    type: "object",
+    properties: {
+      id: { type: "string", description: "Opaque — pass verbatim to GET /api/runs/archive/{id}." },
+      runId: { type: "string" },
+      scenarioName: { type: "string" },
+      targetBaseUrl: { type: "string" },
+      engineId: { type: "string" },
+      calledAt: { type: "string", format: "date-time" },
+      startEpochMs: { type: "number" },
+      status: { type: "string", description: "A RunLifecycleStatus, once the run has one." },
+      endedAt: { type: "string", format: "date-time" },
+      requests: { type: "number" },
+      failed: { type: "number" },
+    },
+  } as const;
+
+  /**
+   * "Open previous execution": every archived run this backend (across every restart) still has a
+   * `manifest.json` for — the k6 adapter's own persistent archive (`runArchive.ts`), not the
+   * in-memory `RunService` state `GET /api/runs` reads. This is what survives a backend restart.
+   */
+  app.get(
+    "/api/runs/archive",
+    documented({
+      tags: ["runs"],
+      summary: "List archived runs, newest first",
+      description:
+        "Reads the k6 adapter's on-disk archive (default `./k6-logs`), across every backend session it has ever written — this is what a restarted backend can still offer for \"open previous execution\", unlike `GET /api/runs` (in-memory only).",
+      response: {
+        200: {
+          description: "Every archived run this backend can find.",
+          type: "object",
+          properties: { entries: { type: "array", items: archiveEntrySchema } },
+        },
+      },
+    }),
+    async () => ({ entries: await archive.list() }),
+  );
+
+  app.get<{ Params: { id: string } }>(
+    "/api/runs/archive/:id",
+    documented({
+      tags: ["runs"],
+      summary: "Reopen one archived run",
+      description:
+        "The manifest always; the authored timeline whenever its file is present (`null` for an archive from before this feature existed, or a run that never got past compiling). `requestLog` is always `null` here — reopening a run must not by itself parse and transfer its whole log; fetch a Load's log lazily instead, from GET /api/runs/{manifest.runId}/requests?loadId=, which works for an archived run too.",
+      params: {
+        type: "object",
+        required: ["id"],
+        properties: { id: { type: "string", description: "An `id` from GET /api/runs/archive." } },
+      },
+      response: {
+        200: {
+          description: "The reconstructed run.",
+          type: "object",
+          required: ["manifest", "timeline", "plan", "requestLog"],
+          properties: {
+            manifest: archiveEntrySchema,
+            timeline: { $ref: LOAD_TIMELINE_REF, nullable: true },
+            plan: {
+              type: "object",
+              nullable: true,
+              description: "The same shape as a live run's RunView.plan — read from the archived plan.json.",
+              additionalProperties: true,
+            },
+            requestLog: {
+              type: "object",
+              nullable: true,
+              properties: {
+                samples: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      offsetMs: { type: "number" },
+                      loadKey: { type: "string" },
+                      operation: { type: "string" },
+                      target: { type: "string" },
+                      durationMs: { type: "number" },
+                      status: { type: "number" },
+                      failed: { type: "boolean" },
+                      exchangeId: { type: "string" },
+                    },
+                  },
+                },
+                truncated: { type: "boolean" },
+              },
+            },
+          },
+        },
+        404: errorResponse("No archived run with that id."),
+      },
+    }),
+    async (request, reply) => {
+      const found = await archive.read(request.params.id);
+      if (!found) return reply.code(404).send({ error: `No archived run with id "${request.params.id}".` });
+      return found;
+    },
   );
 
   app.get<{ Params: { id: string } }>(
@@ -417,6 +523,130 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
     },
   );
 
+  /**
+   * One Load's complete per-request log — every request that Load produced, not the bounded live
+   * tail `RunView.metrics.recentSamples` carries. Deliberately its own endpoint rather than a field
+   * on `RunView`: that keeps its cost off the SSE stream's 1-second cadence entirely (see
+   * `metricsAggregator.ts`'s own doc comment). Deliberately scoped to `?loadId=` too, rather than
+   * the whole run: a finished run can carry hundreds of thousands of samples, and the Run screen
+   * only ever renders one Load's log at a time — omitting `loadId` returns an empty `samples` array
+   * rather than everything, so opening a run never pays to transfer data no panel shows.
+   *
+   * Works for a still-running run (served from the in-memory `RunService`) and an archived one
+   * (served from `metrics.ndjson` on disk) alike, exactly the way `GET /api/runs/{id}/exchanges/
+   * {exchangeId}` already does — `id` is always the bare runId, never an archive id.
+   */
+  app.get<{ Params: { id: string }; Querystring: { loadId?: string } }>(
+    "/api/runs/:id/requests",
+    documented({
+      tags: ["runs"],
+      summary: "One Load's complete per-request log",
+      description:
+        "Every request recorded for this run's `loadId`, oldest first — empty if `loadId` is omitted. Not part of the live SSE stream on purpose — fetch this once a Load is selected, normally only after the run reaches a terminal status (`live: false` in the response says so either way). Works for an archived run too, by its `runId` (from `GET /api/runs/archive/{id}`'s `manifest.runId`), not just a live one.",
+      params: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+      querystring: {
+        type: "object",
+        properties: { loadId: { type: "string", description: "A RunPlanLoadSummary.loadId — one Load can compile to several loadKeys (ADR 0005), all included." } },
+      },
+      response: {
+        200: {
+          description: "The request log for this Load so far.",
+          type: "object",
+          required: ["samples", "truncated", "live"],
+          properties: {
+            samples: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  offsetMs: { type: "number" },
+                  loadKey: { type: "string" },
+                  operation: { type: "string" },
+                  target: { type: "string" },
+                  durationMs: { type: "number" },
+                  status: { type: "number" },
+                  failed: { type: "boolean" },
+                  exchangeId: { type: "string", description: "Pass to GET /api/runs/{id}/exchanges/{exchangeId} for this row's full request/response." },
+                  requestTruncated: { type: "boolean", description: "Whether the captured request body was cut at 64 KB. Absent when exchangeId is absent." },
+                  responseTruncated: { type: "boolean", description: "Whether the captured response body was cut at 64 KB. Absent when exchangeId is absent." },
+                },
+              },
+            },
+            truncated: { type: "boolean", description: "True only if the safety cap on the log was actually reached." },
+            live: { type: "boolean", description: "True while the run has not reached a terminal status yet." },
+          },
+        },
+        404: errorResponse("No run with that id — live or archived."),
+      },
+    }),
+    async (request, reply) => {
+      const { id } = request.params;
+      const { loadId } = request.query;
+      try {
+        if (runs.has(id)) {
+          const log = runs.fullRequestLog(id, loadId);
+          log.samples = await archive.enrichTruncation(id, log.samples);
+          return log;
+        }
+      } catch (error) {
+        return reply.code(statusForError(error)).send(errorBody(error));
+      }
+      const archived = await archive.requestLog(id, loadId);
+      if (!archived) return reply.code(404).send({ error: `No run with id "${id}".` });
+      return { ...archived, live: false };
+    },
+  );
+
+  /**
+   * The Run screen's "open this row" popup: the literal request and response the k6 script
+   * captured for one sample's `exchangeId`, read from the run's `exchanges.log`. Works the same for
+   * a still-running run (k6 is still appending to it) and an archived one — see
+   * `K6RunArchive.exchange()`.
+   */
+  app.get<{ Params: { id: string; exchangeId: string } }>(
+    "/api/runs/:id/exchanges/:exchangeId",
+    documented({
+      tags: ["runs"],
+      summary: "One captured request/response exchange",
+      description:
+        "The literal request and response for one row of the request log, read from the run's log folder (`exchanges.log`, which k6 writes itself while the run is live). How much of each body was kept follows the timeline's `capture` setting — cut at 64 KB, a sample kept complete, or everything complete, with errors optionally always complete. `requestBytes`/`responseBytes` are the real sizes either way.",
+      params: {
+        type: "object",
+        required: ["id", "exchangeId"],
+        properties: {
+          id: { type: "string", description: "The run's id (RunView.id) — live or archived." },
+          exchangeId: { type: "string", description: "A sample's exchangeId, from GET /api/runs/{id}/requests or an archived run's requestLog." },
+        },
+      },
+      response: {
+        200: {
+          description: "The captured exchange.",
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            method: { type: "string" },
+            url: { type: "string" },
+            requestBody: { type: "string" },
+            requestTruncated: { type: "boolean" },
+            requestBytes: { type: "number", description: "UTF-8 size of the request body as sent, whether or not it was cut." },
+            status: { type: "number" },
+            responseBody: { type: "string" },
+            responseTruncated: { type: "boolean" },
+            responseBytes: { type: "number", description: "UTF-8 size of the response body as received, whether or not it was cut." },
+          },
+        },
+        404: errorResponse("No such run, or no captured exchange with that id."),
+      },
+    }),
+    async (request, reply) => {
+      const found = await archive.exchange(request.params.id, request.params.exchangeId);
+      if (!found) {
+        return reply.code(404).send({ error: `No captured exchange "${request.params.exchangeId}" for run "${request.params.id}".` });
+      }
+      return found;
+    },
+  );
+
   /** A generated file (or the plan) for a run, so the user can read exactly what was executed. */
   app.get<{ Params: { id: string; name: string } }>(
     "/api/runs/:id/artifacts/:name",
@@ -424,7 +654,7 @@ export function registerRunRoutes(app: FastifyInstance, deps: { runs: RunService
       tags: ["runs"],
       summary: "Read a generated artifact",
       description:
-        "`main.js` — the entry point k6 was handed — one of the per-request scripts it schedules (e.g. `01-create-shell.js`), or `plan.json`, the k6 plan they were rendered from. Names come from the run's `artifacts` list.",
+        "`main.js` — the entry point k6 was handed — one of the per-request scripts it schedules (named `k6_<track>_<load>_<request spec>.js`, e.g. `k6_writes_steady_create_submodel.js`), or `plan.json`, the k6 plan they were rendered from. Names come from the run's `artifacts` list.",
       params: {
         type: "object",
         required: ["id", "name"],

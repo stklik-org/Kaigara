@@ -27,8 +27,5 @@
       "bindsTo": "body.value"
     }
   ],
-  "defaults": {
-    "weight": 8
-  },
   "kind": "request"
 }

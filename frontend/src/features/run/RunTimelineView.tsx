@@ -35,11 +35,30 @@ function trackProgressLabel(track: Track, elapsedSeconds: number): string {
 /** Read-only sibling of the Compose screen's TimelineView: the same track-label column beside the
  *  same <Timeline>, but driven by `elapsedSeconds` instead of by drag/resize — past/active/future
  *  opacity comes from `toRunTimelineRows`, and the playhead is the library's own native cursor
- *  moved with `TimelineState.setTime()`. */
-export function RunTimelineView({ tracks, elapsedSeconds }: { tracks: Track[]; elapsedSeconds: number }) {
+ *  moved with `TimelineState.setTime()`. Clicking a Load reports its id via `onSelectLoad` — the
+ *  Run screen opens `RunLoadDetailPanel` for it, the same way Compose's own click opens its info
+ *  panels, just read-only. `live` is false once the run has reached a terminal status: the
+ *  playhead-following opacity/ring stops (`toRunTimelineRows`'s own doc comment), and selection
+ *  behaves exactly like Compose's canvas from then on. */
+export function RunTimelineView({
+  tracks,
+  elapsedSeconds,
+  selectedLoadId,
+  onSelectLoad,
+  live = true,
+}: {
+  tracks: Track[];
+  elapsedSeconds: number;
+  selectedLoadId?: string | null;
+  onSelectLoad?: (loadId: string) => void;
+  live?: boolean;
+}) {
   const timelineRef = useRef<TimelineState>(null);
   const [scaleWidth, setScaleWidth] = useState(SCALE_WIDTH_DEFAULT);
-  const editorData = useMemo(() => toRunTimelineRows(tracks, elapsedSeconds), [tracks, elapsedSeconds]);
+  const editorData = useMemo(
+    () => toRunTimelineRows(tracks, elapsedSeconds, selectedLoadId, live),
+    [tracks, elapsedSeconds, selectedLoadId, live],
+  );
 
   useEffect(() => {
     timelineRef.current?.setTime(elapsedSeconds);
@@ -77,6 +96,7 @@ export function RunTimelineView({ tracks, elapsedSeconds }: { tracks: Track[]; e
             disableDrag
             getActionRender={renderAction}
             getScaleRender={renderScale}
+            onClickAction={(_e, { action }) => onSelectLoad?.(action.id)}
           />
         </div>
       </div>

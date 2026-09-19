@@ -51,6 +51,15 @@ export interface RequestSample {
   /** HTTP status, or 0 when the request never completed (timeout, connection refused). */
   status: number;
   failed: boolean;
+  /** Correlates this sample with a captured request/response pair, if the adapter captures those
+   *  (the k6 adapter does — see `scriptTemplates.ts`'s `EXCHANGE_LOG_PREFIX`). `undefined` for an
+   *  adapter, or an older archived run, that never emitted one. */
+  exchangeId?: string;
+  /** Whether the captured request/response body was cut at the engine's capture cap — filled in
+   *  from `exchanges.log`'s own index (`exchangeLog.ts`) after the fact, never present straight off
+   *  the engine's own metrics stream (see `K6RunArchive.enrichTruncation`). */
+  requestTruncated?: boolean;
+  responseTruncated?: boolean;
 }
 
 export interface EngineLogLine {

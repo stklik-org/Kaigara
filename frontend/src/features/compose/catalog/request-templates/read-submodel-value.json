@@ -20,9 +20,6 @@
       "bindsTo": "path.smId"
     }
   ],
-  "defaults": {
-    "weight": 15
-  },
   "notes": "Comparing this against Read Submodel isolates serialisation cost from lookup cost.",
   "kind": "request"
 }

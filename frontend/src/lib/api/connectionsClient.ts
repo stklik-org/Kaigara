@@ -64,6 +64,7 @@ const httpProbe: ConnectionProbe = async (connection) => {
     // succeeds unauthenticated but a run that then 401s would be a worse surprise than the
     // reverse.
     headers: connection.headers,
+    oauth2: connection.oauth2,
   };
 
   let response: Response;
@@ -112,6 +113,9 @@ function applyInput(connection: ServerConnection, input: ConnectionInput): Serve
     defaultTimeoutSeconds: input.defaultTimeoutSeconds ?? connection.defaultTimeoutSeconds,
     scrapeResourceMetrics: input.scrapeResourceMetrics ?? connection.scrapeResourceMetrics,
     headers: input.headers ?? connection.headers,
+    // `undefined` (the key genuinely absent) leaves the existing value; `null` (the form's "OAuth2
+    // off") clears it — see `ConnectionInput.oauth2`.
+    oauth2: input.oauth2 === undefined ? connection.oauth2 : (input.oauth2 ?? undefined),
   };
 }
 
@@ -184,6 +188,12 @@ export function createConnectionsClient(
         lastTest: result,
       }));
       return result;
+    },
+
+    resetToDemoDefaults: async () => {
+      connections = applyTwinsphereDevDefaults(mockConnections.map((c) => ({ ...c })));
+      save();
+      return connections.map(copy);
     },
   };
 }

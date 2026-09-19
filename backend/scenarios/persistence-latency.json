@@ -38,8 +38,24 @@
                     "target": "shell",
                     "weight": 1,
                     "generator": {
-                      "kind": "exact",
-                      "value": "{\n  \"modelType\": \"AssetAdministrationShell\",\n  \"id\": \"https://kaigara.example/ids/aas/persistence-probe\",\n  \"idShort\": \"KaigaraPersistenceProbe\",\n  \"assetInformation\": {\n    \"assetKind\": \"Instance\",\n    \"globalAssetId\": \"https://kaigara.example/ids/asset/persistence-probe\"\n  }\n}"
+                      "kind": "randomized",
+                      "sizeBytes": 256
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "https://kaigara.example/ids/aas/persistence-probe-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "minimal",
+                        "config": {}
+                      }
+                    },
+                    "mintId": {
+                      "format": "https://kaigara.example/ids/aas/persistence-probe-<Num>"
                     }
                   }
                 ]
@@ -69,7 +85,17 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   }
                 ]

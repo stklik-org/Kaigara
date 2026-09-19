@@ -116,16 +116,32 @@ export function toTimelineRows(
 }
 
 /** Read-only rows for the Run screen: nothing drags, and each action carries where it sits
- *  relative to the playhead. */
-export function toRunTimelineRows(tracks: Track[], elapsedSeconds: number): TimelineRow[] {
+ *  relative to the playhead. `selectedLoadId` is the Load a click opened `RunLoadDetailPanel`
+ *  for — same accent-ring treatment `toTimelineRows` gives Compose's own selection.
+ *
+ *  `live` gates the past/active/future opacity and the playhead's own accent ring: while a run is
+ *  actually progressing (or none has started yet) they track the playhead as before, but once a run
+ *  reaches a terminal status `elapsedSeconds` freezes at its final value, and whichever Load that
+ *  happened to land inside would otherwise keep the "active now" ring forever. A finished run
+ *  behaves exactly like Compose's own canvas instead: every Load at full opacity, the accent ring
+ *  meaning only "selected". */
+export function toRunTimelineRows(tracks: Track[], elapsedSeconds: number, selectedLoadId: string | null | undefined, live: boolean): TimelineRow[] {
   const colorOf = trackColorLookup(tracks);
 
   return tracks.map((track) => ({
     id: track.id,
     actions: track.loads.map((load) => {
-      const { start, end } = visualSpan(load);
-      const liveState: LiveState = end <= elapsedSeconds ? "past" : start <= elapsedSeconds ? "active" : "future";
-      return toAction(load, colorOf(track.id), { flexible: false, movable: false, liveState });
+      const liveState = ((): LiveState | undefined => {
+        if (!live) return undefined;
+        const { start, end } = visualSpan(load);
+        return end <= elapsedSeconds ? "past" : start <= elapsedSeconds ? "active" : "future";
+      })();
+      return toAction(load, colorOf(track.id), {
+        flexible: false,
+        movable: false,
+        liveState,
+        selected: load.id === selectedLoadId,
+      });
     }),
   }));
 }

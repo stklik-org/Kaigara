@@ -89,7 +89,17 @@
                     "weight": 100,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
@@ -100,6 +110,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-website-<Num>"
                     }
                   }
                 ]
@@ -122,7 +151,17 @@
                     "weight": 100,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
@@ -133,6 +172,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-website-<Num>"
                     }
                   }
                 ]
@@ -157,7 +215,17 @@
                     "weight": 100,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
@@ -168,6 +236,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-website-<Num>"
                     }
                   }
                 ]
@@ -199,28 +286,46 @@
                     "weight": 100,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 0.5,
+                    "weight": 1,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 0.5,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-website-<Num>"
                     }
                   }
                 ]
@@ -243,28 +348,46 @@
                     "weight": 100,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 0.5,
+                    "weight": 1,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 0.5,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-website-<Num>"
                     }
                   }
                 ]
@@ -289,28 +412,46 @@
                     "weight": 100,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 0.5,
+                    "weight": 1,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 0.5,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-website-<Num>"
                     }
                   }
                 ]
@@ -342,28 +483,46 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 0.5,
+                    "weight": 1,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 0.5,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-website-<Num>"
                     }
                   }
                 ]
@@ -386,28 +545,46 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 0.5,
+                    "weight": 1,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 0.5,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-website-<Num>"
                     }
                   }
                 ]
@@ -432,28 +609,46 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 0.5,
+                    "weight": 1,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 4096
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 0.5,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-website-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 4096,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-website-<Num>"
                     }
                   }
                 ]
@@ -485,7 +680,17 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   }
                 ]
@@ -508,7 +713,17 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   }
                 ]
@@ -533,7 +748,17 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   }
                 ]

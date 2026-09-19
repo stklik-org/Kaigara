@@ -59,7 +59,9 @@ function shapeDetail(shape: LoadShape): string {
   if (shape instanceof RampShape) return `${shape.fromRatePerSec} → ${shape.toRatePerSec} req/s`;
   if (shape instanceof ConstantShape) return `${shape.ratePerSec} req/s`;
   if (shape instanceof SpikeShape) return `${shape.magnitudeRatePerSec} req/s`;
-  if (shape instanceof SineShape) return `peak ${shape.peakRatePerSec} req/s`;
+  if (shape instanceof SineShape) {
+    return `${shape.baseRatePerSec} ±${shape.amplitudeRatePerSec} req/s, ${shape.direction === "rise" ? "rises" : "falls"} first`;
+  }
   if (shape instanceof BellShape) return `peak ${shape.peakRatePerSec} req/s`;
   if (shape instanceof IndividualShape) return `${shape.requestCount} request${shape.requestCount === 1 ? "" : "s"}`;
   return "";

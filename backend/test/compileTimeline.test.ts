@@ -5,6 +5,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
+import { Script } from "node:vm";
 
 import {
   BellShape,
@@ -32,7 +33,7 @@ import { iterationBudget, planScripts, type K6Plan, type PlannedScript } from ".
 import { HEADERS_ENV } from "../src/engines/k6/scriptTemplates.ts";
 import { describeOperation } from "../src/timeline/aasOperations.ts";
 
-const TARGET = { baseUrl: "http://127.0.0.1:8081/api/v3", timeoutSeconds: 30, headers: {} };
+const TARGET = { baseUrl: "http://127.0.0.1:8081/", timeoutSeconds: 30, headers: {} };
 
 /** A target with nothing on it — the default for tests that only care about the schedule. */
 const emptyTarget: IdentifierHarvester = async () => [];
@@ -137,7 +138,7 @@ test("a ramp whose endpoints are equal collapses to a constant-arrival-rate exec
 });
 
 test("a sine is sampled into many ramping-arrival-rate stages whose area matches the analytic integral", () => {
-  const shape = new SineShape({ peakRatePerSec: 200 });
+  const shape = new SineShape({ baseRatePerSec: 200, amplitudeRatePerSec: 100, direction: "rise" });
   const { plan } = planTimeline(singleLoad(shape, 32), { target: TARGET });
 
   const executor = plan.loads[0].executor;
@@ -244,7 +245,7 @@ test("scripts are numbered in the order k6 starts them, across tracks", () => {
   const { plan } = planTimeline(timeline, { target: TARGET });
   const scripts = planScripts(plan);
 
-  assert.deepEqual(scripts.map((script) => script.file), ["01-create-submodel.js", "02-query-shell.js"]);
+  assert.deepEqual(scripts.map((script) => script.file), ["k6_early_l_early_r1.js", "k6_late_l_late_r2.js"]);
   assert.deepEqual(scripts.map((script) => script.key), ["s01_create_submodel", "s02_query_shell"]);
   assert.deepEqual(scripts.map((script) => script.startSeconds), [0, 30]);
 });
@@ -349,7 +350,7 @@ test("a delete claims the identifiers it removes, so nothing later addresses the
   assert.equal(remove.identifiers.use, "each-once");
   assert.deepEqual(remove.identifiers.list, create.identifiers.list.slice(0, 2));
   assert.deepEqual(read.identifiers.list, [], "a read after the delete has nothing left to address");
-  assert.ok(warnings.some((issue) => issue.message.includes("03-read-shell.js") && issue.message.includes("no shell is known to exist")));
+  assert.ok(warnings.some((issue) => issue.message.includes("k6_lifecycle_read_after_delete_r.js") && issue.message.includes("no shell is known to exist")));
 });
 
 test("identifiers found on the target are used when the scenario creates none", async () => {
@@ -377,9 +378,38 @@ test('idPool.source "server" ignores what the run creates', async () => {
   assert.equal(read.identifiers.origin, "server");
 });
 
-test("an explicit server source whose corpus is empty fails the compile", async () => {
+test("an explicit server source whose corpus is empty only warns by default", async () => {
   const timeline = timelineWith(
     track("reads", load("l1", 0, 60, new ConstantShape({ ratePerSec: 1 }), spec("r", "read", "shell", 1, { source: "server" }))),
+  );
+
+  const { plan, warnings } = await compile(timeline, emptyTarget);
+
+  assert.deepEqual(onlyScript(plan).identifiers.list, [], "the empty corpus is treated like any other empty pool");
+  assert.ok(warnings.some((issue) => issue.message.includes("no shell identifiers on the target")));
+});
+
+test("a request's own idPool.onEmpty: \"fail\" restores the stricter, opt-in behaviour", async () => {
+  const timeline = timelineWith(
+    track("reads", load("l1", 0, 60, new ConstantShape({ ratePerSec: 1 }), spec("r", "read", "shell", 1, { source: "server", onEmpty: "fail" }))),
+  );
+
+  await assert.rejects(() => compile(timeline, emptyTarget), EmptyServerCorpusError);
+});
+
+test("one request's \"fail\" wins the whole compile, even if another sharing its entity said \"warn\"", async () => {
+  const timeline = timelineWith(
+    track(
+      "reads",
+      load(
+        "l1",
+        0,
+        60,
+        new ConstantShape({ ratePerSec: 1 }),
+        spec("tolerant", "read", "shell", 1, { source: "server" }),
+        spec("strict", "update", "shell", 1, { source: "server", onEmpty: "fail" }),
+      ),
+    ),
   );
 
   await assert.rejects(() => compile(timeline, emptyTarget), EmptyServerCorpusError);
@@ -427,6 +457,266 @@ test("an Exact create contributes its own identifier to what later scripts addre
 
   assert.deepEqual(create.identifiers.list, [], "an Exact body carries its own identifier");
   assert.deepEqual(read.identifiers.list, ["urn:fixed-1"]);
+});
+
+test("a shell create embeds real references to submodels created earlier", async () => {
+  const timeline = timelineWith(
+    track(
+      "refs",
+      load("make-submodels", 0, 0, new IndividualShape({ requestCount: 4 }), spec("sm", "create", "submodel", 1)),
+      load(
+        "make-shells",
+        20,
+        0,
+        new IndividualShape({ requestCount: 2 }),
+        new RequestSpec({
+          id: "shell",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 256 }),
+          references: { target: "submodel", count: 2 },
+        }),
+      ),
+    ),
+  );
+
+  const { plan, files } = await compile(timeline);
+  const [submodelScript, shellScript] = planScripts(plan);
+
+  // Two shells, two submodels each, drawn from the four just minted — none repeated.
+  assert.equal(shellScript.referencedIds.length, 2);
+  assert.deepEqual(shellScript.referencedIds[0], submodelScript.identifiers.list.slice(0, 2));
+  assert.deepEqual(shellScript.referencedIds[1], submodelScript.identifiers.list.slice(2, 4));
+
+  const shellFile = (files.find((file) => file.name === shellScript.file) as GeneratedFile).content;
+  assert.match(shellFile, /const REFERENCE_IDS = /);
+  assert.match(shellFile, /submodels: REFERENCE_IDS\[i\]\.map/);
+  assert.match(shellFile, /function bodyFor\(id, i\)/);
+  // Only the 4 submodels actually expected to be created are ever referenced — not the spare
+  // headroom ids `identifiers.list` also carries (CREATE_ID_HEADROOM in compileTimeline.ts).
+  for (const id of submodelScript.identifiers.list.slice(0, 4)) {
+    assert.ok(shellFile.includes(JSON.stringify(id)), `${id} missing from ${shellScript.file}`);
+  }
+});
+
+test("a generator's sizeBytesPool is embedded as a pool the script draws from per request, not a fixed size", async () => {
+  const timeline = timelineWith(
+    track(
+      "pool",
+      load(
+        "make-submodels",
+        0,
+        0,
+        new IndividualShape({ requestCount: 3 }),
+        new RequestSpec({
+          id: "sm",
+          operation: "create",
+          target: "submodel",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 256, sizeBytesPool: [256, 4096, 16384] }),
+        }),
+      ),
+    ),
+  );
+
+  const { plan, files } = await compile(timeline);
+  const script = onlyScript(plan);
+  const file = (files.find((f) => f.name === script.file) as GeneratedFile).content;
+
+  assert.match(file, /const SIZE_BYTES_POOL = \[256, 4096, 16384\];/);
+  assert.match(file, /function pickSizeBytes\(\)/);
+  assert.match(file, /const SIZE_BYTES = pickSizeBytes\(\);/);
+  assert.doesNotMatch(file, /const SIZE_BYTES = \d+;/, "no fixed size should remain once a real pool is set");
+});
+
+test("a generator with no real pool still renders through pickSizeBytes, from a one-entry pool", async () => {
+  const timeline = timelineWith(
+    track("single", load("make-shells", 0, 0, new IndividualShape({ requestCount: 2 }), spec("shell", "create", "shell", 1))),
+  );
+
+  const { plan, files } = await compile(timeline);
+  const script = onlyScript(plan);
+  const file = (files.find((f) => f.name === script.file) as GeneratedFile).content;
+
+  assert.match(file, /const SIZE_BYTES_POOL = \[128\];/);
+  assert.match(file, /const SIZE_BYTES = pickSizeBytes\(\);/);
+});
+
+test("too few submodels for the shells that reference them is a warning, not a failure", async () => {
+  const timeline = timelineWith(
+    track(
+      "refs",
+      load("make-submodels", 0, 0, new IndividualShape({ requestCount: 1 }), spec("sm", "create", "submodel", 1)),
+      load(
+        "make-shells",
+        20,
+        0,
+        new IndividualShape({ requestCount: 1 }),
+        new RequestSpec({
+          id: "shell",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 256 }),
+          references: { target: "submodel", count: 3 },
+        }),
+      ),
+    ),
+  );
+
+  const { plan, warnings } = await compile(timeline);
+  const [, shellScript] = planScripts(plan);
+
+  assert.deepEqual(shellScript.referencedIds, [shellScript.referencedIds[0]], "one group, short of the requested 3");
+  assert.ok(shellScript.referencedIds[0].length < 3);
+  assert.ok(warnings.some((issue) => issue.message.includes("will reference fewer than 3")));
+});
+
+test("a create with mintId follows its own format, one counter per entity across the whole scenario", async () => {
+  const timeline = timelineWith(
+    track(
+      "mint",
+      load(
+        "shells-1",
+        0,
+        0,
+        new IndividualShape({ requestCount: 2 }),
+        new RequestSpec({
+          id: "shell-a",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 128 }),
+          mintId: { format: "urn:kaigara:aas:<Num>" },
+        }),
+      ),
+      // A second, unrelated create of the same entity — the counter must not reset for it.
+      load(
+        "shells-2",
+        20,
+        0,
+        new IndividualShape({ requestCount: 2 }),
+        new RequestSpec({
+          id: "shell-b",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 128 }),
+          mintId: { format: "urn:kaigara:aas:<Num>" },
+        }),
+      ),
+    ),
+  );
+
+  const { plan, files } = await compile(timeline);
+  const [first, second] = planScripts(plan);
+
+  // Each script mints CREATE_ID_HEADROOM (2) spares beyond its own 2 expected, so the counter
+  // advances by 4 before the second script starts — proof it is one shared counter, not "restart
+  // per script": if it reset, the second script would start at 0, not 4.
+  assert.deepEqual(first.identifiers.list.slice(0, 2), ["urn:kaigara:aas:0", "urn:kaigara:aas:1"]);
+  assert.deepEqual(second.identifiers.list.slice(0, 2), ["urn:kaigara:aas:4", "urn:kaigara:aas:5"]);
+
+  const firstFile = (files.find((file) => file.name === first.file) as GeneratedFile).content;
+  assert.match(firstFile, /"urn:kaigara:aas:0"/);
+});
+
+test("a mint id without <Num> replaced is not fatal — the format is still used, just unhelpfully", async () => {
+  // The validator warns about this (loadTimelineValidation.test.ts); the engine's own job is only
+  // to not crash on a document that slipped past it (e.g. posted straight to the API).
+  const timeline = timelineWith(
+    track(
+      "mint",
+      load(
+        "shells",
+        0,
+        0,
+        new IndividualShape({ requestCount: 2 }),
+        new RequestSpec({
+          id: "shell",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 128 }),
+          mintId: { format: "urn:kaigara:aas:fixed" },
+        }),
+      ),
+    ),
+  );
+
+  const { plan } = await compile(timeline);
+  assert.deepEqual(onlyScript(plan).identifiers.list.slice(0, 2), ["urn:kaigara:aas:fixed", "urn:kaigara:aas:fixed"]);
+});
+
+test("a create with no mintId at all warns rather than silently minting Kaigara's own scheme", async () => {
+  const timeline = timelineWith(
+    track("mint", load("shells", 0, 0, new IndividualShape({ requestCount: 2 }), spec("shell", "create", "shell", 1))),
+  );
+
+  const { plan, warnings } = await compile(timeline);
+  assert.match(onlyScript(plan).identifiers.list[0], /^https:\/\/kaigara\.dev\/ids\/shell\//);
+  assert.ok(warnings.some((issue) => issue.message.includes("no mintId.format configured") && issue.message.includes("https://kaigara.dev/ids/shell")));
+});
+
+test("a create with an idPool duplicates an existing identifier instead of minting", async () => {
+  const timeline = timelineWith(
+    track(
+      "dup",
+      load("make-shells", 0, 0, new IndividualShape({ requestCount: 3 }), spec("original", "create", "shell", 1)),
+      load(
+        "duplicate-shells",
+        20,
+        0,
+        new IndividualShape({ requestCount: 2 }),
+        new RequestSpec({
+          id: "dup",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 128 }),
+          idPool: { source: "created" },
+        }),
+      ),
+    ),
+  );
+
+  const { plan, files } = await compile(timeline);
+  const [original, duplicate] = planScripts(plan);
+
+  assert.equal(duplicate.identifiers.use, "cycle", "an existing id is cycled, not minted");
+  assert.ok(duplicate.identifiers.list.length > 0);
+  // Every id the duplicate script addresses is one the first script actually minted — nothing new.
+  for (const id of duplicate.identifiers.list) assert.ok(original.identifiers.list.includes(id), `${id} was not minted by ${original.file}`);
+
+  const duplicateFile = (files.find((file) => file.name === duplicate.file) as GeneratedFile).content;
+  assert.match(duplicateFile, /const IDS = /);
+  assert.match(duplicateFile, /IDS\[i % IDS\.length\]/);
+});
+
+test("a create's idPool falls back to the server when this run creates nothing to duplicate", async () => {
+  const timeline = timelineWith(
+    track(
+      "dup",
+      load(
+        "duplicate-shells",
+        0,
+        0,
+        new IndividualShape({ requestCount: 2 }),
+        new RequestSpec({
+          id: "dup",
+          operation: "create",
+          target: "shell",
+          weight: 1,
+          generator: new RandomizedGenerator({ sizeBytes: 128 }),
+          idPool: { source: "server" },
+        }),
+      ),
+    ),
+  );
+
+  const { plan } = await compile(timeline, targetWith({ shell: ["urn:existing-1", "urn:existing-2"] }));
+  assert.deepEqual(onlyScript(plan).identifiers.list, ["urn:existing-1", "urn:existing-2"]);
 });
 
 test("the harvest is paged by cursor and capped by the largest request that asked", async () => {
@@ -518,6 +808,61 @@ test("every generated file is syntactically valid JavaScript", async () => {
   await assertParses(files);
 });
 
+/** The capture functions a generated script defines, evaluated on their own. */
+function captureFunctions(content: string): {
+  keepComplete: (i: number, status: number) => boolean;
+  captured: (body: unknown, complete: boolean) => { text: string; truncated: boolean; bytes: number };
+} {
+  const start = content.indexOf("// Capture:");
+  const end = content.indexOf("export function run()");
+  assert.ok(start !== -1 && end > start, "expected the capture block before run()");
+  return new Script(`${content.slice(start, end)}\n({ keepComplete, captured })`).runInNewContext({});
+}
+
+test("every capture mode renders a keepComplete that keeps what the mode promises, and still parses", async () => {
+  // 50 req/s for 60 s: ~3000 successes, so sampling keeps 1 in 30.
+  const base = singleLoad(new ConstantShape({ ratePerSec: 50 }), 60);
+  const modes = [
+    { capture: undefined, ok: [false, false], error: false },
+    { capture: { mode: "capped", storeAllErrors: true }, ok: [false, false], error: true },
+    { capture: { mode: "complete" }, ok: [true, true], error: true },
+    { capture: { mode: "capped-sampled" }, ok: [true, false], error: true },
+    { capture: { mode: "capped-sampled", storeAllErrors: true }, ok: [true, false], error: true },
+  ] as const;
+
+  for (const { capture, ok, error } of modes) {
+    const { files } = await compile(base.with({ capture }));
+    await assertParses(files);
+    const { keepComplete } = captureFunctions(files[1].content);
+    const label = JSON.stringify(capture ?? "default");
+    assert.deepEqual([keepComplete(0, 200), keepComplete(1, 200)], ok, `${label}: successes`);
+    assert.equal(keepComplete(1, 500), error, `${label}: an error`);
+  }
+});
+
+test("sampled capture puts errors first, from a per-VU budget that runs out unless every error is kept", async () => {
+  const base = singleLoad(new ConstantShape({ ratePerSec: 50 }), 60);
+  const budgeted = captureFunctions((await compile(base.with({ capture: { mode: "capped-sampled" } }))).files[1].content);
+  const kept = Array.from({ length: 50 }, (_, i) => budgeted.keepComplete(i, 404)).filter(Boolean).length;
+  assert.ok(kept >= 10 && kept < 50, `a burst of errors is kept up to the budget, not all of them (kept ${kept})`);
+
+  const all = captureFunctions(
+    (await compile(base.with({ capture: { mode: "capped-sampled", storeAllErrors: true } }))).files[1].content,
+  );
+  assert.ok(Array.from({ length: 50 }, (_, i) => all.keepComplete(i, 404)).every(Boolean));
+});
+
+test("a captured body is cut at the cap only when not kept complete, and reports its real UTF-8 size", async () => {
+  const { captured } = captureFunctions((await compile(singleLoad(new ConstantShape({ ratePerSec: 1 }), 10))).files[1].content);
+  const long = "a".repeat(64 * 1024 + 10);
+
+  // Spread: objects made inside the vm context have that context's Object prototype.
+  assert.deepEqual({ ...captured(long, false) }, { text: long.slice(0, 64 * 1024), truncated: true, bytes: long.length });
+  assert.deepEqual({ ...captured(long, true) }, { text: long, truncated: false, bytes: long.length });
+  assert.equal(captured("ü€😀", false).bytes, 2 + 3 + 4);
+  assert.deepEqual({ ...captured(null, false) }, { text: "", truncated: false, bytes: 0 });
+});
+
 test("main.js schedules one k6 scenario per script and exports every exec it names", async () => {
   const { plan, files } = await compile(everything(), targetWith({ shell: ["urn:s1"], submodel: ["urn:m1"] }));
   const main = files[0];
@@ -539,7 +884,7 @@ test("main.js schedules one k6 scenario per script and exports every exec it nam
 
 test("a script runs standalone: its own options, executor and generator", async () => {
   const { files } = await compile(lifecycle());
-  const read = files.find((file) => file.name === "02-read-shell.js") as GeneratedFile;
+  const read = files.find((file) => file.name === "k6_lifecycle_read_r.js") as GeneratedFile;
 
   assert.match(read.content, /export const EXECUTOR = /);
   assert.match(read.content, /export const options = \{ scenarios: \{ s02_read_shell: EXECUTOR \} \}/);
@@ -552,15 +897,15 @@ test("a create script walks its identifiers once each, a delete script too, and 
   const { files } = await compile(lifecycle());
   const source = (name: string) => (files.find((file) => file.name === name) as GeneratedFile).content;
 
-  assert.match(source("01-create-shell.js"), /if \(i >= IDS\.length\) return null;\n {2}const id = IDS\[i\];/);
-  assert.match(source("03-delete-shell.js"), /if \(i >= IDS\.length\) return null;\n {2}const id = IDS\[i\];/);
-  assert.match(source("02-read-shell.js"), /if \(IDS\.length === 0\) return null;/);
+  assert.match(source("k6_lifecycle_create_c.js"), /if \(i >= IDS\.length\) return null;\n {2}const id = IDS\[i\];/);
+  assert.match(source("k6_lifecycle_delete_d.js"), /if \(i >= IDS\.length\) return null;\n {2}const id = IDS\[i\];/);
+  assert.match(source("k6_lifecycle_read_r.js"), /if \(IDS\.length === 0\) return null;/);
 });
 
 test("the scripts embed their identifiers and discover nothing at run time", async () => {
   const { files } = await compile(lifecycle());
-  const create = (files.find((file) => file.name === "01-create-shell.js") as GeneratedFile).content;
-  const read = (files.find((file) => file.name === "02-read-shell.js") as GeneratedFile).content;
+  const create = (files.find((file) => file.name === "k6_lifecycle_create_c.js") as GeneratedFile).content;
+  const read = (files.find((file) => file.name === "k6_lifecycle_read_r.js") as GeneratedFile).content;
 
   assert.match(create, /const IDS = \[\n {2}"https:\/\/kaigara\.dev\/ids\/shell\/nonce-0",/);
   assert.ok(read.includes('"https://kaigara.dev/ids/shell/nonce-0"'));

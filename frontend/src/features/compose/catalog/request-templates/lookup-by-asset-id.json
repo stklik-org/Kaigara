@@ -28,9 +28,6 @@
       ]
     }
   ],
-  "defaults": {
-    "weight": 8
-  },
   "notes": "Served by the Discovery interface; a repository that does not implement it answers 404 for every request.",
   "kind": "request"
 }

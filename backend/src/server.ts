@@ -58,7 +58,8 @@ export async function createServer({ logger = true }: { logger?: boolean } = {})
   // ADR 0001: only the k6 adapter is registered. Additional engines are a registration plus a
   // config choice, not a redesign — which is the whole point of the seam.
   const engines = new EngineRegistry();
-  engines.register(new K6Adapter());
+  const k6 = new K6Adapter();
+  engines.register(k6);
   const runs = new RunService(engines);
 
   app.get(
@@ -77,7 +78,7 @@ export async function createServer({ logger = true }: { logger?: boolean } = {})
     async () => ({ ok: true, service: "kaigara-backend" }),
   );
 
-  registerRunRoutes(app, { runs, engines });
+  registerRunRoutes(app, { runs, engines, archive: k6.archive });
   registerScenarioRoutes(app);
 
   app.post<{ Body: ConnectionTestRequest }>(
@@ -97,6 +98,19 @@ export async function createServer({ logger = true }: { logger?: boolean } = {})
             type: "object",
             additionalProperties: { type: "string" },
             description: "Extra headers to send with the probe — the same ones a run against this connection would use, e.g. an Authorization bearer token.",
+          },
+          oauth2: {
+            type: "object",
+            additionalProperties: false,
+            required: ["tokenUrl", "clientId", "clientSecret", "scope"],
+            description:
+              "OAuth2 client-credentials exchange, done here rather than in the browser. The resulting token is merged into `headers` as `Authorization`, overriding a manually authored one.",
+            properties: {
+              tokenUrl: { type: "string", description: 'The token endpoint, e.g. "https://<tenant>.ciamlogin.com/<tenant-id>/oauth2/v2.0/token".' },
+              clientId: { type: "string" },
+              clientSecret: { type: "string" },
+              scope: { type: "string", description: 'e.g. "api://<api-id>/.default".' },
+            },
           },
         },
         example: { baseUrl: "http://127.0.0.1:8081/api/v3" },
@@ -118,11 +132,11 @@ export async function createServer({ logger = true }: { logger?: boolean } = {})
       },
     }),
     async (request, reply) => {
-      const { baseUrl, timeoutSeconds, headers } = request.body ?? ({} as ConnectionTestRequest);
+      const { baseUrl, timeoutSeconds, headers, oauth2 } = request.body ?? ({} as ConnectionTestRequest);
       if (typeof baseUrl !== "string" || baseUrl.trim() === "") {
         return reply.code(400).send({ error: "Body must be { baseUrl: string, timeoutSeconds?: number, headers?: object }." });
       }
-      return probeConnection({ baseUrl, timeoutSeconds, headers });
+      return probeConnection({ baseUrl, timeoutSeconds, headers, oauth2 });
     },
   );
 

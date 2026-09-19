@@ -4,6 +4,8 @@
   "operation": "update",
   "target": "aas",
   "execution": "engine",
+  "addDisabled": true,
+  "addDisabledReason": "PUT is temporarily disabled while update semantics are revisited — the engine can run it, but not from here yet.",
   "summary": "PUT a whole shell over an existing one.",
   "endpoint": {
     "method": "PUT",
@@ -28,14 +30,10 @@
       "bindsTo": "body",
       "strategies": [
         "minimal",
-        "size-target",
-        "custom-json"
+        "size-target"
       ],
       "default": "minimal"
     }
   ],
-  "defaults": {
-    "weight": 8
-  },
   "kind": "request"
 }

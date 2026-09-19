@@ -25,8 +25,15 @@
                     "operation": "delete",
                     "target": "submodel",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 },
-                    "idPool": { "source": "server", "maxIds": 100000 }
+                    "generator": { "kind": "randomized", "sizeBytes": 256 },
+                    "templateId": "purge-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "from-server",
+                        "config": { "maxIds": 100000, "onEmpty": "warn" }
+                      }
+                    },
+                    "idPool": { "source": "server", "maxIds": 100000, "onEmpty": "warn" }
                   }
                 ]
               }
@@ -50,8 +57,15 @@
                     "operation": "delete",
                     "target": "shell",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 },
-                    "idPool": { "source": "server", "maxIds": 100000 }
+                    "generator": { "kind": "randomized", "sizeBytes": 256 },
+                    "templateId": "purge-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "from-server",
+                        "config": { "maxIds": 100000, "onEmpty": "warn" }
+                      }
+                    },
+                    "idPool": { "source": "server", "maxIds": 100000, "onEmpty": "warn" }
                   }
                 ]
               }

@@ -12,6 +12,7 @@ import {
   selectedFamily,
   strategiesFor,
   strategyDef,
+  templateSelectionIssue,
 } from "../catalog/resolve";
 import { engineGaps, toRequestSpec } from "../catalog/toRequestSpec";
 import { useIdtaTemplates } from "../catalog/useIdtaTemplates";
@@ -61,6 +62,7 @@ export function ParameterDialog({ draft, onChange, onClose }: {
   const resolved = resolveRequest(template, draft.bindings);
   const gaps = engineGaps(template, draft.bindings);
   const family = selectedFamily(draft.bindings);
+  const selectionIssue = templateSelectionIssue(template, draft.bindings);
 
   function setBinding(parameterId: string, binding: ParameterBinding) {
     onChange({ ...draft, bindings: { ...draft.bindings, [parameterId]: binding } });
@@ -146,6 +148,11 @@ export function ParameterDialog({ draft, onChange, onClose }: {
                   </div>
 
                   {strategy?.hint && <div className="mb-2 text-[11px] text-ink-muted">{strategy.hint}</div>}
+                  {strategy?.warning && (
+                    <div className="mb-2 rounded border border-status-warn bg-status-warn-bg px-2 py-1 text-[11px] text-status-warn">
+                      ⚠ {strategy.warning}
+                    </div>
+                  )}
 
                   <SchemaFields
                     strategy={strategy}
@@ -214,17 +221,6 @@ export function ParameterDialog({ draft, onChange, onClose }: {
               </div>
             </div>
 
-            <label className="block">
-              <div className="mb-0.5 text-[11px] text-ink-muted">Weight</div>
-              <input
-                type="number"
-                min={0}
-                value={draft.weight}
-                onChange={(event) => onChange({ ...draft, weight: Number(event.target.value) })}
-                className="w-24 rounded border border-field-border bg-field px-2 py-1 text-[12px] text-ink outline-none"
-              />
-            </label>
-
             {gaps.length > 0 && (
               <div>
                 <div className="mb-1 text-[11px] font-semibold tracking-wide text-status-warn uppercase">
@@ -243,11 +239,21 @@ export function ParameterDialog({ draft, onChange, onClose }: {
         </div>
 
         <footer className="flex items-center gap-2 border-t border-border px-4 py-3">
-          <div className="min-w-0 flex-1 truncate text-[11px] text-ink-muted">{template.summary}</div>
+          {!draft.editingRequestId && template.addDisabled ? (
+            <div className="min-w-0 flex-1 truncate text-[11px] text-status-warn">{template.addDisabledReason}</div>
+          ) : selectionIssue ? (
+            <div className="min-w-0 flex-1 truncate text-[11px] text-status-warn">{selectionIssue}</div>
+          ) : (
+            <div className="min-w-0 flex-1 truncate text-[11px] text-ink-muted">{template.summary}</div>
+          )}
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" disabled={!found} onClick={commit}>
+          <Button
+            variant="primary"
+            disabled={!found || Boolean(!draft.editingRequestId && template.addDisabled) || Boolean(selectionIssue)}
+            onClick={commit}
+          >
             {draft.editingRequestId ? "Save changes" : "Add to composition"}
           </Button>
         </footer>

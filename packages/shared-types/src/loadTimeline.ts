@@ -116,36 +116,72 @@ export class Track {
   }
 }
 
+/**
+ * How much of every request/response exchange a run keeps in its log folder, for the Run screen's
+ * request/response popup to read back:
+ *
+ *  - `capped` (the default when `capture` is absent) — every exchange, each body cut at
+ *    {@link EXCHANGE_CAPTURE_CAP} characters.
+ *  - `capped-sampled` — every exchange capped, except a sample kept complete: an even spread of
+ *    each request type's successes, and — first in line, with a budget of their own — its errors
+ *    (any status outside 2xx).
+ *  - `complete` — every exchange, every body in full. Costs the most while the load is running.
+ *
+ * `storeAllErrors` keeps every error complete regardless of the mode's cap or sampling budget.
+ */
+export type ExchangeCaptureMode = "capped" | "capped-sampled" | "complete";
+
+export interface ExchangeCaptureData {
+  mode: ExchangeCaptureMode;
+  storeAllErrors?: boolean;
+}
+
+/** Body length, in characters, beyond which a `capped` exchange is cut. */
+export const EXCHANGE_CAPTURE_CAP = 64 * 1024;
+
 export interface LoadTimelineData {
   totalDurationSeconds: number;
   tracks: TrackData[];
+  capture?: ExchangeCaptureData;
 }
 
 export class LoadTimeline {
   totalDurationSeconds: number;
   tracks: Track[];
+  /** Absent means the default, `{ mode: "capped" }` — see {@link ExchangeCaptureData}. */
+  capture?: ExchangeCaptureData;
 
-  constructor(params: { totalDurationSeconds: number; tracks: Track[] }) {
+  constructor(params: { totalDurationSeconds: number; tracks: Track[]; capture?: ExchangeCaptureData }) {
     this.totalDurationSeconds = params.totalDurationSeconds;
     this.tracks = params.tracks;
+    this.capture = params.capture;
   }
 
   toJSON(): LoadTimelineData {
-    return { totalDurationSeconds: this.totalDurationSeconds, tracks: this.tracks.map((track) => track.toJSON()) };
+    return {
+      totalDurationSeconds: this.totalDurationSeconds,
+      tracks: this.tracks.map((track) => track.toJSON()),
+      ...(this.capture !== undefined ? { capture: this.capture } : {}),
+    };
   }
 
   static fromJSON(data: LoadTimelineData): LoadTimeline {
-    return new LoadTimeline({ totalDurationSeconds: data.totalDurationSeconds, tracks: data.tracks.map(Track.fromJSON) });
+    return new LoadTimeline({
+      totalDurationSeconds: data.totalDurationSeconds,
+      tracks: data.tracks.map(Track.fromJSON),
+      capture: data.capture,
+    });
   }
 
   static empty(): LoadTimeline {
     return new LoadTimeline({ totalDurationSeconds: 600, tracks: [] });
   }
 
-  with(patch: Partial<{ totalDurationSeconds: number; tracks: Track[] }>): LoadTimeline {
+  with(patch: Partial<{ totalDurationSeconds: number; tracks: Track[]; capture: ExchangeCaptureData | undefined }>): LoadTimeline {
     return new LoadTimeline({
       totalDurationSeconds: patch.totalDurationSeconds ?? this.totalDurationSeconds,
       tracks: patch.tracks ?? this.tracks,
+      capture: "capture" in patch ? patch.capture : this.capture,
     });
   }
 }

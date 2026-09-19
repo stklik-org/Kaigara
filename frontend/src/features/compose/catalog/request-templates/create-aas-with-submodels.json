@@ -47,8 +47,5 @@
       "default": "idta-template"
     }
   ],
-  "defaults": {
-    "weight": 6
-  },
   "notes": "Steps run in order inside one iteration; a failed step aborts the rest, so a PUT never targets an id that was not created."
 }

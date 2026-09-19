@@ -30,11 +30,61 @@
             "default": 1000,
             "minimum": 1,
             "maximum": 100000,
-            "description": "Paging follows the collection's cursor and stops here. The harvest runs once, before the first request; an empty result aborts the run."
+            "description": "Paging follows the collection's cursor and stops here. The harvest runs once, before the first request."
+          },
+          "onEmpty": {
+            "type": "string",
+            "title": "If nothing is found",
+            "enum": [
+              "warn",
+              "fail"
+            ],
+            "default": "warn",
+            "description": "\"warn\" (default): every request using this binding is skipped, and the run continues — the same as any other empty identifier pool. \"fail\": the compile refuses outright, for a request whose whole point is measuring a corpus that must already exist."
           }
         }
       },
       "sample": "urn:cpl:aas:nameplate:8842"
+    },
+    {
+      "id": "sequence",
+      "label": "Sequence",
+      "hint": "A new identifier per request, following this format. <Num> is replaced by a counter shared by every \"Sequence\" create of this entity type across the whole scenario — one unbroken run of numbers regardless of which load or track creates it.",
+      "schema": {
+        "type": "object",
+        "required": [
+          "format"
+        ],
+        "properties": {
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "default": "AAS-<Num>",
+            "description": "Must contain <Num> exactly once."
+          }
+        }
+      },
+      "sample": "AAS-0"
+    },
+    {
+      "id": "existing",
+      "label": "Existing",
+      "hint": "Reuses an identifier this run already created — or, if none exist yet, one already on the target — instead of minting a new one.",
+      "warning": "This deliberately creates duplicates: the POST targets an identifier that already exists.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "maxIds": {
+            "type": "integer",
+            "title": "Fetch up to",
+            "default": 1000,
+            "minimum": 1,
+            "maximum": 100000,
+            "description": "Only consulted when nothing this run has created yet exists to reuse."
+          }
+        }
+      },
+      "sample": "AAS-0 (already used)"
     },
     {
       "id": "fixed",

@@ -20,8 +20,5 @@
       "bindsTo": "path.smId"
     }
   ],
-  "defaults": {
-    "weight": 6
-  },
   "kind": "request"
 }

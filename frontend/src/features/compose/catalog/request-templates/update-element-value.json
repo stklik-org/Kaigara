@@ -4,6 +4,8 @@
   "operation": "update",
   "target": "submodel",
   "execution": "authoring",
+  "addDisabled": true,
+  "addDisabledReason": "PATCH is authoring-only — the engine has no partial-update call yet.",
   "summary": "PATCH a single property — the smallest write the API offers.",
   "endpoint": {
     "method": "PATCH",
@@ -36,8 +38,5 @@
       "default": "random-number"
     }
   ],
-  "defaults": {
-    "weight": 20
-  },
   "kind": "request"
 }

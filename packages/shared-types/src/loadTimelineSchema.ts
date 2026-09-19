@@ -20,8 +20,18 @@ export const loadTimelineSchema = {
   properties: {
     totalDurationSeconds: { type: "number", minimum: 0 },
     tracks: { type: "array", items: { $ref: "#/definitions/Track" } },
+    capture: { $ref: "#/definitions/ExchangeCapture" },
   },
   definitions: {
+    ExchangeCapture: {
+      type: "object",
+      required: ["mode"],
+      additionalProperties: false,
+      properties: {
+        mode: { type: "string", enum: ["capped", "capped-sampled", "complete"] },
+        storeAllErrors: { type: "boolean" },
+      },
+    },
     RequestOperation: { type: "string", enum: ["create", "read", "update", "delete", "query"] },
     RequestTargetEntity: { type: "string", enum: ["shell", "submodel"] },
     RandomizedGenerator: {
@@ -31,6 +41,7 @@ export const loadTimelineSchema = {
       properties: {
         kind: { const: "randomized" },
         sizeBytes: { type: "number", minimum: 0 },
+        sizeBytesPool: { type: "array", items: { type: "number", minimum: 0 }, minItems: 1 },
       },
     },
     ExactGenerator: {
@@ -72,6 +83,8 @@ export const loadTimelineSchema = {
         templateId: { type: "string" },
         bindings: { $ref: "#/definitions/ParameterBindings" },
         idPool: { $ref: "#/definitions/RequestIdPool" },
+        references: { $ref: "#/definitions/RequestReference" },
+        mintId: { $ref: "#/definitions/RequestMintId" },
       },
     },
     RequestIdPool: {
@@ -82,6 +95,26 @@ export const loadTimelineSchema = {
       properties: {
         source: { type: "string", enum: ["created", "server"] },
         maxIds: { type: "number", minimum: 1 },
+        onEmpty: { type: "string", enum: ["warn", "fail"] },
+      },
+    },
+    RequestReference: {
+      type: "object",
+      additionalProperties: false,
+      required: ["target", "count"],
+      description: "Real references a create's body should embed, drawn from another entity this run created earlier.",
+      properties: {
+        target: { $ref: "#/definitions/RequestTargetEntity" },
+        count: { type: "number", minimum: 1 },
+      },
+    },
+    RequestMintId: {
+      type: "object",
+      additionalProperties: false,
+      required: ["format"],
+      description: "The identifier format a create's own new instance should follow, in place of the engine's opaque default.",
+      properties: {
+        format: { type: "string" },
       },
     },
     ParameterBindings: {
@@ -139,10 +172,12 @@ export const loadTimelineSchema = {
     SineShape: {
       type: "object",
       additionalProperties: false,
-      required: ["kind", "peakRatePerSec"],
+      required: ["kind", "baseRatePerSec", "amplitudeRatePerSec", "direction"],
       properties: {
         kind: { const: "sine" },
-        peakRatePerSec: { type: "number", minimum: 0 },
+        baseRatePerSec: { type: "number", minimum: 0 },
+        amplitudeRatePerSec: { type: "number", minimum: 0 },
+        direction: { type: "string", enum: ["rise", "fall"] },
       },
     },
     BellShape: {

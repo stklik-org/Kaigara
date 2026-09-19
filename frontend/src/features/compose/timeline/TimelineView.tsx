@@ -12,6 +12,7 @@ import { formatMMSS } from "./formatTime";
 import { useMMSSDraft } from "./useMMSSDraft";
 import { TrackLabelSidebar } from "./TrackLabelSidebar";
 import { ZoomControl } from "./ZoomControl";
+import { ExchangeCaptureField } from "./ExchangeCaptureField";
 import {
   ROW_HEIGHT,
   SCALE_SECONDS,
@@ -247,7 +248,10 @@ export function TimelineView({
   return (
     <div className="flex w-full flex-col" style={{ height }}>
       <div className="flex flex-none items-center justify-between gap-3 px-2 py-1">
-        <TotalLengthField />
+        <div className="flex items-center gap-5">
+          <TotalLengthField />
+          <ExchangeCaptureField />
+        </div>
         <ZoomControl scaleWidth={scaleWidth} onChange={onScaleWidthChange} />
       </div>
       <div className="relative flex min-h-0 flex-1">

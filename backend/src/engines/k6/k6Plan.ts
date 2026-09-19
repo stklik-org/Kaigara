@@ -19,7 +19,7 @@
  * back into the document the user edits.
  */
 
-import type { RequestOperation, RequestTargetEntity } from "@kaigara/shared-types";
+import type { ExchangeCaptureData, RequestOperation, RequestTargetEntity } from "@kaigara/shared-types";
 import type { ResolvedTarget } from "../adapter.ts";
 
 /** The target this plan is aimed at — the same shape every adapter resolves a connection to,
@@ -189,7 +189,10 @@ export function describeExecutor(executor: PlannedExecutor, shapeKind?: string):
  *  the authoring model is a deliberate, visible change here too). */
 export type PlannedBody =
   | { kind: "none" }
-  | { kind: "randomized"; sizeBytes: number }
+  /** `sizeBytesPool` is always populated (falling back to `[sizeBytes]` when the authored
+   *  generator carried no real pool) so the script renderer never special-cases "no pool" — see
+   *  `scriptTemplates.ts`'s `pickSizeBytes()`. */
+  | { kind: "randomized"; sizeBytes: number; sizeBytesPool: number[] }
   | { kind: "exact"; value: string }
   | { kind: "mutate"; baseValue: string; mutationRatePercent: number };
 
@@ -213,7 +216,7 @@ export interface PlannedIdentifiers {
   /** Where the list came from, for the generated header and the logs: entities found on the
    *  target at compile time, created earlier in this run, or minted for this script's creates. */
   origin: "none" | "server" | "run" | "minted";
-  /** Human note on how the list was chosen, e.g. "created by 01-create-shell.js". */
+  /** Human note on how the list was chosen, e.g. "created by k6_lifecycle_create_c.js". */
   note: string;
 }
 
@@ -221,7 +224,8 @@ export interface PlannedIdentifiers {
 export interface PlannedScript {
   /** k6 scenario name and `main.js` export, e.g. `s03_read_shell`. Unique across the plan. */
   key: string;
-  /** Generated file name, e.g. `03-read-shell.js`. Numbered in schedule order. */
+  /** Generated file name: `k6_<track id>_<load id>_<request spec id>.js`, e.g.
+   *  `k6_lifecycle_read_r.js`. Not numbered — `key` above carries the schedule position instead. */
   file: string;
   /** The owning `PlannedLoad.key` — also the `load` metric tag, so results roll up per load. */
   loadKey: string;
@@ -241,13 +245,19 @@ export interface PlannedScript {
   expectStatus: number[];
   body: PlannedBody;
   /**
-   * Where the authored spec said identifiers come from: `none` (the operation addresses none),
-   * `created` (this run's own, falling back to the target's — the default), or `server` (only
-   * identifiers that were on the target before the run).
+   * Where the authored spec said identifiers come from: `none` (a read/update/delete addresses
+   * none, or a create mints its own new one — the default), `created` (this run's own, falling
+   * back to the target's), or `server` (only identifiers that were on the target before the run).
+   * For a `create`, anything but `none` means it deliberately reuses an existing identifier rather
+   * than minting one — see `RequestIdPoolData`'s own doc comment.
    */
   idSource: "none" | "created" | "server";
   /** For `idSource: "server"`: how many identifiers the compile-time harvest may page in. */
   maxIds?: number;
+  /** For `idSource: "server"`: the authored `RequestIdPoolData.onEmpty` (default `"warn"` when the
+   *  spec left it unset) — what `harvestServerIds` in compileTimeline.ts does if this script's
+   *  entity harvests to nothing. Not meaningful for any other `idSource`. */
+  onEmptyServerCorpus?: "warn" | "fail";
   /** This request type's normalised share of its load's weight, 0..1. */
   share: number;
   /** Offset from run start at which k6 starts this script, seconds. */
@@ -259,6 +269,19 @@ export interface PlannedScript {
   /** Requests this script is expected to issue if the target keeps up (its iteration budget). */
   expectedRequests: number;
   identifiers: PlannedIdentifiers;
+  /** For a `create`: the authored `RequestReferenceData` (requestComposition.ts) — which other
+   *  entity's identifiers this script's body should embed, and how many per iteration. Only ever
+   *  acted on for the one combination `scriptTemplates.ts` renders — see `references`'s own doc
+   *  comment; otherwise carried through unused. */
+  references?: { target: RequestTargetEntity; count: number };
+  /** One group of already-existing identifiers per iteration, in iteration order — what
+   *  `references` above resolved to once `designRequestPools` could see the referenced entity's
+   *  pool. `[]` until then, and for every script without `references`. */
+  referencedIds: string[][];
+  /** For a `create` with `idSource: "none"` (i.e. minting, not reusing): the authored
+   *  `RequestMintIdData` (requestComposition.ts) — the `<Num>`-templated format its new identifier
+   *  should follow, in place of the engine's own opaque default. Undefined means that default. */
+  mintId?: { format: string };
 }
 
 export interface PlannedLoad {
@@ -293,11 +316,17 @@ export interface K6Plan {
   /** How many identifiers the compile-time harvest found on the target, per entity — `0` both
    *  where the target really is empty and where nothing needed a harvest at all. */
   harvested: Record<RequestTargetEntity, number>;
+  /** The timeline's `capture` setting, with its default filled in — how much of each exchange the
+   *  scripts log (`keepComplete()` in scriptTemplates.ts). */
+  capture: ExchangeCaptureData;
 }
 
-/** Every script in the plan, in schedule order (the order their files are numbered in). */
+/** Every script in the plan, in schedule order. Sorted by `key` (`s01_...`, `s02_...`, zero-padded
+ *  to one width) rather than `file`: `file` is `<track>-<load>-<request spec>.js`, which reads as
+ *  the timeline's own structure but does not sort chronologically, while `key` exists precisely to
+ *  carry that order as a stable, sortable JS identifier — see compileTimeline.ts's numbering pass. */
 export function planScripts(plan: K6Plan): PlannedScript[] {
-  return plan.loads.flatMap((load) => load.scripts).sort((a, b) => a.file.localeCompare(b.file));
+  return plan.loads.flatMap((load) => load.scripts).sort((a, b) => a.key.localeCompare(b.key));
 }
 
 /** Placeholder written instead of a header value wherever a plan is serialised to disk or back to

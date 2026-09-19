@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { useActiveRunStore } from "@/features/run/activeRunStore";
 import { HeaderSlotsProvider } from "./HeaderSlots";
 import { useTheme } from "./ThemeContext";
 
 /** The lifecycle stages, in order. Click-to-jump, not a wizard — nothing here enforces a sequence,
- *  because a benchmark is routinely re-run, re-composed and re-analyzed out of order. */
+ *  because a benchmark is routinely re-run, re-composed and re-analyzed out of order. The one
+ *  exception is a run in progress: leaving Run then is blocked below, since a benchmark keeps
+ *  sending load to a real server regardless of which screen is open. */
 const STAGES = [
   { path: "/connect", label: "Connect" },
   { path: "/load", label: "Load" },
@@ -68,6 +71,8 @@ function ThemeToggle() {
 export function AppShell() {
   const [scenarioSlotEl, setScenarioSlotEl] = useState<HTMLDivElement | null>(null);
   const [actionsSlotEl, setActionsSlotEl] = useState<HTMLDivElement | null>(null);
+  const isRunning = useActiveRunStore((s) => s.isRunning);
+  const location = useLocation();
 
   return (
     <div className="flex h-full flex-col">
@@ -80,19 +85,36 @@ export function AppShell() {
             eats all the row's remaining space evenly on both sides, regardless of how wide the
             slots either side of it happen to be on a given route. */}
         <nav className="mx-auto flex flex-none gap-1 rounded-full border border-border bg-surface-sunken p-1">
-          {STAGES.map((stage) => (
-            <NavLink
-              key={stage.path}
-              to={stage.path}
-              className={({ isActive }) =>
-                `rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                  isActive ? "bg-accent text-white" : "text-ink-muted hover:text-ink"
-                }`
-              }
-            >
-              {stage.label}
-            </NavLink>
-          ))}
+          {STAGES.map((stage) => {
+            // Leaving the *current* stage while a run is live is what this blocks — the Run tab
+            // itself always stays clickable (there's nowhere else to Stop from), and is where you
+            // already are if a run is running, so this only ever intercepts every other tab.
+            const blocked = isRunning && stage.path !== location.pathname;
+            return (
+              <NavLink
+                key={stage.path}
+                to={stage.path}
+                aria-disabled={blocked}
+                title={blocked ? "A benchmark is running — stop it on the Run screen before switching views." : undefined}
+                onClick={(event) => {
+                  if (!blocked) return;
+                  event.preventDefault();
+                  window.alert("A benchmark is running — stop it on the Run screen before switching views.");
+                }}
+                className={({ isActive }) =>
+                  `rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-accent text-white"
+                      : blocked
+                        ? "cursor-not-allowed text-ink-muted opacity-50"
+                        : "text-ink-muted hover:text-ink"
+                  }`
+                }
+              >
+                {stage.label}
+              </NavLink>
+            );
+          })}
         </nav>
         <div className="flex flex-none items-center gap-2">
           <div ref={setActionsSlotEl} className="flex items-center gap-2" />

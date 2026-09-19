@@ -4,6 +4,8 @@
   "operation": "update",
   "target": "submodel",
   "execution": "authoring",
+  "addDisabled": true,
+  "addDisabledReason": "PATCH is authoring-only — the engine has no partial-update call yet.",
   "summary": "PATCH submodel metadata without touching element values.",
   "endpoint": {
     "method": "PATCH",
@@ -33,8 +35,5 @@
       "default": "random-string"
     }
   ],
-  "defaults": {
-    "weight": 5
-  },
   "kind": "request"
 }

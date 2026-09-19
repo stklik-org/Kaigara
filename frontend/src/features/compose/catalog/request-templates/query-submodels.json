@@ -4,6 +4,8 @@
   "operation": "query",
   "target": "submodel",
   "execution": "authoring",
+  "addDisabled": true,
+  "addDisabledReason": "The IDTA Query API ($query) is authoring-only — the engine has no executor for it yet.",
   "summary": "POST /submodels/$query with an IDTA-01002 $condition.",
   "endpoint": {
     "method": "POST",
@@ -27,9 +29,6 @@
       "bindsTo": "body.limit"
     }
   ],
-  "defaults": {
-    "weight": 12
-  },
   "notes": "Not every server implements the Query API. Set a fallback, or the run reports 501s as failures.",
   "kind": "request"
 }

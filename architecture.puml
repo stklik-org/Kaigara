@@ -1,5 +1,5 @@
 @startuml Kaigara-Architecture
-title Kaigara -- System Architecture\n(Option C: the EngineAdapter seam is in place; only the k6 adapter is implemented -- ADR 0001.\nThe adapter compiles the timeline itself; no plan crosses the seam -- ADR 0004)
+title Kaigara -- System Architecture\n(Option C: the EngineAdapter seam is in place; only the k6 adapter is implemented -- ADR 0001.\nThe adapter compiles the timeline itself; no plan crosses the seam -- ADR 0004.\nIt emits one small k6 script per request type, scheduled by a thin main.js -- ADR 0005)
 skinparam wrapWidth 200
 skinparam shadowing false
 skinparam componentStyle rectangle
@@ -52,10 +52,10 @@ package "Kaigara -- one repo, npm workspaces" {
     component "Connection probe\nGET {baseUrl}/description, falling back\nto /shells -- standards-only" as probe <<implemented>>
     component "Scenario library\nread-only folder of documents" as library <<implemented>>
     component "RunService\norchestration, RunState projection,\nruns held in memory" as runsvc <<implemented>>
-    component "Timeline compiler (k6-internal)\nLoadTimeline -> K6Plan, one executor per\nLoadShape (sine/bell sampled via rateAt());\ncompile-time identifier harvest" as compiler <<implemented>>
+    component "Timeline compiler (k6-internal)\nLoadTimeline -> K6Plan -> one small script per\nrequest type + a thin main.js; one executor per\nLoadShape scaled by weight; compile-time\nidentifier harvest and per-script id lists" as compiler <<implemented>>
     component "Metrics aggregator\nper-second buckets + bounded latency\nreservoir; raw events never reach the UI" as aggregator <<implemented>>
     component "EngineAdapter interface\n+ registry" as adapterIface <<implemented>>
-    component "k6 adapter\ncompile(timeline) -> CompiledRun,\nspawns subprocess, parses --out json" as k6adapter <<implemented>>
+    component "k6 adapter\ncompile(timeline) -> CompiledRun,\nspawns one subprocess on main.js,\nparses --out json" as k6adapter <<implemented>>
     component "Correctness checker\najv + official JSON Schemas" as correctness <<planned>>
     component "Generated OpenAPI client\npreparation / cleanup phases" as openapiclient <<planned>>
   }
@@ -64,7 +64,7 @@ package "Kaigara -- one repo, npm workspaces" {
   database "SQLite\nrun history, saved scenarios, connections" as sqlite <<planned>>
 }
 
-component "k6\nexternal subprocess -- AGPL,\nnever linked in-process" as k6 <<external>>
+component "k6\nexternal subprocess -- AGPL,\nnever linked in-process\n(k6 run main.js)" as k6 <<external>>
 
 package "Systems under test" {
   component "Target AAS server(s)\ntwinsphere / Eclipse BaSyx\nvia the IDTA-01002 REST API" as target <<external>>
@@ -99,7 +99,7 @@ k6adapter --> compiler : validate + compile
 runsvc --> aggregator : samples in, RunView out
 k6adapter ..|> adapterIface : implements
 
-k6adapter --> k6 : spawn subprocess\nwith generated script
+k6adapter --> k6 : spawn subprocess\nwith generated scripts
 k6 --> target : load generation
 
 probe --> target : reachability +\nadvertised profiles
@@ -119,7 +119,9 @@ note bottom of k6adapter
   scripts, VUs or subprocesses crosses back into the
   results -- an adapter takes the authored timeline and
   emits samples; its compiled K6Plan never crosses the
-  seam (ADR 0004). A second engine brings its own compiler.
+  seam (ADR 0004). What it emits is many small, separately
+  runnable scripts scheduled by a thin main.js (ADR 0005).
+  A second engine brings its own compiler.
 end note
 
 note bottom of runsvc

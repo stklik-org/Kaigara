@@ -76,28 +76,46 @@
                     "weight": 85,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-shell",
                     "operation": "create",
                     "target": "shell",
-                    "weight": 5,
+                    "weight": 13,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 8,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   },
                   {
@@ -107,7 +125,14 @@
                     "weight": 2,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -132,28 +157,46 @@
                     "weight": 85,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-shell",
                     "operation": "create",
                     "target": "shell",
-                    "weight": 5,
+                    "weight": 13,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 8,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   },
                   {
@@ -163,7 +206,14 @@
                     "weight": 2,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -188,28 +238,46 @@
                     "weight": 85,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-shell",
                     "operation": "create",
                     "target": "shell",
-                    "weight": 5,
+                    "weight": 13,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 8,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   },
                   {
@@ -219,7 +287,14 @@
                     "weight": 2,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -244,28 +319,46 @@
                     "weight": 85,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-shell",
                     "operation": "create",
                     "target": "shell",
-                    "weight": 5,
+                    "weight": 13,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 8,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   },
                   {
@@ -275,7 +368,14 @@
                     "weight": 2,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -300,28 +400,46 @@
                     "weight": 85,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-shell",
                     "operation": "create",
                     "target": "shell",
-                    "weight": 5,
+                    "weight": 13,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 8,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   },
                   {
@@ -331,7 +449,14 @@
                     "weight": 2,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -356,28 +481,46 @@
                     "weight": 85,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-shell",
                     "operation": "create",
                     "target": "shell",
-                    "weight": 5,
+                    "weight": 13,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 8,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   },
                   {
@@ -387,7 +530,14 @@
                     "weight": 2,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -406,7 +556,9 @@
               "durationSeconds": 35,
               "shape": {
                 "kind": "sine",
-                "peakRatePerSec": 300
+                "baseRatePerSec": 200,
+                "amplitudeRatePerSec": 100,
+                "direction": "rise"
               },
               "requests": {
                 "requests": [
@@ -417,28 +569,46 @@
                     "weight": 70,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 10,
+                    "weight": 25,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 15,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   },
                   {
@@ -448,7 +618,14 @@
                     "weight": 5,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -460,7 +637,9 @@
               "durationSeconds": 35,
               "shape": {
                 "kind": "sine",
-                "peakRatePerSec": 300
+                "baseRatePerSec": 200,
+                "amplitudeRatePerSec": 100,
+                "direction": "rise"
               },
               "requests": {
                 "requests": [
@@ -471,28 +650,46 @@
                     "weight": 70,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 10,
+                    "weight": 25,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 15,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   },
                   {
@@ -502,7 +699,14 @@
                     "weight": 5,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -514,7 +718,9 @@
               "durationSeconds": 35,
               "shape": {
                 "kind": "sine",
-                "peakRatePerSec": 300
+                "baseRatePerSec": 200,
+                "amplitudeRatePerSec": 100,
+                "direction": "rise"
               },
               "requests": {
                 "requests": [
@@ -525,28 +731,46 @@
                     "weight": 70,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-submodels",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 10,
+                    "weight": 25,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 15,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   },
                   {
@@ -556,7 +780,14 @@
                     "weight": 5,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]
@@ -583,21 +814,29 @@
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
-                    "weight": 40,
+                    "weight": 100,
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
-                    }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 60,
-                    "generator": {
-                      "kind": "mutate",
-                      "baseValue": "{}",
-                      "mutationRatePercent": 25
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   }
                 ]
@@ -628,6 +867,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   }
                 ]
@@ -651,6 +909,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   }
                 ]
@@ -674,6 +951,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   }
                 ]
@@ -697,6 +993,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
+                    },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "SM-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "SM-showcase-<Num>"
                     }
                   }
                 ]
@@ -726,7 +1041,17 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "list-shells",
+                    "bindings": {
+                      "pageSize": {
+                        "strategy": "fixed",
+                        "config": {
+                          "limit": 20,
+                          "paging": "first page only"
+                        }
+                      }
                     }
                   }
                 ]
@@ -757,6 +1082,25 @@
                     "generator": {
                       "kind": "randomized",
                       "sizeBytes": 256
+                    },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": {
+                          "format": "AAS-showcase-<Num>"
+                        }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": {
+                          "bytes": 256,
+                          "grow": "more elements"
+                        }
+                      }
+                    },
+                    "mintId": {
+                      "format": "AAS-showcase-<Num>"
                     }
                   }
                 ]
@@ -779,7 +1123,14 @@
                     "weight": 1,
                     "generator": {
                       "kind": "randomized",
-                      "sizeBytes": 0
+                      "sizeBytes": 256
+                    },
+                    "templateId": "delete-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
                     }
                   }
                 ]

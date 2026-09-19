@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { withAssignedTrackColors } from "@kaigara/shared-types";
+import { withAssignedTrackColors, type ServerConnection } from "@kaigara/shared-types";
 import { HeaderActionsSlot, HeaderScenarioSlot } from "@/app/HeaderSlots";
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
@@ -211,6 +211,42 @@ function ScenarioNameField({ name, onCommit }: { name: string; onCommit: (name: 
   );
 }
 
+/** Which connection a run against this scenario will target, editable right here instead of a
+ *  round trip to the Connect screen — the Run screen and this one both derive "the target" the
+ *  same way (`connections.find((c) => c.active)`), so picking one here is exactly "Activate" over
+ *  there, just without leaving Compose. A native `<select>` rather than a custom dropdown: this is
+ *  a single-choice list of names, which is exactly what it's for. */
+function TargetConnectionSelect({
+  connections,
+  activeId,
+  disabled,
+  onActivate,
+}: {
+  connections: ServerConnection[];
+  activeId: string | null;
+  disabled: boolean;
+  onActivate: (id: string) => void;
+}) {
+  return (
+    <select
+      value={activeId ?? ""}
+      disabled={disabled || connections.length === 0}
+      onChange={(event) => onActivate(event.target.value)}
+      title="Which server connection a run against this scenario targets"
+      aria-label="Target connection"
+      className="max-w-[10rem] truncate rounded-md border border-border-strong bg-surface px-1.5 py-1 text-xs text-ink outline-none focus:border-accent disabled:opacity-60"
+    >
+      {connections.length === 0 && <option value="">No connections</option>}
+      {activeId === null && connections.length > 0 && <option value="">Select a target…</option>}
+      {connections.map((connection) => (
+        <option key={connection.id} value={connection.id}>
+          {connection.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 /** Blocks Download while the scenario is still called {@link DEFAULT_SCENARIO_NAME} — a literal
  *  "untitled-scenario.json" is not a useful thing to find in a Downloads folder later. Confirming
  *  both renames the scenario for good (through the same `setScenarioName` the header field itself
@@ -334,8 +370,22 @@ export function ComposePage() {
 
   // Which target a run would go against. Read here rather than at click time so the Run button can
   // say where it is about to send load before it is pressed.
-  const { data: connections } = useAsyncData(() => api.connections.list(), [api]);
+  const { data: connections, reload: reloadConnections } = useAsyncData(() => api.connections.list(), [api]);
   const activeConnection = connections?.find((connection) => connection.active) ?? null;
+  const [switchingConnection, setSwitchingConnection] = useState(false);
+
+  /** Mirrors the Connect screen's "Activate": exactly one connection is active at a time, and
+   *  changing it here is the same mutation, just reachable without leaving Compose. */
+  async function handleActivateConnection(id: string) {
+    if (!id || id === activeConnection?.id) return;
+    setSwitchingConnection(true);
+    try {
+      await api.connections.activate(id);
+      await reloadConnections();
+    } finally {
+      setSwitchingConnection(false);
+    }
+  }
 
   useEffect(() => {
     writeString(SIDEBAR_WIDTH_KEY, String(Math.round(sidebarWidth)));
@@ -483,6 +533,15 @@ export function ComposePage() {
       <HeaderScenarioSlot>
         <SegmentedControl label="Compose view" value={mode} options={VIEW_MODE_OPTIONS} onChange={setMode} />
         <ScenarioNameField name={scenarioName} onCommit={setScenarioName} />
+        <label className="flex items-center gap-1.5 text-xs text-ink-muted">
+          Server
+          <TargetConnectionSelect
+            connections={connections ?? []}
+            activeId={activeConnection?.id ?? null}
+            disabled={switchingConnection}
+            onActivate={(id) => void handleActivateConnection(id)}
+          />
+        </label>
       </HeaderScenarioSlot>
       <HeaderActionsSlot>
         {uploadError && (

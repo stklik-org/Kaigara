@@ -1,15 +1,24 @@
 /**
  * Server-side aggregation of engine samples.
  *
- * The proposal (section 7.2) is explicit that raw per-request events must never reach the browser:
- * metrics are "pre-aggregated and down-sampled server-side (e.g. one point per second rather than
- * per request) so the front end never has to process raw per-request events at high load". This is
- * that stage. A run at 800 req/s produces 800 samples a second and one bucket.
+ * The proposal (section 7.2) originally ruled out forwarding raw per-request events to the
+ * browser at all; that rule is deliberately overridden here — the Run screen's request/response
+ * log needs the real per-request rows (timestamp, status, load), not an aggregate pretending to be
+ * one. What survives from §7.2 is the *reason* it existed: the tool's own footprint must not
+ * compete with the load it is generating (section 2.3). So the override is split in two:
  *
- * Memory is bounded on every axis that could otherwise grow with run length or request rate:
+ *  - `recentSamples` — a small, fixed-size ring buffer of the most recent requests, re-published
+ *    on every live tick while a run is active. This is what the Run screen's log renders *during*
+ *    a run: cheap enough to serialize every second regardless of run length or request rate.
+ *  - `fullLog()` — every request the run has produced, capped only by a generous safety ceiling
+ *    (`FULL_LOG_SAFETY_CAP`), never re-published on a timer. `RunService` only ever calls this
+ *    once a run has reached a terminal status, and only in response to an explicit request (see
+ *    `GET /api/runs/:id/requests`) — so its cost is paid once, after the run stops competing with
+ *    anything, never per tick while it is still running.
+ *
+ * Memory is otherwise bounded on every axis that could grow with run length or request rate:
  * per-second buckets are capped, and the latency distribution is a fixed-size reservoir rather
- * than every observation. That matters more here than in a typical service — the tool's own
- * footprint competes directly with the load it is generating (section 2.3).
+ * than every observation.
  */
 
 import type { RequestSample } from "../engines/adapter.ts";
@@ -20,6 +29,15 @@ const MAX_BUCKETS = 3600;
 /** Reservoir size for the latency distribution. 5000 samples put the p99 estimate well inside the
  *  run-to-run noise of the thing being measured, at a fixed ~40 KB. */
 const RESERVOIR_SIZE = 5000;
+/** How many of the most recent requests the Run screen's *live* log can show while a run is still
+ *  active. Small on purpose — it is a "what just happened" window, re-published on every tick, so
+ *  this also bounds the size of every live SSE update while a run is running. `fullLog()` is the
+ *  complete record; this is only ever the tail of it. */
+const RECENT_SAMPLES_LIMIT = 300;
+/** Hard ceiling on `fullLog()` — not a design target, a backstop against an unbounded run
+ *  eventually exhausting memory. At ~150 bytes/sample this is on the order of tens of MB; a run
+ *  that reaches it gets a truncated log (oldest requests dropped) rather than an OOM. */
+const FULL_LOG_SAFETY_CAP = 500_000;
 
 export interface LoadTotals {
   requests: number;
@@ -45,6 +63,9 @@ export interface MetricsSnapshot {
   byStatus: Record<string, number>;
   /** Loads that have been observed issuing requests in the most recent second. */
   activeLoadKeys: string[];
+  /** The most recent `RECENT_SAMPLES_LIMIT` requests, oldest first — see the module doc comment
+   *  for why this one field carries raw events at all. */
+  recentSamples: RequestSample[];
 }
 
 export class MetricsAggregator {
@@ -53,6 +74,9 @@ export class MetricsAggregator {
   private readonly operationTotals = new Map<string, LoadTotals>();
   private readonly statusCounts = new Map<number, number>();
   private readonly reservoir: number[] = [];
+  private readonly recentSamples: RequestSample[] = [];
+  private readonly log: RequestSample[] = [];
+  private logTruncated = false;
 
   private totalRequests = 0;
   private totalFailed = 0;
@@ -74,6 +98,10 @@ export class MetricsAggregator {
       this.accumulate(this.operationTotals, `${sample.operation}:${sample.target}`, sample);
       this.statusCounts.set(sample.status, (this.statusCounts.get(sample.status) ?? 0) + 1);
       this.sampleLatency(sample.durationMs);
+      this.recentSamples.push(sample);
+      if (this.recentSamples.length > RECENT_SAMPLES_LIMIT) this.recentSamples.shift();
+      if (this.log.length < FULL_LOG_SAFETY_CAP) this.log.push(sample);
+      else this.logTruncated = true;
 
       if (second > this.latestSecond) {
         this.latestSecond = second;
@@ -143,6 +171,13 @@ export class MetricsAggregator {
     return [...this.buckets.values()].sort((a, b) => a.second - b.second);
   }
 
+  /** Every request recorded so far, oldest first — see the module doc comment for when this is
+   *  meant to be called (once, after a run stops, not on a live-tick cadence). `truncated` is true
+   *  only if `FULL_LOG_SAFETY_CAP` was actually reached, which no ordinary run should approach. */
+  fullLog(): { samples: RequestSample[]; truncated: boolean } {
+    return { samples: [...this.log], truncated: this.logTruncated };
+  }
+
   snapshot(): MetricsSnapshot {
     const sorted = [...this.reservoir].sort((a, b) => a - b);
     const at = (q: number): number => {
@@ -160,6 +195,7 @@ export class MetricsAggregator {
       byOperation: Object.fromEntries(this.operationTotals),
       byStatus: Object.fromEntries([...this.statusCounts].map(([status, count]) => [String(status), count])),
       activeLoadKeys: [...this.activeThisSecond],
+      recentSamples: [...this.recentSamples],
     };
   }
 }

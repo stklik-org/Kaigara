@@ -25,13 +25,19 @@ export type ExecutionSupport = "engine" | "authoring";
 /** The subset of JSON Schema the parameter dialog renders. Anything outside it is ignored rather
  *  than rejected — a strategy may carry keywords for a future validator. */
 export interface JsonSchemaProperty {
-  type?: "string" | "number" | "integer" | "boolean" | "object";
+  type?: "string" | "number" | "integer" | "boolean" | "object" | "array";
   title?: string;
   description?: string;
   enum?: (string | number)[];
   default?: unknown;
   minimum?: number;
   maximum?: number;
+  /** `type: "array"` only — e.g. a multi-select whose options come from live data, see
+   *  `families` on the "IDTA template" payload strategy. `x-options-from` (and `enum`, if a fixed
+   *  array of choices is ever needed) lives on this, not on the array field itself, mirroring how
+   *  a single-value field of the same shape would be described. */
+  items?: JsonSchemaProperty;
+  minItems?: number;
   /** Renders a multi-line input. Not standard JSON Schema; the only presentational hint here. */
   format?: "textarea";
   /** Options come from live data instead of a fixed `enum` — see `optionsFor` in resolve.ts. */
@@ -53,6 +59,10 @@ export interface Strategy {
   label: string;
   /** One sentence under the pills explaining what this produces. */
   hint?: string;
+  /** A stronger caveat than `hint`, shown with warning styling — for a choice that is correct but
+   *  unusual enough that picking it by accident would be a bad surprise (e.g. "existing" for a
+   *  create's own identifier deliberately posting a duplicate). */
+  warning?: string;
   /** A representative value, used when nothing better can be derived from the config. */
   sample?: string;
   /** Overrides the endpoint's expected status codes — this is how "non-existing" becomes a 404
@@ -116,11 +126,22 @@ export interface RequestTemplate {
   endpoint?: Endpoint;
   steps?: CompositeStep[];
   parameters?: TemplateParameter[];
-  defaults?: { weight?: number };
   captures?: Record<string, string>;
   consumesPool?: boolean;
   /** A caveat worth showing in the dialog (e.g. "not every server implements the Query API"). */
   notes?: string;
+  /**
+   * The card can still be opened and its parameters inspected, but "Add to composition" is
+   * disabled — a temporary, reversible brake independent of {@link execution}: an `"engine"` card
+   * (PUT's replace-aas/replace-submodel today) can be add-disabled while still being honestly
+   * described as something the engine runs, and an `"authoring"` card stays add-disabled for its
+   * own, permanent reason regardless of this flag. Editing a request already in the composition is
+   * unaffected — only adding a new one is blocked.
+   */
+  addDisabled?: boolean;
+  /** Shown next to the grayed-out card and on the disabled button; required when {@link addDisabled}
+   *  is set, so the brake always comes with a reason rather than an unexplained dead button. */
+  addDisabledReason?: string;
 }
 
 /** One published IDTA submodel template, from `templates.index.json` — generated out of

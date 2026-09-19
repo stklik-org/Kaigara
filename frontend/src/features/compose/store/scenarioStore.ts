@@ -8,6 +8,7 @@ import {
   Track,
   assignTrackColors,
   withAssignedTrackColors,
+  type ExchangeCaptureData,
 } from "@kaigara/shared-types";
 import { createTrack } from "../timeline/modelFactories";
 import { coverLoads } from "../timeline/timelineAdapters";
@@ -68,6 +69,9 @@ interface ScenarioStore {
    *  authored value it is — clamped only to the schema's `>= 0`, so the user can still set it
    *  shorter than the furthest Load (which then shows the usual "past the end" warning). */
   setTotalDuration: (seconds: number) => void;
+  /** Sets how much of each request/response a run keeps (`LoadTimeline.capture`); `undefined` is
+   *  the default and leaves the field out of the document. */
+  setCapture: (capture: ExchangeCaptureData | undefined) => void;
   /** The Load screen picks a Scenario and hands it here; Compose reads whatever's already loaded
    *  instead of always re-instantiating its own default. Tracks that arrive uncoloured get a
    *  palette colour here, so the colour is part of the document from the moment it is opened
@@ -139,6 +143,8 @@ export const useScenarioStore = create<ScenarioStore>((set) => ({
     set((state) => ({
       timeline: state.timeline.with({ totalDurationSeconds: Math.max(0, Math.round(seconds)) }),
     })),
+
+  setCapture: (capture) => set((state) => ({ timeline: state.timeline.with({ capture }) })),
 
   loadScenario: (scenario) =>
     set({

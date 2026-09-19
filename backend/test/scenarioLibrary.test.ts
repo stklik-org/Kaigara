@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -46,6 +46,33 @@ test("every bundled scenario carries a distinct palette colour per track", async
   }
 });
 
+/** A request with no catalogue card behind it renders in the Compose screen as something nobody can
+ *  edit, and one naming an add-disabled card is something nobody could have authored there — so the
+ *  shipped library may only use cards the catalogue actually offers. */
+test("every bundled request is a pick from an addable catalogue card", async () => {
+  const CATALOGUE = resolve(fileURLToPath(new URL("../../frontend/src/features/compose/catalog/request-templates", import.meta.url)));
+  const cards = new Map<string, { operation: string; target: string; addDisabled?: boolean }>();
+  for (const file of (await readdir(CATALOGUE)).filter((name) => name.endsWith(".json"))) {
+    const card = JSON.parse(await readFile(join(CATALOGUE, file), "utf8"));
+    cards.set(card.id, card);
+  }
+
+  const { entries } = await listScenarios(BUNDLED);
+  for (const entry of entries) {
+    const scenario = await readScenario(entry.id, BUNDLED);
+    for (const load of scenario.phases.method.tracks.flatMap((t) => t.loads)) {
+      for (const request of load.requests.requests) {
+        const where = `${entry.file} ${load.id}/${request.id}`;
+        const card = request.templateId ? cards.get(request.templateId) : undefined;
+        assert.ok(card, `${where} names no catalogue card (templateId ${JSON.stringify(request.templateId)})`);
+        assert.ok(!card.addDisabled, `${where} uses "${request.templateId}", which the catalogue does not let anyone add`);
+        assert.equal(card.operation, request.operation, `${where} disagrees with its card's operation`);
+        assert.equal(card.target === "aas" ? "shell" : card.target, request.target, `${where} disagrees with its card's target`);
+      }
+    }
+  }
+});
+
 test("the demo set covers the shapes the Compose screen offers", async () => {
   const showcase = await readScenario("shape-showcase", BUNDLED);
   const kinds = new Set(showcase.phases.method.tracks.flatMap((t) => t.loads.map((l) => l.shape.kind)));
@@ -60,10 +87,12 @@ test("the persistence probe injects once and then polls at 1 kHz", async () => {
   assert.ok(inject, "expected a one-off injection");
   assert.equal(inject.shape.kind === "individual" && inject.shape.requestCount, 1);
   assert.deepEqual(
-    inject.requests.requests.map((r) => [r.operation, r.target, r.generator.kind]),
-    [["create", "shell", "exact"]],
-    "the injected shell must be sent verbatim, so its identifier is known before the run",
+    inject.requests.requests.map((r) => [r.operation, r.target, r.templateId]),
+    [["create", "shell", "create-aas"]],
   );
+  // A one-off create minting from a fixed format gets `<Num>` = 0, so the injected shell's
+  // identifier is known before the run — which is what the probe needs.
+  assert.match(inject.requests.requests[0].mintId?.format ?? "", /<Num>/);
 
   const poll = loads.find((l) => l.shape.kind === "constant");
   assert.ok(poll, "expected a sustained poll");

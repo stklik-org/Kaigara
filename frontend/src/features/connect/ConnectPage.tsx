@@ -29,6 +29,23 @@ export function ConnectPage() {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  /** Wipes this browser's stored connections (including anything the user added or edited) and
+   *  reseeds the shipped demo list — the escape hatch for a list that predates a source change, or
+   *  just wanting a clean slate. Confirmed inline since it discards local edits with no undo. */
+  async function resetToDemoDefaults() {
+    if (!window.confirm("Remove all connections stored in this browser and replace them with the shipped demo list? This cannot be undone.")) {
+      return;
+    }
+    setResetting(true);
+    try {
+      await api.connections.resetToDemoDefaults();
+      await reload();
+    } finally {
+      setResetting(false);
+    }
+  }
 
   /** Runs a mutation with the row marked busy, then re-reads the list — the client owns the state,
    *  so the screen never patches its own copy and can't drift from it. */
@@ -46,7 +63,12 @@ export function ConnectPage() {
     <div className="mx-auto max-w-3xl space-y-4 p-6">
       <div className="flex items-baseline justify-between">
         <h1 className="text-lg font-semibold text-ink">Server connections</h1>
-        <span className="text-xs text-ink-muted">Test probes GET {"{base URL}"}/description</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-ink-muted">Test probes GET {"{base URL}"}/description</span>
+          <Button variant="danger" disabled={resetting} onClick={resetToDemoDefaults}>
+            {resetting ? "Resetting…" : "Remove cached connections"}
+          </Button>
+        </div>
       </div>
 
       {!connections ? (

@@ -35,6 +35,21 @@ function looksSecret(name: string): boolean {
   return /auth|secret|token|key|password|credential/i.test(name);
 }
 
+/** OAuth2 client-credentials fields, kept as one blank-or-complete unit rather than four
+ *  independent optionals — a half-filled set isn't a usable auth config, so `submit()` only turns
+ *  this into `ConnectionInput.oauth2` when every field has something in it. */
+type OAuth2FormState = { tokenUrl: string; clientId: string; clientSecret: string; scope: string };
+
+const BLANK_OAUTH2: OAuth2FormState = { tokenUrl: "", clientId: "", clientSecret: "", scope: "" };
+
+function oauth2FormStateFrom(oauth2: ServerConnection["oauth2"]): OAuth2FormState {
+  return oauth2 ? { ...oauth2 } : { ...BLANK_OAUTH2 };
+}
+
+function isOAuth2FormBlank(oauth2: OAuth2FormState): boolean {
+  return !oauth2.tokenUrl.trim() && !oauth2.clientId.trim() && !oauth2.clientSecret.trim() && !oauth2.scope.trim();
+}
+
 /** The form's own state is all strings — a half-typed timeout is not a number yet, and forcing it
  *  to be one mid-keystroke is how a field ends up fighting the person filling it in. */
 type FormState = {
@@ -43,6 +58,8 @@ type FormState = {
   environment: string;
   defaultTimeoutSeconds: string;
   headerRows: HeaderRow[];
+  oauth2Enabled: boolean;
+  oauth2: OAuth2FormState;
 };
 
 function toFormState(connection: ServerConnection | undefined): FormState {
@@ -52,6 +69,8 @@ function toFormState(connection: ServerConnection | undefined): FormState {
     environment: connection?.environment ?? "",
     defaultTimeoutSeconds: String(connection?.defaultTimeoutSeconds ?? DEFAULT_TIMEOUT_SECONDS),
     headerRows: headerRowsFrom(connection?.headers),
+    oauth2Enabled: Boolean(connection?.oauth2),
+    oauth2: oauth2FormStateFrom(connection?.oauth2),
   };
 }
 
@@ -115,6 +134,10 @@ export function ConnectionForm({
     });
   }
 
+  function updateOAuth2(patch: Partial<OAuth2FormState>) {
+    setForm((prev) => ({ ...prev, oauth2: { ...prev.oauth2, ...patch } }));
+  }
+
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!form.name.trim()) {
@@ -125,6 +148,17 @@ export function ConnectionForm({
       setError("The base URL needs an http(s):// scheme, e.g. http://localhost:8081/api/v3.");
       return;
     }
+    if (form.oauth2Enabled && isOAuth2FormBlank(form.oauth2)) {
+      setError("Fill in all four OAuth2 fields, or turn OAuth2 off.");
+      return;
+    }
+    if (form.oauth2Enabled && !isOAuth2FormBlank(form.oauth2)) {
+      const missing = (["tokenUrl", "clientId", "clientSecret", "scope"] as const).filter((key) => !form.oauth2[key].trim());
+      if (missing.length > 0) {
+        setError(`OAuth2 needs all four fields — missing ${missing.join(", ")}.`);
+        return;
+      }
+    }
     setError(null);
     onSubmit({
       name: form.name,
@@ -132,6 +166,7 @@ export function ConnectionForm({
       environment: form.environment,
       defaultTimeoutSeconds: Number(form.defaultTimeoutSeconds) || DEFAULT_TIMEOUT_SECONDS,
       headers: headersFromRows(form.headerRows),
+      oauth2: form.oauth2Enabled ? { ...form.oauth2 } : null,
     });
   }
 
@@ -216,6 +251,61 @@ export function ConnectionForm({
         <p className="text-[11px] text-ink-muted">
           Stored in this browser's local storage, like the rest of the connection — not a secrets vault.
         </p>
+      </div>
+      <div className="space-y-1.5 rounded border border-field-border p-2.5">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={form.oauth2Enabled}
+            onChange={(event) => setForm((prev) => ({ ...prev, oauth2Enabled: event.target.checked }))}
+          />
+          <span className="text-xs font-medium text-ink-muted">
+            OAuth2 client credentials{" "}
+            <span className="font-normal">
+              — the backend exchanges these for a bearer token before every Test/Run and sends it as{" "}
+              <code className="font-mono">Authorization</code>, overriding a header of that name above.
+            </span>
+          </span>
+        </label>
+        {form.oauth2Enabled && (
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <label className="col-span-2 space-y-1">
+              <span className="text-xs font-medium text-ink-muted">Token URL</span>
+              <input
+                className={`${FIELD_CLASS} font-mono`}
+                placeholder="https://<tenant>.ciamlogin.com/<tenant-id>/oauth2/v2.0/token"
+                value={form.oauth2.tokenUrl}
+                onChange={(event) => updateOAuth2({ tokenUrl: event.target.value })}
+              />
+            </label>
+            <label className="space-y-1">
+              <span className="text-xs font-medium text-ink-muted">Client ID</span>
+              <input
+                className={`${FIELD_CLASS} font-mono`}
+                value={form.oauth2.clientId}
+                onChange={(event) => updateOAuth2({ clientId: event.target.value })}
+              />
+            </label>
+            <label className="space-y-1">
+              <span className="text-xs font-medium text-ink-muted">Client secret</span>
+              <input
+                className={`${FIELD_CLASS} font-mono`}
+                type="password"
+                value={form.oauth2.clientSecret}
+                onChange={(event) => updateOAuth2({ clientSecret: event.target.value })}
+              />
+            </label>
+            <label className="col-span-2 space-y-1">
+              <span className="text-xs font-medium text-ink-muted">Scope</span>
+              <input
+                className={`${FIELD_CLASS} font-mono`}
+                placeholder="api://<api-id>/.default"
+                value={form.oauth2.scope}
+                onChange={(event) => updateOAuth2({ scope: event.target.value })}
+              />
+            </label>
+          </div>
+        )}
       </div>
       {error && <p className="text-xs text-status-fail">{error}</p>}
       <div className="flex gap-2">

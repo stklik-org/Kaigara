@@ -29,6 +29,11 @@ const DIRECTION_OPTIONS = [
   { value: "down" as const, label: "Down" },
 ];
 
+const SINE_DIRECTION_OPTIONS = [
+  { value: "rise" as const, label: "Rises first" },
+  { value: "fall" as const, label: "Falls first" },
+];
+
 /** The fields specific to each concrete LoadShape subclass. Narrowed with `instanceof`, which is
  *  what actually narrows the class type — checking `shape.kind` only narrows the string literal,
  *  since the subclasses are not a discriminated union at the type level. Edits go through
@@ -77,7 +82,30 @@ function ShapeFields({ shape, onChange }: { shape: LoadShape; onChange: (next: L
     );
   }
 
-  if (shape instanceof SineShape || shape instanceof BellShape) {
+  if (shape instanceof SineShape) {
+    return (
+      <>
+        <SelectField
+          label="Direction"
+          value={shape.direction}
+          options={SINE_DIRECTION_OPTIONS}
+          onChange={(direction) => onChange(patchShape(shape, { direction }))}
+        />
+        <NumberField
+          label="Base rate/sec"
+          value={shape.baseRatePerSec}
+          onChange={(baseRatePerSec) => onChange(patchShape(shape, { baseRatePerSec }))}
+        />
+        <NumberField
+          label="Amplitude rate/sec"
+          value={shape.amplitudeRatePerSec}
+          onChange={(amplitudeRatePerSec) => onChange(patchShape(shape, { amplitudeRatePerSec }))}
+        />
+      </>
+    );
+  }
+
+  if (shape instanceof BellShape) {
     return (
       <NumberField
         label="Peak rate/sec"

@@ -40,9 +40,6 @@
       "default": "synthesised"
     }
   ],
-  "defaults": {
-    "weight": 4
-  },
   "notes": "Watch for 413 (payload too large) and 507 (storage exhausted) — they are conformance findings, not latency.",
   "kind": "request"
 }

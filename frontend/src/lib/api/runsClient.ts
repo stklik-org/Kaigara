@@ -2,6 +2,10 @@ import type {
   ConcretePlan,
   EngineDescriptorView,
   LoadTimeline,
+  RunArchiveDetail,
+  RunArchiveEntry,
+  RunExchange,
+  RunRequestLog,
   RunView,
   ServerConnection,
   StartRunRequest,
@@ -34,9 +38,9 @@ const runFailure = (message: string, status: number, issues: ValidationIssue[]) 
 
 export interface StartRunOptions {
   timeline: LoadTimeline;
-  /** The target to run against. Its `baseUrl`, timeout and `headers` are what the engine actually
-   *  uses — the same credentials the Connect screen's "Test" probes with. */
-  connection: Pick<ServerConnection, "id" | "baseUrl" | "defaultTimeoutSeconds" | "headers">;
+  /** The target to run against. Its `baseUrl`, timeout, `headers` and `oauth2` are what the
+   *  engine actually uses — the same credentials the Connect screen's "Test" probes with. */
+  connection: Pick<ServerConnection, "id" | "baseUrl" | "defaultTimeoutSeconds" | "headers" | "oauth2">;
   scenarioName?: string;
   dryRun?: boolean;
 }
@@ -45,7 +49,12 @@ function toRequest({ timeline, connection, scenarioName, dryRun }: StartRunOptio
   return {
     // The same serialization the Code view renders, so what runs is exactly what the user read.
     timeline: timeline.toJSON(),
-    target: { baseUrl: connection.baseUrl, timeoutSeconds: connection.defaultTimeoutSeconds, headers: connection.headers },
+    target: {
+      baseUrl: connection.baseUrl,
+      timeoutSeconds: connection.defaultTimeoutSeconds,
+      headers: connection.headers,
+      oauth2: connection.oauth2,
+    },
     connectionId: connection.id,
     scenarioName,
     dryRun,
@@ -73,6 +82,23 @@ export interface RunsClient {
   /** Expands the timeline into a bucketed, time-ordered schedule of the requests the engine will
    *  issue — the Run screen's "Concrete plan" debug view. Runs nothing. */
   concretePlan(options: StartRunOptions): Promise<ConcretePlan>;
+  /** One Load's complete per-request log — not the bounded live tail
+   *  `RunView.metrics.recentSamples` carries. Its own request rather than folded into
+   *  `detail`/`subscribeDetail` so fetching it is a deliberate, one-off choice the caller makes
+   *  (normally once a Load is selected on a finished run), never something paid for on every live
+   *  tick, and never for the whole run at once — omitting `loadId` gets back no samples. Works for
+   *  an archived run's `runId` too, not just a live one. */
+  requestLog(runId: string, loadId?: string): Promise<RunRequestLog>;
+  /** One row's captured request and response, for the "open this row" popup — fetched only when a
+   *  row is actually clicked, never preloaded for the whole table. Read from the run's log folder,
+   *  so it works for a live run and an archived one alike. */
+  exchange(runId: string, exchangeId: string): Promise<RunExchange>;
+  /** "Open previous execution": every run the k6 adapter's own on-disk archive still has a
+   *  manifest for, across every backend restart — unlike `list()`-from-memory (not exposed here;
+   *  see `GET /api/runs`), this is what survives one. */
+  archiveList(): Promise<RunArchiveEntry[]>;
+  /** Reopens one archived run by the `id` an `archiveList()` entry gave it. */
+  archiveDetail(id: string): Promise<RunArchiveDetail>;
   engines(): Promise<EngineDescriptorView[]>;
 }
 
@@ -127,6 +153,23 @@ export function createRunsClient(baseUrl = ""): RunsClient {
     async concretePlan(options) {
       const response = await postJson(url(`${RUNS_ENDPOINT}/concrete-plan`), toRequest(options));
       return read<ConcretePlan>(response);
+    },
+
+    async requestLog(runId, loadId) {
+      const query = loadId !== undefined ? `?loadId=${encodeURIComponent(loadId)}` : "";
+      return read<RunRequestLog>(await fetch(runUrl(runId, `/requests${query}`)));
+    },
+
+    async exchange(runId, exchangeId) {
+      return read<RunExchange>(await fetch(runUrl(runId, `/exchanges/${encodeURIComponent(exchangeId)}`)));
+    },
+
+    async archiveList() {
+      return (await read<{ entries: RunArchiveEntry[] }>(await fetch(url(`${RUNS_ENDPOINT}/archive`)))).entries;
+    },
+
+    async archiveDetail(id) {
+      return read<RunArchiveDetail>(await fetch(url(`${RUNS_ENDPOINT}/archive/${encodeURIComponent(id)}`)));
     },
 
     async engines() {

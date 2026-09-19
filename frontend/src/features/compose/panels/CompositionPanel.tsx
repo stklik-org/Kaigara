@@ -1,12 +1,7 @@
 import { useMemo } from "react";
-import {
-  RequestComposition,
-  RequestSpec,
-  type RequestOperation,
-  type RequestTargetEntity,
-} from "@kaigara/shared-types";
+import { RequestComposition, RequestSpec, type RequestOperation, type RequestTargetEntity } from "@kaigara/shared-types";
 import { Button } from "@/components/ui/Button";
-import { REQUEST_TEMPLATES, requestTemplate } from "../catalog/catalog";
+import { requestTemplate } from "../catalog/catalog";
 import { resolveRequest, sampleOf, strategyDef } from "../catalog/resolve";
 import { engineGaps, newRequestId } from "../catalog/toRequestSpec";
 import { useScenarioStore } from "../store/scenarioStore";
@@ -20,41 +15,24 @@ import type { CatalogDraft } from "./catalogDraft";
 /**
  * What the selected Load actually sends, as an ordered list with weights.
  *
- * Rows come in two shapes on purpose. A request authored from the catalogue carries its
- * `templateId`/`bindings`, so it renders as the pattern it is and reopens in the parameter dialog.
- * A request from a scenario written before the catalogue existed (every file in
- * `backend/scenarios/`) has only operation/target/weight — it stays fully editable inline, and can
- * be converted to the matching catalogue pattern rather than being deleted and re-added.
+ * Rows come in two shapes. A request authored from the catalogue — every request in the shipped
+ * library included — carries its `templateId`/`bindings`, so it renders as the pattern it is and
+ * reopens in the parameter dialog. A hand-written request with only operation/target/generator
+ * renders as the plain values it carries, read-only.
  */
 
-const OPERATION_OPTIONS: { value: RequestOperation; label: string }[] = [
-  { value: "create", label: "Create" },
-  { value: "read", label: "Read" },
-  { value: "update", label: "Update" },
-  { value: "delete", label: "Delete" },
-  { value: "query", label: "Query" },
-];
+const OPERATION_LABEL: Record<RequestOperation, string> = {
+  create: "Create",
+  read: "Read",
+  update: "Update",
+  delete: "Delete",
+  query: "Query",
+};
 
-const TARGET_OPTIONS: { value: RequestTargetEntity; label: string }[] = [
-  { value: "shell", label: "Shell" },
-  { value: "submodel", label: "Submodel" },
-];
-
-const INLINE_SELECT = "rounded border border-field-border bg-field px-1 py-0.5 text-[11px] text-ink outline-none";
-
-/** The catalogue pattern a pre-catalogue spec would have been authored from, if there is exactly
- *  one engine-executable card for its (operation, target). */
-function matchingTemplateId(spec: RequestSpec): string | undefined {
-  const candidates = [...requestTemplateIdsFor(spec.operation, spec.target)];
-  return candidates.length === 1 ? candidates[0] : undefined;
-}
-
-function requestTemplateIdsFor(operation: RequestOperation, target: RequestTargetEntity): string[] {
-  const wanted = target === "shell" ? "aas" : "submodel";
-  return REQUEST_TEMPLATES.filter(
-    (template) => template.execution === "engine" && template.operation === operation && template.target === wanted,
-  ).map((template) => template.id);
-}
+const TARGET_LABEL: Record<RequestTargetEntity, string> = {
+  shell: "Shell",
+  submodel: "Submodel",
+};
 
 
 export function CompositionPanel({ onEdit }: { onEdit: (draft: CatalogDraft) => void }) {
@@ -179,46 +157,12 @@ export function CompositionPanel({ onEdit }: { onEdit: (draft: CatalogDraft) => 
                   </div>
                 ) : (
                   <div className="mt-0.5 flex flex-wrap items-center gap-1">
-                    <select
-                      aria-label="Operation"
-                      value={spec.operation}
-                      onChange={(event) =>
-                        replace(
-                          specs.map((other) =>
-                            other.id === spec.id
-                              ? withSpecFields(other, { operation: event.target.value as RequestOperation })
-                              : other,
-                          ),
-                        )
-                      }
-                      className={INLINE_SELECT}
-                    >
-                      {OPERATION_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      aria-label="Target"
-                      value={spec.target}
-                      onChange={(event) =>
-                        replace(
-                          specs.map((other) =>
-                            other.id === spec.id
-                              ? withSpecFields(other, { target: event.target.value as RequestTargetEntity })
-                              : other,
-                          ),
-                        )
-                      }
-                      className={INLINE_SELECT}
-                    >
-                      {TARGET_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                    <span className="rounded-full border border-border-strong px-1.5 text-[9.5px] text-ink-muted">
+                      {OPERATION_LABEL[spec.operation]}
+                    </span>
+                    <span className="rounded-full border border-border-strong px-1.5 text-[9.5px] text-ink-muted">
+                      {TARGET_LABEL[spec.target]}
+                    </span>
                     <span className="rounded-full border border-border-strong px-1.5 text-[9.5px] text-ink-muted">
                       {spec.generator.label}
                     </span>
@@ -242,23 +186,21 @@ export function CompositionPanel({ onEdit }: { onEdit: (draft: CatalogDraft) => 
                   className="w-11 rounded border border-field-border bg-field px-1 py-0.5 text-right text-[11px] text-ink outline-none"
                 />
                 <span className="w-7 text-right font-mono text-[10px] text-ink-muted">{share}%</span>
-                <RowButton
-                  label={template ? "Edit parameters" : "Configure with a catalogue pattern"}
-                  disabled={!template && !matchingTemplateId(spec)}
-                  onClick={() => {
-                    const id = spec.templateId ?? matchingTemplateId(spec);
-                    const picked = id ? requestTemplate(id) : undefined;
-                    if (!picked) return;
-                    onEdit({
-                      templateId: picked.id,
-                      weight: spec.weight,
-                      bindings: spec.bindings ?? {},
-                      editingRequestId: spec.id,
-                    });
-                  }}
-                >
-                  {template ? "✎" : "⇪"}
-                </RowButton>
+                {template && (
+                  <RowButton
+                    label="Edit parameters"
+                    onClick={() =>
+                      onEdit({
+                        templateId: template.id,
+                        weight: spec.weight,
+                        bindings: spec.bindings ?? {},
+                        editingRequestId: spec.id,
+                      })
+                    }
+                  >
+                    ✎
+                  </RowButton>
+                )}
                 <RowButton
                   label="Duplicate"
                   onClick={() =>
@@ -291,25 +233,14 @@ export function CompositionPanel({ onEdit }: { onEdit: (draft: CatalogDraft) => 
   );
 }
 
-function RowButton({
-  label,
-  onClick,
-  disabled,
-  children,
-}: {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-  children: string;
-}) {
+function RowButton({ label, onClick, children }: { label: string; onClick: () => void; children: string }) {
   return (
     <button
       type="button"
       title={label}
       aria-label={label}
-      disabled={disabled}
       onClick={onClick}
-      className="rounded px-1 py-0.5 text-[11px] text-ink-muted transition-colors hover:bg-surface hover:text-ink disabled:opacity-30"
+      className="rounded px-1 py-0.5 text-[11px] text-ink-muted transition-colors hover:bg-surface hover:text-ink"
     >
       {children}
     </button>

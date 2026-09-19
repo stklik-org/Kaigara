@@ -27,8 +27,5 @@
       "bindsTo": "path.path"
     }
   ],
-  "defaults": {
-    "weight": 4
-  },
   "kind": "request"
 }

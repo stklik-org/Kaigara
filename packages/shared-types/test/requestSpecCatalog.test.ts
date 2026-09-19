@@ -142,9 +142,11 @@ test("an id pool with a stale onEmpty key is rejected", () => {
 });
 
 test("an id pool on an operation that addresses no identifier is a warning, not an error", () => {
+  // query pages a whole collection and never draws from a pool — unlike create, which is now the
+  // one exception where an id pool means something ("duplicate an existing identifier on purpose").
   const spec = new RequestSpec({
-    id: "create-1",
-    operation: "create",
+    id: "query-1",
+    operation: "query",
     target: "submodel",
     weight: 1,
     generator: RandomizedGenerator.createDefault(),
@@ -154,6 +156,67 @@ test("an id pool on an operation that addresses no identifier is a warning, not 
   const issues = collectLoadTimelineIssues(JSON.parse(JSON.stringify(timelineWith(spec))));
   assert.equal(hasErrors(issues), false);
   assert.match(issues.map((issue) => issue.message).join("\n"), /does not address an entity by identifier/);
+});
+
+test("an id pool on a create is valid — it means \"duplicate an existing identifier\"", () => {
+  const spec = new RequestSpec({
+    id: "create-1",
+    operation: "create",
+    target: "shell",
+    weight: 1,
+    generator: RandomizedGenerator.createDefault(),
+    idPool: { source: "server" },
+  });
+
+  const issues = collectLoadTimelineIssues(JSON.parse(JSON.stringify(timelineWith(spec))));
+  assert.deepEqual(issues, []);
+});
+
+test("a mint id format round-trips", () => {
+  const spec = new RequestSpec({
+    id: "create-1",
+    operation: "create",
+    target: "shell",
+    weight: 1,
+    generator: RandomizedGenerator.createDefault(),
+    mintId: { format: "urn:kaigara:aas:<Num>" },
+  });
+
+  const after = parseLoadTimeline(JSON.parse(JSON.stringify(timelineWith(spec))));
+  assert.deepEqual(after.tracks[0].loads[0].requests.requests[0].mintId, { format: "urn:kaigara:aas:<Num>" });
+});
+
+test("a mint id format without the <Num> placeholder is a warning, not an error", () => {
+  const spec = new RequestSpec({
+    id: "create-1",
+    operation: "create",
+    target: "shell",
+    weight: 1,
+    generator: RandomizedGenerator.createDefault(),
+    mintId: { format: "urn:kaigara:aas:fixed" },
+  });
+
+  const issues = collectLoadTimelineIssues(JSON.parse(JSON.stringify(timelineWith(spec))));
+  assert.equal(hasErrors(issues), false);
+  assert.ok(
+    issues.some((issue) => issue.path.endsWith("mintId/format") && issue.severity === "warning"),
+    JSON.stringify(issues),
+  );
+});
+
+test("a mint id on a non-create is a warning, not an error", () => {
+  const spec = new RequestSpec({
+    id: "read-1",
+    operation: "read",
+    target: "shell",
+    weight: 1,
+    generator: RandomizedGenerator.createDefault(),
+    mintId: { format: "urn:kaigara:aas:<Num>" },
+  });
+
+  const issues = collectLoadTimelineIssues(JSON.parse(JSON.stringify(timelineWith(spec))));
+  assert.equal(hasErrors(issues), false);
+  assert.match(issues.map((issue) => issue.message).join("\n"), /never consulted by "read"/);
 });
 
 test("an unknown id pool source is rejected", () => {

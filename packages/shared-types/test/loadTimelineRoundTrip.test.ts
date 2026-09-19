@@ -45,7 +45,9 @@ function buildKitchenSinkTimeline(): LoadTimeline {
                 operation: "create",
                 target: "shell",
                 weight: 5,
-                generator: new RandomizedGenerator({ sizeBytes: 256 }),
+                // A real pool (more than one entry) — the case sizeBytesPool exists for, not the
+                // ordinary single-size generator every other RequestSpec below still uses.
+                generator: new RandomizedGenerator({ sizeBytes: 256, sizeBytesPool: [256, 4096] }),
               }),
               new RequestSpec({
                 id: "r2",
@@ -97,7 +99,7 @@ function buildKitchenSinkTimeline(): LoadTimeline {
             id: "l-sine",
             startSeconds: 60,
             durationSeconds: 35,
-            shape: new SineShape({ peakRatePerSec: 300 }),
+            shape: new SineShape({ baseRatePerSec: 200, amplitudeRatePerSec: 100, direction: "rise" }),
             requests: new RequestComposition([
               new RequestSpec({
                 id: "r5",
@@ -199,6 +201,22 @@ test("a user-picked track colour survives the round trip and validates clean", (
   const reparsed = parseLoadTimeline(JSON.parse(JSON.stringify(original)));
   assert.equal(reparsed.tracks[0].color, "#3b82f6");
   assert.equal(reparsed.tracks[1].color, undefined);
+});
+
+test("an exchange capture setting survives the round trip, and is absent from the document when unset", () => {
+  const plain = buildKitchenSinkTimeline();
+  assert.equal("capture" in plain.toJSON(), false, "the default must not appear in documents that never chose one");
+
+  const chosen = plain.with({ capture: { mode: "capped-sampled", storeAllErrors: true } });
+  const reparsed = parseLoadTimeline(JSON.parse(JSON.stringify(chosen)));
+  assert.deepEqual(reparsed.capture, { mode: "capped-sampled", storeAllErrors: true });
+  assert.equal(reparsed.with({ capture: undefined }).toJSON().capture, undefined);
+
+  const bad = collectLoadTimelineIssues({ ...plain.toJSON(), capture: { mode: "everything", storeAllErrors: "yes", extra: 1 } });
+  assert.deepEqual(
+    bad.filter((i) => i.severity === "error").map((i) => i.path).sort(),
+    ["capture/extra", "capture/mode", "capture/storeAllErrors"],
+  );
 });
 
 test("structural problems are reported as errors, with the path to the offending value", () => {

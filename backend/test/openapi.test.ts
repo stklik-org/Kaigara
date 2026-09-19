@@ -31,12 +31,16 @@ const EXPECTED_PATHS = [
   "/api/scenarios",
   "/api/scenarios/{id}",
   "/api/runs",
+  "/api/runs/archive",
+  "/api/runs/archive/{id}",
   "/api/runs/compile",
   "/api/runs/concrete-plan",
   "/api/runs/scenario",
   "/api/runs/{id}",
   "/api/runs/{id}/stop",
   "/api/runs/{id}/events",
+  "/api/runs/{id}/requests",
+  "/api/runs/{id}/exchanges/{exchangeId}",
   "/api/runs/{id}/artifacts/{name}",
 ];
 

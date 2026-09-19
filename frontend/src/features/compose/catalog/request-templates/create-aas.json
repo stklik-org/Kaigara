@@ -20,12 +20,10 @@
       "type": "aas-identifier",
       "bindsTo": "body.id",
       "strategies": [
-        "fixed"
+        "sequence",
+        "existing"
       ],
-      "default": "fixed",
-      "config": {
-        "mode": "sequence"
-      }
+      "default": "sequence"
     },
     {
       "id": "payload",
@@ -34,17 +32,13 @@
       "bindsTo": "body",
       "strategies": [
         "minimal",
-        "size-target",
-        "custom-json"
+        "size-target"
       ],
       "default": "minimal"
     }
   ],
   "captures": {
     "aasId": "$.id"
-  },
-  "defaults": {
-    "weight": 10
   },
   "kind": "request"
 }

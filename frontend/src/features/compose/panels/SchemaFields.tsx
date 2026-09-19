@@ -37,6 +37,23 @@ function Control({
       />
     );
   }
+  if (spec.type === "array" && spec.items) {
+    const arrayOptions = optionsFor(spec.items, family, templates) ?? [];
+    const selected = Array.isArray(value) ? (value as unknown[]).map(String) : [];
+    const toggle = (optionValue: string) =>
+      onChange(selected.includes(optionValue) ? selected.filter((v) => v !== optionValue) : [...selected, optionValue]);
+    return (
+      <div className="max-h-40 space-y-0.5 overflow-y-auto">
+        {arrayOptions.length === 0 && <div className="px-1 py-0.5 text-[11px] text-ink-muted">No options.</div>}
+        {arrayOptions.map((option) => (
+          <label key={option.value} className="flex items-center gap-1.5 rounded px-1 py-0.5 text-[12px] text-ink hover:bg-surface-sunken">
+            <input type="checkbox" checked={selected.includes(option.value)} onChange={() => toggle(option.value)} />
+            <span className="truncate">{option.label}</span>
+          </label>
+        ))}
+      </div>
+    );
+  }
   if (options) {
     return (
       <select value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} className={`truncate ${CONTROL_CLASS}`}>
@@ -100,8 +117,9 @@ export function SchemaFields({
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2">
       {properties.map(([key, spec]) => {
-        // Textareas and data-driven dropdowns carry long values; give them the whole row.
-        const wide = spec.format === "textarea" || Boolean(spec["x-options-from"]);
+        // Textareas, data-driven dropdowns and multi-select lists carry long values; give them
+        // the whole row.
+        const wide = spec.format === "textarea" || spec.type === "array" || Boolean(spec["x-options-from"]);
         return (
           <div key={key} className={wide ? "col-span-full" : undefined}>
             {spec.type === "boolean" ? (

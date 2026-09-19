@@ -11,18 +11,25 @@
     {
       "id": "idta-template",
       "label": "IDTA template",
-      "hint": "An instance of a published submodel template, from frontend/submodel-templates.",
+      "hint": "An instance of a published submodel template, from frontend/submodel-templates. Select several to have one chosen at random per request — a realistic mix instead of every instance being identical.",
       "schema": {
         "type": "object",
         "required": [
-          "family"
+          "families"
         ],
         "properties": {
-          "family": {
-            "type": "string",
-            "title": "Template",
-            "default": "Digital nameplate",
-            "x-options-from": "idta-templates"
+          "families": {
+            "type": "array",
+            "title": "Templates",
+            "default": [
+              "Digital nameplate"
+            ],
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "x-options-from": "idta-templates"
+            },
+            "description": "One is chosen at random for each request generated from this pick."
           },
           "variation": {
             "type": "string",

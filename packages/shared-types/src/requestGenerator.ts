@@ -7,8 +7,17 @@ export type RequestGeneratorKind = "randomized" | "exact" | "mutate";
 
 export interface RandomizedGeneratorData {
   kind: "randomized";
-  /** Payload size, in bytes, of each freshly-randomized request body. */
+  /** Payload size, in bytes, of each freshly-randomized request body. The size actually sent when
+   *  `sizeBytesPool` is also set and has more than one entry — kept as the representative value
+   *  for anything that only wants a single number (the Compose overlay's estimate, the catalogue's
+   *  own preview), so it never becomes meaningless just because a pool exists. */
   sizeBytes: number;
+  /** When set with more than one entry, each generated request draws its payload size uniformly
+   *  at random from this pool instead of always using `sizeBytes` — e.g. one entry per submodel
+   *  template family when the catalogue's "IDTA template" payload pick names more than one
+   *  (`toRequestSpec.ts`'s `generatorFor`), so a run genuinely varies which one's size shows up
+   *  request to request rather than picking one family once for the whole load. */
+  sizeBytesPool?: number[];
 }
 
 /** A single literal payload sent on every request — hand-authored via "Specify payload in
@@ -60,14 +69,16 @@ export class RandomizedGenerator extends RequestGenerator {
   readonly kind = "randomized" as const;
   readonly label = "Randomized";
   sizeBytes: number;
+  sizeBytesPool?: number[];
 
   constructor(data: Omit<RandomizedGeneratorData, "kind">) {
     super();
     this.sizeBytes = data.sizeBytes;
+    this.sizeBytesPool = data.sizeBytesPool;
   }
 
   toJSON(): RandomizedGeneratorData {
-    return { kind: "randomized", sizeBytes: this.sizeBytes };
+    return { kind: "randomized", sizeBytes: this.sizeBytes, ...(this.sizeBytesPool ? { sizeBytesPool: this.sizeBytesPool } : {}) };
   }
 
   static createDefault(): RandomizedGenerator {

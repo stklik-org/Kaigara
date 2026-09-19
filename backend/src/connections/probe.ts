@@ -1,5 +1,7 @@
 import type { ConnectionErrorKind, ConnectionTestRequest, ConnectionTestResult } from "@kaigara/shared-types";
 
+import { OAuth2TokenError, withResolvedAuth } from "./oauth2.ts";
+
 /**
  * Reachability / conformance probe for a target AAS server.
  *
@@ -133,7 +135,20 @@ export async function probeConnection(request: ConnectionTestRequest): Promise<C
   }
 
   const timeoutMs = clampTimeoutSeconds(request.timeoutSeconds) * 1000;
-  const headers = request.headers ?? {};
+  let headers: Record<string, string>;
+  try {
+    headers = await withResolvedAuth(request.headers, request.oauth2);
+  } catch (err) {
+    const message = err instanceof OAuth2TokenError ? err.message : `OAuth2 token exchange failed: ${(err as Error).message}`;
+    return {
+      reachable: false,
+      probedUrl: `${baseUrl}/description`,
+      probedEndpoint: "description",
+      detail: message,
+      error: { kind: "auth", message },
+      checkedAt,
+    };
+  }
   const description = await attempt(`${baseUrl}/description`, timeoutMs, headers);
   const base = { probedUrl: description.url, probedEndpoint: "description" as const, checkedAt };
 

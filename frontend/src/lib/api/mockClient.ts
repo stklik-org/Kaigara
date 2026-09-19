@@ -60,6 +60,10 @@ export function createMockApiClient(): ApiClient {
       subscribeDetail: () => () => {},
       compile: requiresBackend("Compiling a timeline"),
       concretePlan: requiresBackend("The concrete execution plan"),
+      requestLog: requiresBackend("The per-request log"),
+      exchange: requiresBackend("A captured request/response exchange"),
+      archiveList: requiresBackend("The run archive"),
+      archiveDetail: requiresBackend("Reopening an archived run"),
       engines: () => Promise.resolve([]),
     },
     analysis: {

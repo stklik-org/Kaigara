@@ -1,7 +1,7 @@
 {
   "id": "list-shells",
   "title": "List shells (paged)",
-  "operation": "read",
+  "operation": "query",
   "target": "aas",
   "execution": "engine",
   "summary": "GET the shell collection with limit/cursor paging.",
@@ -23,8 +23,5 @@
       "bindsTo": "query.limit"
     }
   ],
-  "defaults": {
-    "weight": 10
-  },
   "kind": "request"
 }

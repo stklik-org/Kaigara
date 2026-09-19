@@ -37,4 +37,8 @@ export interface ConnectionsClient {
    *  connection. Unlike the rest of this interface, this is *not* mocked by default — see
    *  `connectionsClient.ts`. */
   test(id: string): Promise<ConnectionTestResult>;
+  /** Discards every connection this browser has stored (`localStorage`, including anything the
+   *  user added or edited) and reseeds the shipped demo list from `lib/mock/connections.ts`. The
+   *  escape hatch for a stale list that predates a source change, or just wanting a clean slate. */
+  resetToDemoDefaults(): Promise<ServerConnection[]>;
 }

@@ -13,7 +13,8 @@
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "prestub-aas": "node ../scripts/ports.mjs 8081 stub-aas",
-    "stub-aas": "node src/devtools/stubAasServer.ts"
+    "stub-aas": "node src/devtools/stubAasServer.ts",
+    "try-timeline": "node src/devtools/tryTimeline.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.0",

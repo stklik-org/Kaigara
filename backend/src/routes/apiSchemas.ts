@@ -92,7 +92,20 @@ const runTarget: JsonSchema = {
     headers: {
       type: "object",
       additionalProperties: { type: "string" },
-      description: "Sent with every generated request; where authentication goes once it exists.",
+      description: "Sent with every generated request, e.g. a static Authorization bearer token or API key.",
+    },
+    oauth2: {
+      type: "object",
+      additionalProperties: false,
+      required: ["tokenUrl", "clientId", "clientSecret", "scope"],
+      description:
+        "OAuth2 client-credentials exchange, done server-side before the run starts. The resulting token is merged into `headers` as `Authorization`, overriding a manually authored one.",
+      properties: {
+        tokenUrl: { type: "string", description: 'The token endpoint, e.g. "https://<tenant>.ciamlogin.com/<tenant-id>/oauth2/v2.0/token".' },
+        clientId: { type: "string" },
+        clientSecret: { type: "string" },
+        scope: { type: "string", description: 'e.g. "api://<api-id>/.default".' },
+      },
     },
   },
 };

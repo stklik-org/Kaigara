@@ -151,6 +151,12 @@ function sanitiseKey(value: string): string {
   return value.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "load";
 }
 
+/** The filename counterpart to `sanitiseKey`: lowercase rather than a JS identifier, since a
+ *  generated script's name only has to be a safe path segment, not a valid import alias. */
+function slugForFile(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "x";
+}
+
 /** Sizes a k6 arrival-rate executor's VU pool from the peak rate it has to sustain. */
 function sizeWorkerPool(peakRatePerSec: number): { preAllocatedVUs: number; maxVUs: number } {
   const estimated = Math.ceil(Math.max(0, peakRatePerSec) * ASSUMED_LATENCY_SECONDS);
@@ -278,8 +284,10 @@ function planBody(spec: RequestSpec, sendsBody: boolean): PlannedBody {
 
   const generator = spec.generator.toJSON();
   switch (generator.kind) {
-    case "randomized":
-      return { kind: "randomized", sizeBytes: generator.sizeBytes };
+    case "randomized": {
+      const pool = generator.sizeBytesPool && generator.sizeBytesPool.length > 0 ? generator.sizeBytesPool : [generator.sizeBytes];
+      return { kind: "randomized", sizeBytes: generator.sizeBytes, sizeBytesPool: pool };
+    }
     case "exact":
       return { kind: "exact", value: generator.value };
     case "mutate":
@@ -296,9 +304,12 @@ function planBody(spec: RequestSpec, sendsBody: boolean): PlannedBody {
 }
 
 /** How a script's generator will walk its identifier list — see `IdentifierUse`. */
-function identifierUse(operation: RequestSpec["operation"], body: PlannedBody): IdentifierUse {
+function identifierUse(operation: RequestSpec["operation"], body: PlannedBody, idSource: "none" | "created" | "server"): IdentifierUse {
   switch (operation) {
     case "create":
+      // idSource !== "none" means an authored idPool — "duplicate an existing identifier", not
+      // "mint a new one" — so this create cycles over a pool exactly like a read or update would.
+      if (idSource !== "none") return "cycle";
       return body.kind === "exact" ? "none" : "mint";
     case "delete":
       return "each-once";
@@ -320,6 +331,7 @@ function describeShape(load: Load): string {
     case "spike":
       return `Spike ${shape.magnitudeRatePerSec} req/s`;
     case "sine":
+      return `${load.shape.label} ${shape.baseRatePerSec}±${shape.amplitudeRatePerSec} req/s (${shape.direction} first)`;
     case "bell":
       return `${load.shape.label} peak ${shape.peakRatePerSec} req/s`;
     case "individual":
@@ -376,11 +388,21 @@ export function planTimeline(input: LoadTimelineData | LoadTimeline, options: Co
 
         const descriptor = describeOperation(spec.operation, spec.target);
         const body = planBody(spec, descriptor.sendsBody);
-        // An authored `idPool.source: "server"` only means anything where the operation addresses
-        // an identifier at all; on a create or a collection read it is inert, and the validator
-        // has already said so.
-        const idSource =
-          descriptor.idSource === "none" ? "none" : spec.idPool?.source === "server" ? "server" : "created";
+        // Read/update/delete: idSource follows the descriptor. A create is the one exception —
+        // the descriptor always says "none" (a create addresses nothing by default), but an
+        // authored idPool there means "duplicate an existing identifier on purpose" instead of
+        // minting a new one (RequestIdPoolData's own doc comment) — still a real idSource.
+        const addressesOrDuplicates = descriptor.idSource !== "none" || (spec.operation === "create" && spec.idPool !== undefined);
+        const idSource: "none" | "created" | "server" = !addressesOrDuplicates
+          ? "none"
+          : spec.idPool?.source === "server"
+            ? "server"
+            : "created";
+        // The one combination scriptTemplates.ts actually renders a reference-embedding body for
+        // — see RequestReferenceData's own doc comment. Anything else authored is carried nowhere;
+        // the validator has already warned that it is never consulted.
+        const supportsReferences =
+          spec.operation === "create" && spec.target === "shell" && spec.references?.target === "submodel" && body.kind === "randomized";
 
         drafts.push({
           loadKey: key,
@@ -394,13 +416,20 @@ export function planTimeline(input: LoadTimelineData | LoadTimeline, options: Co
           expectStatus: descriptor.expectStatus,
           body,
           idSource,
-          ...(idSource === "server" ? { maxIds: spec.idPool?.maxIds ?? DEFAULT_SERVER_MAX_IDS } : {}),
+          ...(idSource === "server"
+            ? { maxIds: spec.idPool?.maxIds ?? DEFAULT_SERVER_MAX_IDS, onEmptyServerCorpus: spec.idPool?.onEmpty ?? "warn" }
+            : {}),
+          ...(supportsReferences ? { references: { target: spec.references!.target, count: spec.references!.count } } : {}),
+          referencedIds: [],
+          // Only meaningful for a create that mints (idSource "none") — one reusing an existing
+          // identifier instead has nothing to format, so this is left out even if authored.
+          ...(spec.operation === "create" && idSource === "none" && spec.mintId ? { mintId: spec.mintId } : {}),
           share: shares[requestIndex],
           startSeconds: load.startSeconds,
           endSeconds: load.startSeconds + executorWindowSeconds(executor),
           executor,
           expectedRequests: Math.round(iterationBudget(executor)),
-          identifiers: { use: identifierUse(spec.operation, body), list: [], origin: "none", note: "" },
+          identifiers: { use: identifierUse(spec.operation, body, idSource), list: [], origin: "none", note: "" },
           order: [load.startSeconds, trackIndex, loadIndex, requestIndex],
         });
       });
@@ -421,17 +450,39 @@ export function planTimeline(input: LoadTimelineData | LoadTimeline, options: Co
     });
   });
 
-  // Number every script in the order k6 will start it, so `ls` of a run directory reads as its
-  // schedule and `main.js` lists its imports chronologically.
+  // Order every script the way k6 will start it — `main.js`'s own header comment (see
+  // scriptTemplates.ts's renderMain) lists that schedule explicitly, since the file names below no
+  // longer sort chronologically.
   const all = loads.flatMap((load) => load.drafts);
   all.sort((a, b) => a.order.reduce((diff, value, i) => diff || value - b.order[i], 0));
   const width = Math.max(2, String(all.length).length);
+  // Raw (unsanitised) track/load ids per load, keyed the same way `draft.loadKey` is, so the file
+  // name below can be built from what was actually authored rather than parsed back out of the
+  // already-folded key.
+  const loadIdentity = new Map(loads.map((load) => [load.key, { trackId: load.trackId, loadId: load.loadId }]));
   const numbered = new Map<ScriptDraft, { key: string; file: string }>();
+  // Track and load ids are validated unique *as authored* (loadTimelineValidation.ts), but only
+  // `slugForFile` — lossy on purpose, since it also has to be a safe path segment — decides the
+  // file name. Two ids differing only in case or punctuation would fold to the same base name, and
+  // a real collision would silently overwrite one script's file with another's, so disambiguate
+  // deterministically by schedule position rather than risk it.
+  const fileBaseCount = new Map<string, number>();
   all.forEach((draft, index) => {
     const number = String(index + 1).padStart(width, "0");
+    const identity = loadIdentity.get(draft.loadKey) as { trackId: string; loadId: string };
+    // k6_<track>_<load>_<request spec>, each id exactly as authored — so `ls` of a run directory
+    // reads as the timeline's own structure instead of a number that means nothing without opening
+    // the file. The `k6_` prefix groups Kaigara's own generated files together next to whatever
+    // else may be sitting in the same directory (the archive's plan.json, a hand-added script).
+    const base = `k6_${slugForFile(identity.trackId)}_${slugForFile(identity.loadId)}_${slugForFile(draft.requestId)}`;
+    const priorUses = fileBaseCount.get(base) ?? 0;
+    fileBaseCount.set(base, priorUses + 1);
     numbered.set(draft, {
+      // Still numbered and still keyed by operation/target: a valid, stable JS identifier (used as
+      // the k6 scenario name, the exported `run` binding, and the SharedArray name — see
+      // scriptTemplates.ts), independent of whatever the file itself is named.
       key: `s${number}_${draft.operation}_${draft.target}`,
-      file: `${number}-${draft.operation}-${draft.target}.js`,
+      file: priorUses === 0 ? `${base}.js` : `${base}_${priorUses + 1}.js`,
     });
   });
 
@@ -452,6 +503,7 @@ export function planTimeline(input: LoadTimelineData | LoadTimeline, options: Co
     loads: plannedLoads,
     expectedRequests: plannedLoads.reduce((sum, load) => sum + load.expectedRequests, 0),
     harvested: { shell: 0, submodel: 0 },
+    capture: timeline.capture ?? { mode: "capped" },
   };
 
   return { plan, warnings: issues.filter((issue) => issue.severity === "warning") };
@@ -466,26 +518,46 @@ export function planTimeline(input: LoadTimelineData | LoadTimeline, options: Co
  * request's own `maxIds` wins; anything else asks for one page, which only has to give a request
  * with nothing of its own to address something to fall back on.
  *
- * @throws {EmptyServerCorpusError} if an entity with an explicit `server`-sourced request harvests
- * to nothing — a benchmark against a corpus that does not exist measures nothing, and it is better
- * to say so before a script is even written than mid-run.
+ * Whether an empty corpus is fatal is each affected script's own `onEmptyServerCorpus` — carried
+ * from the authored `RequestIdPoolData.onEmpty` (see requestComposition.ts) — not a setting of the
+ * harvest itself: two requests against the same empty entity may disagree, and the stricter one
+ * wins for the whole compile, same as any other reason a document fails to compile.
+ *
+ * @throws {EmptyServerCorpusError} for the first script, in schedule order, whose entity harvests
+ * to nothing and whose own `onEmptyServerCorpus` is `"fail"`. The default, `"warn"`, returns a
+ * warning for that script instead: an empty corpus is treated the same as any other empty
+ * identifier pool rather than refused outright.
  */
 async function harvestServerIds(
   scripts: PlannedScript[],
   harvest: IdentifierHarvester,
-): Promise<Record<RequestTargetEntity, string[]>> {
+): Promise<{ server: Record<RequestTargetEntity, string[]>; warnings: ValidationIssue[] }> {
   const server: Record<RequestTargetEntity, string[]> = { shell: [], submodel: [] };
+  const warnings: ValidationIssue[] = [];
 
   for (const entity of ["shell", "submodel"] as const) {
     const needing = scripts.filter((script) => script.target === entity && script.idSource !== "none");
     if (needing.length === 0) continue;
 
-    const strict = needing.some((script) => script.idSource === "server");
+    const serverSourced = needing.filter((script) => script.idSource === "server");
     const maxIds = Math.max(DEFAULT_HARVEST_SIZE, ...needing.map((script) => script.maxIds ?? 0));
     server[entity] = await harvest(entity, maxIds);
-    if (strict && server[entity].length === 0) throw new EmptyServerCorpusError(entity);
+
+    if (serverSourced.length === 0 || server[entity].length > 0) continue;
+    const strict = serverSourced.find((script) => script.onEmptyServerCorpus === "fail");
+    if (strict) throw new EmptyServerCorpusError(entity);
+    // One warning per script that actually asked for this entity from the server, not one per
+    // entity — the same granularity `designRequestPools`'s own warnings use, and what lets the
+    // caller see exactly which requests will do nothing rather than just "something was empty".
+    for (const script of serverSourced) {
+      warnings.push({
+        path: script.sourcePath,
+        severity: "warning",
+        message: `${script.file}: no ${entity} identifiers on the target — every request this script sends will be skipped.`,
+      });
+    }
   }
-  return server;
+  return { server, warnings };
 }
 
 /** One identifier's life during the run, as far as compile time can know it. */
@@ -581,6 +653,9 @@ function designRequestPools(
 
   for (const script of scripts) {
     if (script.operation !== "create") continue;
+    // "existing": an authored idPool on a create means duplicate one already there, not mint a
+    // new one — handled below, with reads and updates, by the exact same pool-cycling logic.
+    if (script.idSource !== "none") continue;
     const budget = iterationBudget(script.executor);
     const expected = Math.floor(budget + 1e-9);
 
@@ -600,8 +675,26 @@ function designRequestPools(
       continue;
     }
 
+    // No `mintId` reaching here is easy to mistake for "I set a format and it's being honoured" —
+    // a request's own `mintId` is the *only* thing that reaches this point (a catalogue pick that
+    // fails to translate into one, e.g. today's "Fixed" strategy, or a hand-authored RequestSpec
+    // that never set the field, both look identical from here) — so it gets a warning rather than
+    // silently handing back Kaigara's own scheme with no indication the requested format was lost.
+    if (!script.mintId) {
+      warn(
+        script,
+        `no mintId.format configured for this create — minting ${ID_PREFIX[script.target]}/<nonce>-<n> instead of a chosen format.`,
+      );
+    }
+
+    // The counter is per entity type and lives for the whole compile (`minted`, declared once
+    // above), not per script — every "sequence" create of the same entity shares it, numbering the
+    // scenario's shells (or submodels) in one unbroken run regardless of which load creates them.
     const count = Math.ceil(budget - 1e-9) + CREATE_ID_HEADROOM;
-    const list = Array.from({ length: count }, () => `${ID_PREFIX[script.target]}/${nonce}-${minted[script.target]++}`);
+    const list = Array.from({ length: count }, () => {
+      const n = minted[script.target]++;
+      return script.mintId ? script.mintId.format.replaceAll("<Num>", String(n)) : `${ID_PREFIX[script.target]}/${nonce}-${n}`;
+    });
     for (const id of list.slice(0, expected)) {
       pools[script.target].push({ id, origin: "run", existsFrom: script.endSeconds, createdBy: script.file });
     }
@@ -611,6 +704,30 @@ function designRequestPools(
       origin: "minted",
       note: `minted for this run: ${expected} expected to be created, ${count - expected} spare`,
     };
+
+    // Real references to embed in this create's own body (ADR-less, but the same "no discovery at
+    // run time" rule as everything else here): only ever this run's own earlier creates — a
+    // reference is a promise the target really has something at the other end of it, and "found on
+    // the server" cannot make that promise the way "this run just created it" can.
+    if (script.references) {
+      const referenced = script.references;
+      const available = pools[referenced.target].filter((tracked) => tracked.origin === "run" && aliveThroughout(tracked, script));
+      const groups = Array.from({ length: expected }, (_, i) =>
+        available.slice(i * referenced.count, i * referenced.count + referenced.count).map((tracked) => tracked.id),
+      );
+      script.referencedIds = groups;
+
+      const short = groups.filter((group) => group.length < referenced.count).length;
+      if (short > 0) {
+        warn(
+          script,
+          `wants ${plural(referenced.count, referenced.target)} per ${script.target}, but only ` +
+            `${plural(available.length, referenced.target)} ${available.length === 1 ? "is" : "are"} known to exist by ` +
+            `+${script.startSeconds}s; ${plural(short, script.target)} will reference fewer than ${referenced.count}. ` +
+            `Create ${referenced.target}s earlier in the timeline, with enough headroom before this load starts.`,
+        );
+      }
+    }
   }
 
   /** A create on the same entity still running at some point during `script`'s window. */
@@ -668,7 +785,10 @@ function designRequestPools(
   }
 
   for (const script of scripts) {
-    if (script.operation !== "read" && script.operation !== "update") continue;
+    // A create with idSource !== "none" is "existing" mode — it cycles a pool exactly like a read
+    // or update, just to duplicate an id rather than address or modify it.
+    const reusesExisting = script.operation === "create" && script.idSource !== "none";
+    if (script.operation !== "read" && script.operation !== "update" && !reusesExisting) continue;
     const needed = Math.max(1, Math.ceil(iterationBudget(script.executor) - 1e-9));
     const candidates = candidatesFor(script, pools[script.target], (tracked) => aliveThroughout(tracked, script));
     const chosen = evenlySpaced(candidates.ids, needed);
@@ -699,13 +819,14 @@ function mintNonce(): string {
  * otherwise nothing — the generated scripts discover no server state of their own.
  *
  * @throws {TimelineValidationError} for an invalid document (see `planTimeline`).
- * @throws {EmptyServerCorpusError} when an explicit `server`-sourced request finds nothing.
+ * @throws {EmptyServerCorpusError} when an explicit `server`-sourced request finds nothing and
+ * that request's own `idPool.onEmpty` is `"fail"` — the default, `"warn"`, does not throw.
  */
 export async function compileTimeline(input: LoadTimelineData | LoadTimeline, options: CompileOptions): Promise<CompileResult> {
   const { plan, warnings } = planTimeline(input, options);
   const scripts = planScripts(plan);
 
-  const server = await harvestServerIds(scripts, options.harvest ?? httpHarvester(options.target));
+  const { server, warnings: harvestWarnings } = await harvestServerIds(scripts, options.harvest ?? httpHarvester(options.target));
   plan.harvested = { shell: server.shell.length, submodel: server.submodel.length };
   const poolWarnings = designRequestPools(plan, server, options.nonce ?? mintNonce());
 
@@ -718,5 +839,5 @@ export async function compileTimeline(input: LoadTimelineData | LoadTimeline, op
     })),
   ];
 
-  return { plan, files, warnings: [...warnings, ...poolWarnings] };
+  return { plan, files, warnings: [...warnings, ...harvestWarnings, ...poolWarnings] };
 }

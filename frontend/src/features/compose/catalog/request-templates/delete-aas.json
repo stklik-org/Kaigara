@@ -27,9 +27,6 @@
       ]
     }
   ],
-  "defaults": {
-    "weight": 5
-  },
   "consumesPool": true,
   "notes": "Consumes the id from the pool — a second delete of the same id would answer 404 and skew the error rate.",
   "kind": "request"

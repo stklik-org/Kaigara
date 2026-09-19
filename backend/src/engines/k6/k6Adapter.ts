@@ -45,6 +45,7 @@ import { compileTimeline } from "./compileTimeline.ts";
 import { planScripts, redactPlan, type K6Plan } from "./k6Plan.ts";
 import { K6OutputParser, readSummaryTotals } from "./parseOutput.ts";
 import { K6RunArchive } from "./runArchive.ts";
+import { EXCHANGES_FILE } from "./exchangeLog.ts";
 import { HEADERS_ENV, SUMMARY_FILE, requestLine } from "./scriptTemplates.ts";
 
 /** How often the metrics file is drained. One second matches the proposal's "one point per second
@@ -52,6 +53,21 @@ import { HEADERS_ENV, SUMMARY_FILE, requestLine } from "./scriptTemplates.ts";
 const TAIL_INTERVAL_MS = 1000;
 /** Grace period between asking k6 to stop and killing it outright. */
 const STOP_GRACE_MS = 5000;
+
+/** With `--log-format json`, every k6 log line is itself a JSON object: the message in `.msg`, and
+ *  the detail a warning carries (`error`, `url`, …) in fields beside it — this turns one back into
+ *  `message key=value …`. Not every line is one of these (the human-readable end-of-run summary box
+ *  k6 prints is plain text), so a line that fails to parse is passed through as-is. */
+function k6LogMessage(line: string): string {
+  try {
+    const { msg, level: _level, time: _time, source: _source, ...detail } = JSON.parse(line) as Record<string, unknown>;
+    if (typeof msg !== "string") return line;
+    const fields = Object.entries(detail).map(([key, value]) => `${key}=${typeof value === "string" ? value : JSON.stringify(value)}`);
+    return fields.length > 0 ? `${msg} ${fields.join(" ")}` : msg;
+  } catch {
+    return line;
+  }
+}
 
 export interface K6AdapterOptions {
   /** Path to the k6 binary; defaults to whatever is on PATH. */
@@ -72,8 +88,12 @@ export class K6Adapter implements EngineAdapter {
 
   private readonly binary: string;
   /** Persistent, human-navigable record of every script generated and every `k6 run` issued, so a
-   *  benchmark can be reproduced after its tmp work dir is gone — see `runArchive.ts`. */
-  private readonly archive: K6RunArchive;
+   *  benchmark can be reproduced after its tmp work dir is gone — see `runArchive.ts`. Public
+   *  (not `private`) on purpose: `registerRunRoutes` reads it directly for `GET /api/runs/archive`
+   *  and `GET /api/runs/archive/:id` — "open previous execution" is exactly what this already
+   *  tracked, so the routes borrow this instance rather than RunService growing its own copy of
+   *  the same bookkeeping. */
+  readonly archive: K6RunArchive;
   /** The `K6Plan` `compile()` built, kept only until the matching `start()` call has logged it to
    *  the archive — see the module doc. A `dryRun` compile whose `start()` never comes leaves its
    *  entry here for the life of the process, same as the run itself staying in `RunService`'s
@@ -145,7 +165,7 @@ export class K6Adapter implements EngineAdapter {
 
     // Also mirror everything into the persistent archive; the work dir above is under the OS tmpdir
     // and does not survive. Never throws.
-    await this.archive.saveScripts(context.runId, plan, files);
+    await this.archive.saveScripts(context.runId, plan, files, context.timeline);
     // Kept only for start()'s archive logging — see the module doc and the `plans` field comment.
     this.plans.set(context.runId, plan);
 
@@ -199,13 +219,24 @@ export class K6Adapter implements EngineAdapter {
     const summaryPath = join(context.workDir, SUMMARY_FILE);
     const startEpochMs = Date.now();
 
+    // Captured exchanges go straight from k6 into the run's log folder — never through this
+    // process while the load runs; the popup reads them back from there (exchangeLog.ts).
+    const exchangesPath = this.archive.exchangesPath(context.runId) ?? join(context.workDir, EXCHANGES_FILE);
+
     // `--quiet` drops the progress bar (which would otherwise dominate stdout and tell us nothing
     // we are not already reading from the metrics stream). `--no-usage-report` keeps a benchmark
-    // run from making an unrelated outbound request of its own.
+    // run from making an unrelated outbound request of its own. `--log-format json` makes every
+    // log line — k6's own warnings on stderr and the exchange lines in `--console-output` — one JSON
+    // object carrying its message untouched: k6's default text format backslash-escapes a message
+    // that contains quotes, which a captured JSON body always does.
     const args = [
       "run",
       "--quiet",
       "--no-usage-report",
+      "--log-format",
+      "json",
+      "--console-output",
+      exchangesPath,
       "--out",
       `json=${metricsPath}`,
       entry.absolutePath,
@@ -222,7 +253,9 @@ export class K6Adapter implements EngineAdapter {
         workDir: context.workDir,
         entryPath: entry.absolutePath,
         metricsPath,
+        exchangesPath,
         headerNames: Object.keys(context.target.headers),
+        startEpochMs,
       });
     }
 
@@ -283,15 +316,23 @@ export class K6Adapter implements EngineAdapter {
 
     const timer = setInterval(() => void drainOnce(), TAIL_INTERVAL_MS);
 
+    // Node hands a stream to `data` in arbitrarily-sized chunks, so a line routinely spans two of
+    // them; each stream keeps its own carry-over, the same split-across-chunks handling
+    // `K6OutputParser` does for the metrics file.
+    const handleK6Line = (stream: "stdout" | "stderr", line: string): void => {
+      if (line.trim() !== "") handlers.onLog({ stream, message: k6LogMessage(line) });
+    };
+    let stdoutCarry = "";
     child.stdout?.on("data", (chunk) => {
-      for (const line of String(chunk).split("\n")) {
-        if (line.trim() !== "") handlers.onLog({ stream: "stdout", message: line });
-      }
+      const lines = (stdoutCarry + String(chunk)).split("\n");
+      stdoutCarry = lines.pop() ?? "";
+      for (const line of lines) handleK6Line("stdout", line);
     });
+    let stderrCarry = "";
     child.stderr?.on("data", (chunk) => {
-      for (const line of String(chunk).split("\n")) {
-        if (line.trim() !== "") handlers.onLog({ stream: "stderr", message: line });
-      }
+      const lines = (stderrCarry + String(chunk)).split("\n");
+      stderrCarry = lines.pop() ?? "";
+      for (const line of lines) handleK6Line("stderr", line);
     });
 
     child.on("error", (error) => {
@@ -301,6 +342,10 @@ export class K6Adapter implements EngineAdapter {
     child.on("close", (code, signal) => {
       exited = true;
       clearInterval(timer);
+      // A process killed mid-write (Stop, or a crash) can leave its very last line with no
+      // trailing newline, sitting only in the carry buffer — flush it rather than lose it.
+      if (stdoutCarry.trim() !== "") handleK6Line("stdout", stdoutCarry);
+      if (stderrCarry.trim() !== "") handleK6Line("stderr", stderrCarry);
 
       void (async () => {
         // One last drain: the interval may have missed everything written since its last tick. It
@@ -317,6 +362,21 @@ export class K6Adapter implements EngineAdapter {
         } catch {
           summary = undefined;
         }
+
+        // Mirrors RunService.finish()'s own status logic exactly (stopped wins, then completed vs
+        // failed by whether a summary ever got written) — the archive needs the same terminal
+        // status "open previous execution" will show, computed independently since the adapter has
+        // no way to ask RunService what it decided.
+        await this.archive.finalizeRun(
+          context.runId,
+          {
+            status: stopped ? "stopped" : summary !== undefined ? "completed" : "failed",
+            endedAt: new Date().toISOString(),
+            requests: summary?.requests ?? 0,
+            failed: summary?.failed ?? 0,
+          },
+          metricsPath,
+        );
 
         handlers.onExit({
           code,

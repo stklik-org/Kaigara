@@ -1,0 +1,34 @@
+{
+  "id": "purge-submodel",
+  "title": "Purge — Delete Submodel",
+  "operation": "delete",
+  "target": "submodel",
+  "execution": "engine",
+  "summary": "DELETE every submodel already on the target — a bulk teardown, not one addressed delete.",
+  "endpoint": {
+    "method": "DELETE",
+    "path": "/submodels/{smId}",
+    "expect": [
+      204,
+      200
+    ]
+  },
+  "parameters": [
+    {
+      "id": "smId",
+      "label": "Submodel identifier",
+      "type": "submodel-identifier",
+      "bindsTo": "path.smId",
+      "strategies": [
+        "from-server"
+      ],
+      "default": "from-server",
+      "config": {
+        "maxIds": 100000
+      }
+    }
+  ],
+  "consumesPool": true,
+  "notes": "A preparatory step, not a benchmark — it resets the target rather than measuring anything, so its numbers do not belong next to a real run's. Give its Load a high, short-lived rate (a Spike, or a brief Constant well above the corpus size) so it finishes before the rest of the timeline starts; see backend/scenarios/purge-repository.json for the shape this mirrors.",
+  "kind": "request"
+}

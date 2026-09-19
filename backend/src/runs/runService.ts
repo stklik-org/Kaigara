@@ -39,6 +39,7 @@ import {
   type ValidationIssue,
 } from "@kaigara/shared-types";
 
+import { withResolvedAuth } from "../connections/oauth2.ts";
 import { buildConcretePlan } from "../engines/k6/concretePlan.ts";
 import { compileTimeline, planTimeline, type GeneratedFile } from "../engines/k6/compileTimeline.ts";
 import { redactPlan, type K6Plan } from "../engines/k6/k6Plan.ts";
@@ -49,6 +50,7 @@ import type {
   EngineRegistry,
   EngineRunHandle,
   EngineSummary,
+  RequestSample,
   ResolvedTarget,
 } from "../engines/adapter.ts";
 import { MetricsAggregator, type MetricsSnapshot } from "./metricsAggregator.ts";
@@ -128,7 +130,7 @@ export class RunService {
   async compileOnly(request: CreateRunRequest): Promise<{ plan: K6Plan; files: GeneratedFile[]; warnings: ValidationIssue[] }> {
     const { plan, files, warnings } = await compileTimeline(request.timeline, {
       scenarioName: request.scenarioName,
-      target: this.resolveTarget(request.target),
+      target: await this.resolveTarget(request.target),
     });
     // Header values never leave the process: they reach k6 through its environment, and this
     // response goes back over the wire.
@@ -139,11 +141,12 @@ export class RunService {
    * Expands a timeline into the time-ordered request schedule the Run screen's "Concrete plan"
    * debug view renders. Compiles but executes nothing — the same validation path as `compileOnly`.
    */
-  concretePlan(request: CreateRunRequest): ConcretePlan {
-    // Only the schedule is needed here, so this half of the compile never contacts the target.
+  async concretePlan(request: CreateRunRequest): Promise<ConcretePlan> {
+    // The schedule itself never contacts the target, but resolving `oauth2` still needs the
+    // exchange — cheap and cached, and it surfaces a bad secret here rather than only at "Run".
     const { plan, warnings } = planTimeline(request.timeline, {
       scenarioName: request.scenarioName,
-      target: this.resolveTarget(request.target),
+      target: await this.resolveTarget(request.target),
     });
     return buildConcretePlan(plan, warnings);
   }
@@ -159,7 +162,7 @@ export class RunService {
       throw new EngineUnavailableError(`Engine "${engineId}" is not available: ${availability.detail}`);
     }
 
-    const target = this.resolveTarget(request.target);
+    const target = await this.resolveTarget(request.target);
     const id = randomUUID();
     const workDir = join(this.workRoot, id);
     await mkdir(workDir, { recursive: true });
@@ -291,6 +294,31 @@ export class RunService {
     return record?.status === "running";
   }
 
+  /** Whether this id names a run this process still holds in memory — the route's guard for
+   *  falling back to the on-disk archive (`K6RunArchive.requestLog`) for a run from an earlier
+   *  backend process, the same in-memory-then-disk order `archive.exchange()` already follows. */
+  has(id: string): boolean {
+    return this.runs.has(id);
+  }
+
+  /** Every request the run has produced so far *for one Load*, not the live-tick `recentSamples`
+   *  tail — see `MetricsAggregator`'s own doc comment for why the two are separate. Scoped to
+   *  `loadId` (matching `RunPlanLoadSummary.loadId`, which one Load can spread across several
+   *  compiled `loadKey`s — one script per request type, ADR 0005) rather than the whole run: a
+   *  finished run can carry hundreds of thousands of samples, and the Run screen only ever shows
+   *  one Load's log at a time. Omitting `loadId` returns no samples at all — callers that only need
+   *  run-wide aggregates already have them on `RunView.metrics`, cheaply, without this endpoint.
+   *  `live: true` says the run has not reached a terminal status yet, so this is a snapshot of "so
+   *  far", not the complete run. */
+  fullRequestLog(id: string, loadId?: string): { samples: RequestSample[]; truncated: boolean; live: boolean } {
+    const record = this.require(id);
+    const live = record.status === "starting" || record.status === "running";
+    const { samples, truncated } = record.aggregator.fullLog();
+    if (loadId === undefined) return { samples: [], truncated, live };
+    const allowedKeys = new Set(record.summary.loads.filter((load) => load.loadId === loadId).map((load) => load.key));
+    return { samples: samples.filter((sample) => allowedKeys.has(sample.loadKey)), truncated, live };
+  }
+
   private require(id: string): RunRecord {
     const record = this.runs.get(id);
     if (!record) throw new RunNotFoundError(`No run with id "${id}".`);
@@ -303,7 +331,7 @@ export class RunService {
     for (const subscriber of record.subscribers) subscriber(view);
   }
 
-  private resolveTarget(target: CreateRunRequest["target"]): ResolvedTarget {
+  private async resolveTarget(target: CreateRunRequest["target"]): Promise<ResolvedTarget> {
     const baseUrl = (target?.baseUrl ?? "").trim().replace(/\/+$/, "");
     if (!baseUrl) throw new InvalidTargetError("A target baseUrl is required, e.g. http://localhost:8081/api/v3.");
     let parsed: URL;
@@ -315,10 +343,16 @@ export class RunService {
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       throw new InvalidTargetError(`Unsupported protocol "${parsed.protocol}" — the AAS REST API is http(s) only.`);
     }
+    let headers: Record<string, string>;
+    try {
+      headers = await withResolvedAuth(target.headers, target.oauth2);
+    } catch (err) {
+      throw new InvalidTargetError((err as Error).message);
+    }
     return {
       baseUrl,
       timeoutSeconds: target.timeoutSeconds && target.timeoutSeconds > 0 ? target.timeoutSeconds : DEFAULT_TIMEOUT_SECONDS,
-      headers: target.headers ?? {},
+      headers,
     };
   }
 

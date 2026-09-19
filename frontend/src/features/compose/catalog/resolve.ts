@@ -44,7 +44,9 @@ export function defaultConfig(strategy: Strategy | undefined): Record<string, un
             ? false
             : spec.type === "integer" || spec.type === "number"
               ? 0
-              : "";
+              : spec.type === "array"
+                ? []
+                : "";
   }
   return config;
 }
@@ -96,6 +98,68 @@ export function selectedFamily(bindings: Record<string, ParameterBinding>): stri
   return undefined;
 }
 
+function selectedFamilies(config: Record<string, unknown> | undefined): string[] {
+  return Array.isArray(config?.families) ? (config.families as unknown[]).filter((f): f is string => typeof f === "string") : [];
+}
+
+/** A sibling "count" parameter's min/max, if the template has one — "Create AAS + Submodels"'
+ *  "Submodels per shell" is the only one today, but this reads any card shaped the same way. */
+function countRange(
+  template: RequestTemplate,
+  bindings: Record<string, ParameterBinding>,
+): { param: TemplateParameter; min: number; max: number } | undefined {
+  const param = (template.parameters ?? []).find((candidate) => candidate.type === "count");
+  if (!param) return undefined;
+  const binding = bindings[param.id];
+  if (binding?.strategy === "range") {
+    return { param, min: Number(binding.config?.min ?? 0), max: Number(binding.config?.max ?? Infinity) };
+  }
+  if (binding?.strategy === "fixed") {
+    const n = Number(binding.config?.n ?? 0);
+    return { param, min: n, max: n };
+  }
+  return undefined;
+}
+
+/** The families an "idta-template" pick actually feeds into the generator: every one selected,
+ *  unless a sibling "count" parameter's max is smaller — "Create AAS + Submodels" needs at most
+ *  `max` per shell, so selecting more than that picks a random subset of that size rather than
+ *  using all of them for every request. `Math.random()` matches how every other "chosen per
+ *  request" value in this codebase is randomised (see `toRequestSpec.ts`'s own doc comments) —
+ *  this only has to be *a* legal subset each time it is computed, not a stable one. */
+export function templateFamiliesFor(template: RequestTemplate, bindings: Record<string, ParameterBinding>, binding: ParameterBinding | undefined): string[] {
+  const families = selectedFamilies(binding?.config);
+  const range = countRange(template, bindings);
+  if (!range || families.length <= range.max) return families;
+
+  const pool = [...families];
+  for (let i = pool.length - 1; i > pool.length - 1 - range.max; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(pool.length - range.max);
+}
+
+/** Whether a payload pick's selected templates satisfy a sibling "count" parameter's minimum —
+ *  "Create AAS + Submodels" needs at least `min` distinct templates so every submodel a shell asks
+ *  for (down to the smallest count in its range) can draw from a real selection rather than always
+ *  repeating whatever was picked. Returns the problem to show, or `undefined` when it's fine. */
+export function templateSelectionIssue(template: RequestTemplate, bindings: Record<string, ParameterBinding>): string | undefined {
+  const payloadParam = (template.parameters ?? []).find((candidate) => candidate.type === "payload-template");
+  if (!payloadParam) return undefined;
+  const binding = bindings[payloadParam.id];
+  if (binding?.strategy !== "idta-template") return undefined;
+
+  const range = countRange(template, bindings);
+  if (!range) return undefined;
+
+  const families = selectedFamilies(binding.config);
+  if (families.length < range.min) {
+    return `"${payloadParam.label}" needs at least ${range.min} selected template${range.min === 1 ? "" : "s"} — "${range.param.label}" can ask for up to ${range.min} per shell.`;
+  }
+  return undefined;
+}
+
 /** One concrete example of what a bound parameter produces — the chips in the composition list and
  *  the dialog's preview are both this. */
 export function sampleOf(parameter: TemplateParameter, binding: ParameterBinding | undefined): string {
@@ -118,13 +182,19 @@ export function sampleOf(parameter: TemplateParameter, binding: ParameterBinding
       return String(Math.round((num("min", 0) + num("max", 1000)) / 2));
     case "one-of":
       return text("values").split("\n").filter(Boolean)[0] || strategy?.sample || "";
-    case "idta-template":
+    case "idta-template": {
+      const families = Array.isArray(config.families)
+        ? (config.families as unknown[]).filter((f): f is string => typeof f === "string")
+        : [];
+      const templates = idtaTemplatesOrEmpty().filter((candidate) => families.includes(candidate.family));
+      if (templates.length === 0) return strategy?.sample ?? "";
+      if (templates.length === 1) return `${templates[0].idShort} · ${templates[0].elements} elements`;
+      return `${templates.length} templates, one chosen per request`;
+    }
     case "by-semantic-id": {
       const template = idtaTemplatesOrEmpty().find((candidate) => candidate.family === text("family"));
       if (!template) return strategy?.sample ?? "";
-      return binding.strategy === "idta-template"
-        ? `${template.idShort} · ${template.elements} elements`
-        : `semanticId = ${template.semanticId}`;
+      return `semanticId = ${template.semanticId}`;
     }
     case "by-property-value":
       return `${text("path")} ${text("operator")} ${text("value")}`;

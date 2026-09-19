@@ -5,11 +5,11 @@ import { K6OutputParser, readSummaryTotals } from "../src/engines/k6/parseOutput
 
 const START = Date.parse("2026-09-03T12:00:00.000Z");
 
-function point(metric: string, value: number, tags: Record<string, string>, offsetMs = 0): string {
+function point(metric: string, value: number, tags: Record<string, string>, offsetMs = 0, metadata?: Record<string, string>): string {
   return JSON.stringify({
     type: "Point",
     metric,
-    data: { time: new Date(START + offsetMs).toISOString(), value, tags },
+    data: { time: new Date(START + offsetMs).toISOString(), value, tags, ...(metadata ? { metadata } : {}) },
   });
 }
 
@@ -29,6 +29,20 @@ test("http_req_duration points become samples with offsets relative to the run s
     status: 200,
     failed: false,
   });
+});
+
+test("a request's script tag and iteration metadata make the exchangeId that ties it to its captured exchange", () => {
+  const parser = new K6OutputParser(START);
+  const { samples } = parser.push(`${point("http_req_duration", 12.5, { ...REQUEST_TAGS, script: "k6_t1_l1_q" }, 2500, { i: "7" })}\n`);
+
+  assert.equal(samples[0].exchangeId, "k6_t1_l1_q:7");
+});
+
+test("a request with no iteration metadata has no exchangeId key at all", () => {
+  const parser = new K6OutputParser(START);
+  const { samples } = parser.push(`${point("http_req_duration", 12.5, REQUEST_TAGS, 2500)}\n`);
+
+  assert.ok(!("exchangeId" in samples[0]), "exchangeId must be omitted, not merely undefined");
 });
 
 test("a request whose status was not expected is marked failed", () => {

@@ -36,6 +36,9 @@ interface K6Line {
     time?: string;
     value?: number;
     tags?: Record<string, string>;
+    /** Per-sample data that is not a tag — k6 keeps no time series for it (scriptTemplates.ts
+     *  puts each request's iteration number here). */
+    metadata?: Record<string, string>;
   };
 }
 
@@ -133,6 +136,10 @@ export class K6OutputParser {
       // `expected_response` is bound to each script's own EXPECTED_STATUS (scriptTemplates.ts),
       // so it is authoritative rather than k6's default 2xx/3xx notion.
       failed: tags.expected_response !== "true",
+      // Matches the id a script's own EXCHANGE_LOG_PREFIX line carries for the same request
+      // (scriptTemplates.ts's runBlock()) — how a Run screen row finds its captured request and
+      // response. Omitted (not merely undefined) for output that has no iteration metadata.
+      ...(tags.script && data.metadata?.i ? { exchangeId: `${tags.script}:${data.metadata.i}` } : {}),
     };
   }
 }

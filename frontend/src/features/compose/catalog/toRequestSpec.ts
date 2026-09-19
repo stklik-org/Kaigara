@@ -4,11 +4,12 @@ import {
   RequestSpec,
   type ParameterBinding,
   type RequestIdPoolData,
+  type RequestMintIdData,
   type RequestOperation,
   type RequestTargetEntity,
 } from "@kaigara/shared-types";
 import { requestTemplate } from "./catalog";
-import { engineFallbackFor, formatBytes, sampleOf, strategyDef } from "./resolve";
+import { engineFallbackFor, formatBytes, sampleOf, strategyDef, templateFamiliesFor } from "./resolve";
 import { idtaTemplatesOrEmpty } from "./templateIndex";
 import type { RequestTemplate } from "./types";
 
@@ -48,10 +49,12 @@ function generatorFor(template: RequestTemplate, bindings: Record<string, Parame
         return new ExactGenerator({ value: typeof config.json === "string" ? config.json : "{}" });
       case "size-target":
         return new RandomizedGenerator({ sizeBytes: typeof config.bytes === "number" ? config.bytes : 4096 });
-      case "idta-template":
-        return new RandomizedGenerator({
-          sizeBytes: estimateTemplateBytes(typeof config.family === "string" ? config.family : ""),
-        });
+      case "idta-template": {
+        const sizes = templateFamiliesFor(template, bindings, binding).map(estimateTemplateBytes);
+        return sizes.length > 0
+          ? new RandomizedGenerator({ sizeBytes: sizes[0], ...(sizes.length > 1 ? { sizeBytesPool: sizes } : {}) })
+          : RandomizedGenerator.createDefault();
+      }
       default:
         return RandomizedGenerator.createDefault();
     }
@@ -86,9 +89,42 @@ function idPoolFor(
     return {
       source: "server",
       ...(typeof config.maxIds === "number" ? { maxIds: config.maxIds } : {}),
+      ...(config.onEmpty === "warn" || config.onEmpty === "fail" ? { onEmpty: config.onEmpty } : {}),
     };
   }
   return undefined;
+}
+
+/**
+ * Lowers a `create`'s own "New identifier" binding — "Sequence" or "Existing" in create-aas.json /
+ * create-submodel.json — into the two fields the engine actually reads. The two are mutually
+ * exclusive by construction (one strategy is picked at a time), so at most one of `mintId`/`idPool`
+ * ever comes back set. See `RequestMintIdData`/`RequestIdPoolData`'s own doc comments for what each
+ * means to the engine; this function only reads the strategy's own config, same as {@link idPoolFor}.
+ */
+function createIdFor(
+  template: RequestTemplate,
+  bindings: Record<string, ParameterBinding>,
+): { mintId?: RequestMintIdData; idPool?: RequestIdPoolData } {
+  if (template.operation !== "create") return {};
+
+  for (const parameter of template.parameters ?? []) {
+    if (!parameter.type.endsWith("identifier") || parameter.bindsTo !== "body.id") continue;
+    const binding = bindings[parameter.id];
+    const config = binding?.config ?? {};
+
+    if (binding?.strategy === "sequence") {
+      return typeof config.format === "string" ? { mintId: { format: config.format } } : {};
+    }
+    if (binding?.strategy === "existing") {
+      // "created": this run's own duplicates, falling back to the server's — see
+      // RequestIdPoolData's own doc comment. Never "server" outright: the whole point of
+      // "Existing" is duplicating something real, and this run's own creates are the identifiers
+      // this pick can actually promise exist.
+      return { idPool: { source: "created", ...(typeof config.maxIds === "number" ? { maxIds: config.maxIds } : {}) } };
+    }
+  }
+  return {};
 }
 
 let sequence = 0;
@@ -104,7 +140,8 @@ export function toRequestSpec(
   weight: number,
   id = newRequestId(template.id),
 ): RequestSpec {
-  const idPool = idPoolFor(template, bindings);
+  const createId = createIdFor(template, bindings);
+  const idPool = idPoolFor(template, bindings) ?? createId.idPool;
   return new RequestSpec({
     id,
     operation: template.operation as RequestOperation,
@@ -114,6 +151,7 @@ export function toRequestSpec(
     templateId: template.id,
     bindings,
     ...(idPool ? { idPool } : {}),
+    ...(createId.mintId ? { mintId: createId.mintId } : {}),
   });
 }
 
@@ -156,11 +194,17 @@ export function engineGaps(template: RequestTemplate, bindings: Record<string, P
       }
     }
     if (parameter.type === "payload-template" && binding.strategy === "idta-template") {
-      const family = typeof binding.config?.family === "string" ? binding.config.family : "the template";
-      gaps.push(
-        `Sends a randomised ${target} of about ${formatBytes(estimateTemplateBytes(family))} rather than a ` +
-          `${family} instance.`,
-      );
+      const families = templateFamiliesFor(template, bindings, binding);
+      if (families.length <= 1) {
+        const family = families[0] ?? "the template";
+        gaps.push(`Sends a randomised ${target} of about ${formatBytes(estimateTemplateBytes(family))} rather than a ${family} instance.`);
+      } else {
+        const sizes = families.map(estimateTemplateBytes).map(formatBytes);
+        gaps.push(
+          `Sends a randomised ${target} sized like one of ${families.length} chosen templates ` +
+            `(${sizes.join(" / ")}, picked at random per request) rather than an actual instance of any of them.`,
+        );
+      }
     }
     if (parameter.type === "attachment" && binding.strategy !== "none") {
       gaps.push("Uploads no file — attachment traffic is not generated yet.");

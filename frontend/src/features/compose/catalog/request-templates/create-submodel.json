@@ -20,12 +20,10 @@
       "type": "submodel-identifier",
       "bindsTo": "body.id",
       "strategies": [
-        "fixed"
+        "sequence",
+        "existing"
       ],
-      "default": "fixed",
-      "config": {
-        "mode": "sequence"
-      }
+      "default": "sequence"
     },
     {
       "id": "payload",
@@ -37,9 +35,6 @@
   ],
   "captures": {
     "smId": "$.id"
-  },
-  "defaults": {
-    "weight": 10
   },
   "kind": "request"
 }

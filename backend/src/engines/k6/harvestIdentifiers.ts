@@ -23,7 +23,14 @@ export const DEFAULT_HARVEST_SIZE = 100;
 export type IdentifierHarvester = (entity: RequestTargetEntity, maxIds: number) => Promise<string[]>;
 
 /** Thrown when an explicit `idPool.source: "server"` request has nothing to draw from — the
- *  target's corpus for that entity is empty, so the plan as authored cannot be measured. */
+ *  target's corpus for that entity is empty, so the plan as authored cannot be measured.
+ *
+ *  Opt-in only, and per request: `compileTimeline.ts`'s `harvestServerIds` throws this exclusively
+ *  for a script whose own authored `RequestIdPoolData.onEmpty` (requestComposition.ts) is `"fail"`.
+ *  The default, `"warn"`, treats an empty corpus the same as any other empty identifier pool —
+ *  every request that would have addressed it is skipped, with a warning, and the rest of the plan
+ *  still runs. An empty target is a legitimate thing to benchmark against (freshly provisioned, or
+ *  already purged by an earlier run), so failing outright is the exception, not the rule. */
 export class EmptyServerCorpusError extends Error {
   // Explicit field rather than a constructor parameter property: Node executes this source by
   // stripping types, which cannot erase a parameter property, so `erasableSyntaxOnly` rejects one.

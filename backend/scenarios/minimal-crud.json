@@ -1,12 +1,12 @@
 {
   "id": "minimal-crud",
-  "name": "Minimal CRUD lifecycle",
-  "description": "Create an AAS and a submodel, then read, update, read and delete them — one step every 10 seconds.",
+  "name": "Minimal lifecycle (create, read, delete)",
+  "description": "Create an AAS and a submodel, read them back, then delete them — one step every 10 seconds. There is no update step: every update card in the request catalogue is currently add-disabled.",
   "phases": {
     "preparation": [],
     "preconditions": [],
     "method": {
-      "totalDurationSeconds": 50,
+      "totalDurationSeconds": 30,
       "tracks": [
         {
           "id": "lifecycle",
@@ -25,93 +25,83 @@
                     "operation": "create",
                     "target": "shell",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 512 }
+                    "generator": { "kind": "randomized", "sizeBytes": 512 },
+                    "templateId": "create-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "sequence",
+                        "config": { "format": "AAS-crud-<Num>" }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": { "bytes": 512, "grow": "more elements" }
+                      }
+                    },
+                    "mintId": { "format": "AAS-crud-<Num>" }
                   },
                   {
                     "id": "create-submodel",
                     "operation": "create",
                     "target": "submodel",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 512 }
+                    "generator": { "kind": "randomized", "sizeBytes": 512 },
+                    "templateId": "create-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "sequence",
+                        "config": { "format": "SM-crud-<Num>" }
+                      },
+                      "payload": {
+                        "strategy": "size-target",
+                        "config": { "bytes": 512, "grow": "more elements" }
+                      }
+                    },
+                    "mintId": { "format": "SM-crud-<Num>" }
                   }
                 ]
               }
             },
             {
-              "id": "read-after-create",
+              "id": "read",
               "startSeconds": 10,
               "durationSeconds": 0,
               "shape": { "kind": "individual", "requestCount": 2 },
               "requests": {
                 "requests": [
                   {
-                    "id": "read-shell-1",
+                    "id": "read-shell",
                     "operation": "read",
                     "target": "shell",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                    "generator": { "kind": "randomized", "sizeBytes": 256 },
+                    "templateId": "read-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
+                    }
                   },
                   {
-                    "id": "read-submodel-1",
+                    "id": "read-submodel",
                     "operation": "read",
                     "target": "submodel",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 }
-                  }
-                ]
-              }
-            },
-            {
-              "id": "update",
-              "startSeconds": 20,
-              "durationSeconds": 0,
-              "shape": { "kind": "individual", "requestCount": 2 },
-              "requests": {
-                "requests": [
-                  {
-                    "id": "update-shell",
-                    "operation": "update",
-                    "target": "shell",
-                    "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 512 }
-                  },
-                  {
-                    "id": "update-submodel",
-                    "operation": "update",
-                    "target": "submodel",
-                    "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 512 }
-                  }
-                ]
-              }
-            },
-            {
-              "id": "read-after-update",
-              "startSeconds": 30,
-              "durationSeconds": 0,
-              "shape": { "kind": "individual", "requestCount": 2 },
-              "requests": {
-                "requests": [
-                  {
-                    "id": "read-shell-2",
-                    "operation": "read",
-                    "target": "shell",
-                    "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 }
-                  },
-                  {
-                    "id": "read-submodel-2",
-                    "operation": "read",
-                    "target": "submodel",
-                    "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                    "generator": { "kind": "randomized", "sizeBytes": 256 },
+                    "templateId": "read-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
+                    }
                   }
                 ]
               }
             },
             {
               "id": "delete",
-              "startSeconds": 40,
+              "startSeconds": 20,
               "durationSeconds": 0,
               "shape": { "kind": "individual", "requestCount": 2 },
               "requests": {
@@ -121,14 +111,28 @@
                     "operation": "delete",
                     "target": "submodel",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                    "generator": { "kind": "randomized", "sizeBytes": 256 },
+                    "templateId": "delete-submodel",
+                    "bindings": {
+                      "smId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
+                    }
                   },
                   {
                     "id": "delete-shell",
                     "operation": "delete",
                     "target": "shell",
                     "weight": 1,
-                    "generator": { "kind": "randomized", "sizeBytes": 0 }
+                    "generator": { "kind": "randomized", "sizeBytes": 256 },
+                    "templateId": "delete-aas",
+                    "bindings": {
+                      "aasId": {
+                        "strategy": "created-in-scenario",
+                        "config": {}
+                      }
+                    }
                   }
                 ]
               }

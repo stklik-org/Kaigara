@@ -4,6 +4,8 @@
   "operation": "update",
   "target": "submodel",
   "execution": "engine",
+  "addDisabled": true,
+  "addDisabledReason": "PUT is temporarily disabled while update semantics are revisited — the engine can run it, but not from here yet.",
   "summary": "PUT a whole submodel over an existing one — the heaviest write.",
   "endpoint": {
     "method": "PUT",
@@ -29,8 +31,5 @@
       "default": "idta-template"
     }
   ],
-  "defaults": {
-    "weight": 8
-  },
   "kind": "request"
 }

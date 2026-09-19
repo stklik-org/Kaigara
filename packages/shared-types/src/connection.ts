@@ -1,3 +1,18 @@
+/** Credentials for an OAuth2 client-credentials exchange (e.g. twinsphere's service-account
+ *  flow against its Entra ID CIAM tenant): the backend exchanges these for a bearer access token
+ *  itself, just before a probe or a run, and merges `Authorization: Bearer <token>` into the
+ *  connection's `headers` — the secret never crosses into a k6 script or the browser's fetch. Kept
+ *  distinct from `headers` because it needs *behaviour* (a token exchange with caching/refresh),
+ *  not just a value to send verbatim. */
+export interface OAuth2ClientCredentials {
+  /** The token endpoint, e.g. "https://<tenant>.ciamlogin.com/<tenant-id>/oauth2/v2.0/token". */
+  tokenUrl: string;
+  clientId: string;
+  clientSecret: string;
+  /** The resource scope to request, e.g. "api://<api-id>/.default". */
+  scope: string;
+}
+
 /** A configured target AAS server (e.g. twinsphere, Eclipse BaSyx). See proposal §3.3. */
 export interface ServerConnection {
   id: string;
@@ -26,6 +41,10 @@ export interface ServerConnection {
    *  Stored in `localStorage` like the rest of the connection (`backend/README.md`) — this is
    *  dev-grade credential storage, not a secrets vault. */
   headers?: Record<string, string>;
+  /** When set, the backend exchanges these for a fresh bearer token before every probe and every
+   *  run and merges it into `headers` as `Authorization` — see `OAuth2ClientCredentials`. Takes
+   *  precedence over a manually authored `Authorization` header of the same connection. */
+  oauth2?: OAuth2ClientCredentials;
   /** Result of the most recent reachability probe, if one has been run this session. */
   lastTest?: ConnectionTestResult;
 }
@@ -40,6 +59,9 @@ export interface ConnectionInput {
   defaultTimeoutSeconds?: number;
   scrapeResourceMetrics?: boolean;
   headers?: Record<string, string>;
+  /** `undefined` leaves the connection's existing `oauth2` untouched; `null` clears it. See
+   *  `ServerConnection.oauth2`. */
+  oauth2?: OAuth2ClientCredentials | null;
 }
 
 export type ConnectionErrorKind =
@@ -53,6 +75,10 @@ export type ConnectionErrorKind =
   /** The probe service itself (the Kaigara backend) could not be reached — a local problem,
    *  not a statement about the target server. */
   | "probe-unavailable"
+  /** The `oauth2` token exchange itself failed (bad client secret, wrong scope, tenant
+   *  unreachable) — distinct from the target server rejecting the resulting token, which still
+   *  reports as an ordinary HTTP 401/403. */
+  | "auth"
   | "unknown";
 
 /**
@@ -87,4 +113,7 @@ export interface ConnectionTestRequest {
   timeoutSeconds?: number;
   /** Same headers a run against this connection would send — see `ServerConnection.headers`. */
   headers?: Record<string, string>;
+  /** Same OAuth2 credentials a run against this connection would use — see
+   *  `ServerConnection.oauth2`. */
+  oauth2?: OAuth2ClientCredentials;
 }

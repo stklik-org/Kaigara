@@ -4,6 +4,8 @@
   "operation": "query",
   "target": "aas",
   "execution": "authoring",
+  "addDisabled": true,
+  "addDisabledReason": "The IDTA Query API ($query) is authoring-only — the engine has no executor for it yet.",
   "summary": "POST /shells/$query with an IDTA-01002 $condition.",
   "endpoint": {
     "method": "POST",
@@ -27,8 +29,5 @@
       "bindsTo": "body.limit"
     }
   ],
-  "defaults": {
-    "weight": 8
-  },
   "kind": "request"
 }

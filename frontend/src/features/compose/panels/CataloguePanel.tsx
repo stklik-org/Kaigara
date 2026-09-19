@@ -28,7 +28,10 @@ const TARGETS: { value: CatalogTarget | "all"; label: string }[] = [
   { value: "submodel", label: "Submodel" },
 ];
 
-function FilterPills<T extends string>({
+/** Pill-row filter with a live count per option — the catalogue's Operation/Target rows, and
+ *  reused as-is by the Run screen's status-code filter (`RequestResponseView`) so "look similar to
+ *  the catalogue filter" is literally the same component, not a lookalike. */
+export function FilterPills<T extends string>({
   label,
   value,
   options,
@@ -169,8 +172,10 @@ export function CataloguePanel({ onPick }: { onPick: (draft: CatalogDraft) => vo
                 key={template.id}
                 type="button"
                 onClick={() => onPick(draftForTemplate(template))}
-                title={`Add ${template.title}`}
-                className="group relative flex flex-col gap-1.5 overflow-hidden rounded-lg border border-border bg-surface py-2 pr-2 pl-3 text-left transition-colors hover:border-accent"
+                title={template.addDisabled ? `${template.title} — ${template.addDisabledReason}` : `Add ${template.title}`}
+                className={`group relative flex flex-col gap-1.5 overflow-hidden rounded-lg border border-border bg-surface py-2 pr-2 pl-3 text-left transition-colors hover:border-accent ${
+                  template.addDisabled ? "opacity-50 saturate-50 hover:opacity-75" : ""
+                }`}
               >
                 <span
                   aria-hidden
@@ -200,6 +205,14 @@ export function CataloguePanel({ onPick }: { onPick: (draft: CatalogDraft) => vo
                       className="rounded-full border border-status-warn bg-status-warn-bg px-1.5 text-[9.5px] text-status-warn"
                     >
                       authoring
+                    </span>
+                  )}
+                  {template.addDisabled && (
+                    <span
+                      title={template.addDisabledReason}
+                      className="rounded-full border border-border-strong px-1.5 text-[9.5px] text-ink-muted"
+                    >
+                      add disabled
                     </span>
                   )}
                 </div>
